@@ -22,7 +22,6 @@ function cangen(device){
 
     const pid = child.pid
     return pid;
-
 }
 
 module.exports = {cangen}

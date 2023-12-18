@@ -1,5 +1,6 @@
 const HTTPPORT = 8080
 const can = require('socketcan')
+const fs = require('fs')
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -9,6 +10,7 @@ require('dotenv').config()
 const MONGODBURI = process.env.MONGODBURI
 const vcanconfig = require('./modules/vcanconfig')
 const startcangen = require('./modules/cangen')
+//const saveRawPackets = require('./modules/dataSaver')
 const io = require("socket.io")(httpServer, {
 	cors: {
 		origin: "http://localhost:3000",
@@ -18,6 +20,7 @@ const io = require("socket.io")(httpServer, {
 	  }
 	})
 let pid = ''
+let now = new Date()
 
 app.use(express.json())
 app.use(cors())
@@ -28,15 +31,45 @@ io.on('connection', (socket) => {
 	socket.on('disconnect', ()=> {
 		console.log("Client Disconnected")
 	})
+
+	setInterval(() => {
+		socket.emit('message', decodedInfo)
+	}, 2.75);
 })
 
-// Parse database
+// Parse CAN signals database
 var network = can.parseNetworkDescription("./dbc-files/j1939.kcd")
 //Create channel to listen interface vcan0
-var channel = can.createRawChannel("vcan0", true);
+var channel = can.createRawChannel('vcan0',true)
 var db_bus = new can.DatabaseService(channel, network.buses["Private"])
 // Start listening channel
 channel.start()
+// Save raw packets
+//saveRawPackets() // This works to save raw packets in a file. Just uncomment const saveRawPackets on top of this file
+
+//Listen for messgages to dump it into a file
+channel.addListener("onMessage", dumpPacket)
+
+//Helper function. Emulates candump -L 
+function toHex(number) {
+	return ("00000000" + number.toString(16)).slice(-8);
+}
+
+// Dump raw packets to file
+function dumpPacket(msg) {
+	let timestamp = now.toISOString().replace(/[-:.]/g, '')
+	let filename = './packets/' + timestamp + '.log'
+	let writeStream = fs.createWriteStream(filename, {flags: 'a'});
+	let data = '(' + (msg.ts_sec + msg.ts_usec / 1000000).toFixed(6) + ')  ' + 'vcan0  ' +
+	toHex(msg.id).toUpperCase() + '  [8]  ' + msg.data.toString('hex').toUpperCase() + '\r\n';
+	writeStream.write(data) //This works perfectly to write the stream on a file
+	writeStream.end()
+  
+	// This is here incase any errors occur
+	writeStream.on('error', function (err) {
+	  console.log(err)
+	})
+}
 
 //Connecting to virtual can bus interface 29-bit
 app.get('/vcan', (req,res) => {
@@ -45,12 +78,6 @@ app.get('/vcan', (req,res) => {
 	pid = startcangen.cangen(device)
 	res.send("Virtual CAN Bus 29-bits initialized")
 })
-
-// Connect to MongoDB
-mongoose.connect(MONGODBURI).then(() => console.log("Connected to the MONGODB CAN Bus database")).catch(console.error)
-
-var packetInfo = {};
-packetInfo.data = '';
 
 //Store Decoded Information in a list
 var decodedInfo ={}
@@ -140,7 +167,7 @@ db_bus.messages["EEC1"].signals["EngSpeed"].onUpdate(function(s) {
 })
  
 db_bus.messages["ETC1"].signals["PercentClutchSlip"].onUpdate(function(s) {
-    console.log("Percent Clutch Slip: " + s.value)
+    console.log("Percent Clutch Slip Error: " + s.error)
 })
 
 db_bus.messages["CCVS"].signals["WheelBasedVehicleSpeed"].onUpdate(function(s) {
@@ -162,6 +189,9 @@ db_bus.messages["VD"].signals["TotalVehicleDistance"].onUpdate(function(s) {
 db_bus.messages["VD"].signals["TripDistance"].onUpdate(function(s) {
 	console.log("Trip Distance: " + s.value)
 })
+
+// Connect to MongoDB
+mongoose.connect(MONGODBURI).then(() => console.log("Connected to the MONGODB CAN Bus database")).catch(console.error)
 
 httpServer.listen(HTTPPORT, () => {
     console.log(`Server is running on port: ${HTTPPORT}`)
