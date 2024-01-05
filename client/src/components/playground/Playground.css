@@ -1,7 +1,7 @@
 /* Entire available screen */
 .Playground{
     display: flex;
-    height: 740px;
+    height: 100%;
 }
 
 /* Dashboard */
@@ -12,4 +12,93 @@
 /* File Menu / Table */
 .data{
     width: 50%;
+}
+
+.canvas {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Ajusta esto según tus necesidades */
+    width: 100%;
+}
+
+.chatgpt {
+    margin-top: 0;
+}
+
+.chat {
+    height: 100%;
+    width: 100%;
+    /* background-color: blue; */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+}
+
+.bottom-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.input-container {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+}
+
+input {
+    width: 100%;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 10px 15px;
+    box-shadow: rgba(0, 0, 0, 0.05) 0 54px 55px,
+    rgba(0, 0, 0, 0.05) 0 -12px 30px,
+    rgba(0, 0, 0, 0.05) 0 4px 6px,
+    rgba(0, 0, 0, 0.05) 0 12px 3px,
+    rgba(0, 0, 0, 0.05) 0 -3px 5px;
+}
+
+input:focus {
+    outline: none
+}
+
+#submit {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+.feed {
+    overflow: auto;
+    width: 100%;
+    padding: 0;
+    max-height: 135px;
+}
+
+.feed li {
+    display: flex;
+    background-color: #444654;
+    width: 100%;
+    padding: 5px;
+    margin: 5px 0 5px 0;
+}
+
+.feed p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    text-align: left;
+    margin: 0 0 5px;
+}
+
+.feed p.role {
+    min-width: 100px;
 }

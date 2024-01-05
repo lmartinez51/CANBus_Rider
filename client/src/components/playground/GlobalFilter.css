@@ -1,7 +1,10 @@
 .searchInput{
+    margin-top: 2px;
     margin-left: auto;
     margin-bottom: 2px;
     margin-right: 2px;
+    width: 400px;
+    border-radius: 0;
     background-color: rgb(109, 98, 98);
     color: white;
 }

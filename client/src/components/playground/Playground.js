@@ -6,7 +6,6 @@ import { draw } from "./DrawFunctions"
 import iconos from './assets/icons.svg'
 import io from 'socket.io-client'
 
-
 const ENDPOINT = 'http://localhost:8080/'
 const socket = io(ENDPOINT, {
   withCredentials: true,
@@ -43,6 +42,10 @@ export default function Playground() {
         'oil':        0,
         'engineFail': 0
     })
+    const [value, setValue] = useState("")
+    const [message, setMessage] = useState(null)
+    const [previousChats, setPreviousChats] = useState([])
+    const [currentTitle, setCurrentTitle] = useState(null)
 
     useEffect(() => {
         // Escuchar el evento del socket para actualizar los datos
@@ -57,8 +60,49 @@ export default function Playground() {
           socket.off('message');
         };
       }, []); // Dependencia vacía para ejecutarlo solo una vez
-    
 
+    useEffect(() => {
+        if(!currentTitle && value && message) {
+            setCurrentTitle(value)
+        }
+        if(currentTitle && value && message){
+            setValue('')
+            setPreviousChats( prevChats => (
+                [...prevChats, {
+                    title: currentTitle,
+                    role: "User:",
+                    content: value
+                }, {
+                    title: currentTitle,
+                    role: "Assistant:",
+                    content: message
+                }]
+            ))
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [message, currentTitle])
+    
+    const getMessages = async () => {
+        const options = {
+            method: "POST",
+            body: JSON.stringify({
+                message: value,
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+        try {
+            const response = await fetch ('http://localhost:8080/playground', options)
+            const data = await response.json()
+            setMessage(data.message)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const currentChat = previousChats.filter(previousChat => previousChat.title === currentTitle)
+ 
     return (
         <>
         <div className="Playground">
@@ -67,7 +111,31 @@ export default function Playground() {
                 <div style={{display: "none"}}>
                     <img id="sprite" alt='icons' src={iconos}></img>
                 </div>
-                <Canvas draw={(ctx) => draw(ctx, speed, tacho, gas, mileage, turnSignalsStates, iconsStates)} width={740} height={260}/>
+                <div className="canvas">
+                    <Canvas draw={(ctx) => draw(ctx, speed, tacho, gas, mileage, turnSignalsStates, iconsStates)} width={960} height={260}/>
+                </div>
+                <div id="chatgpt" className="chatgpt">
+                    <section className="chat">
+                        <h6>BusWhizBot</h6>
+                        <ul className="feed">
+                            {currentChat?.map((chatMessage, index) => <li key={index}>
+                                <p className="role">{chatMessage.role}</p>
+                                <p>{chatMessage.content}</p>
+                            </li>)}
+                        </ul>
+                        <div className="bottom-section">
+                            <div className="input-container">
+                                <input value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => {
+                                    if (e.code === 'Enter') {
+                                        e.preventDefault(); // Previene la acción por defecto del 'Enter'
+                                        getMessages();
+                                    }
+                                }}/>
+                                <div id="submit" onClick={getMessages}>➢</div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
             {/** DATA REGION **/}
             <div className="data">

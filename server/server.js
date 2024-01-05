@@ -10,6 +10,7 @@ require('dotenv').config()
 const MONGODBURI = process.env.MONGODBURI
 const vcanconfig = require('./modules/vcanconfig')
 const startcangen = require('./modules/cangen')
+const chatAssistant = require('./chatAssistant.js');
 //const saveRawPackets = require('./modules/dataSaver')
 const io = require("socket.io")(httpServer, {
 	cors: {
@@ -24,6 +25,8 @@ let now = new Date()
 
 app.use(express.json())
 app.use(cors())
+
+app.post('/playground', chatAssistant.createChatCompletion)
 
 io.on('connection', (socket) => {
 	console.log(`Client Connected: ${socket.id}`)

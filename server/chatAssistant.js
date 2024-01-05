@@ -1,0 +1,132 @@
+require('dotenv').config("./.env")
+const axios = require('axios');
+const { response } = require('express');
+const {OpenAI} = require("openai")
+const openai = new OpenAI({
+	apiKey: process.env.CHATGPT_API_KEY
+})
+const canWizardID = process.env.CAN_WIZARD_ID
+const user = "Lorenzo"
+let conversations = {}
+
+class Contacts {
+    constructor() {
+        this.contacts = new Set();
+    }
+
+    add_contacts(contact) {
+        this.contacts.add(contact);
+    }
+
+    search_names(contact) {
+        let ordered_contacts = Array.from(this.contacts).sort();
+        console.log(`Connected contacts: ${ordered_contacts}`);
+        return this.contacts.has(contact);
+    }
+}
+
+const contacts = new Contacts()
+
+let self = module.exports = {
+    async createChatCompletion(req, res) {
+        try {
+            // Step 1: Retrive the assisant. (I already have the assistant ID)
+            // const my_assistant = await openai.beta.assistants.retrieve(canWizardID)
+            let check_user = contacts.search_names(user)
+            let user_thread;
+            if (check_user) {
+                console.log(`Usuario encontrado: ${user}`)
+                await self.create_message(conversations[user], req.body.message)
+            } else {
+                console.log('Usuario no encontrado. Creando nuevo usuario...')
+                contacts.add_contacts(user)
+                // Step 2, 3: Create a thread and then a message
+                user_thread = await self.create_thread(user, req.body.message)
+            }
+            //Step 4, 5: Run the assistant and check the status
+            await self.run_assistant(conversations[user], canWizardID)
+            // Step 6: Display the Assistant's Response
+            const url = `https://api.openai.com/v1/threads/${conversations[user]}/messages`
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.CHATGPT_API_KEY}`,
+                'OpenAI-Beta': 'assistants=v1'
+            }
+            let response = await axios.get(url, { headers: headers })
+            res.send({ message: response.data.data[0].content[0].text.value })
+        } catch (error) {
+            console.log(error)
+        }
+    },
+
+    async create_thread(user, context) {
+        const url = 'https://api.openai.com/v1/threads'
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.CHATGPT_API_KEY}`,
+            'OpenAI-Beta': 'assistants=v1'
+        }
+        try {
+            const response = await axios.post(url, {}, { headers: headers })
+            const user_thread = response.data
+            await self.create_message(user_thread.id, context)
+            conversations[user] = user_thread.id
+            return user_thread
+        } catch (error) {
+            console.error(error)
+        }
+    },
+
+    async create_message(thread_id, context) {
+        const url = `https://api.openai.com/v1/threads/${thread_id}/messages`
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.CHATGPT_API_KEY}`,
+            'OpenAI-Beta': 'assistants=v1'
+        }
+        const data = {
+            "role": "user",
+            "content": context
+        }   
+        try {
+            await axios.post(url, data, { headers: headers })
+        } catch (error) {
+            console.error(error)
+        }
+    },
+    
+    async run_assistant(user_thread_id, assistant_id) {
+        const url = `https://api.openai.com/v1/threads/${user_thread_id}/runs`
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.CHATGPT_API_KEY}`,
+            'OpenAI-Beta': 'assistants=v1'
+        }
+        const data = {
+            'assistant_id': assistant_id
+        }
+        try {
+            const response = await axios.post(url, data, { headers: headers })
+            let run  = response.data
+            const run_url = `https://api.openai.com/v1/threads/${user_thread_id}/runs/${run.id}`
+            const run_headers = {
+                'Authorization': `Bearer ${process.env.CHATGPT_API_KEY}`,
+                'OpenAI-Beta': 'assistants=v1'
+            }
+            while (true) {
+                try {
+                    run = await axios.get(run_url, { headers: run_headers })
+                } catch (error) {
+                    console.error(error)
+                }
+                if (run.data.status === "completed") {
+                    console.log("Run is completed.")
+                    break
+                }
+                await new Promise(resolve => setTimeout(resolve, 5000))
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+}
