@@ -50,7 +50,7 @@ export default function Playground() {
     useEffect(() => {
         // Escuchar el evento del socket para actualizar los datos
         socket.on('message', (data) => {
-            console.log(data)
+            //console.log(data)
             setTacho(data.revs/8000)
             setMileage(data.dist)
         });
@@ -112,7 +112,7 @@ export default function Playground() {
                     <img id="sprite" alt='icons' src={iconos}></img>
                 </div>
                 <div className="canvas">
-                    <Canvas draw={(ctx) => draw(ctx, speed, tacho, gas, mileage, turnSignalsStates, iconsStates)} width={960} height={260}/>
+                    <Canvas draw={(ctx) => draw(ctx, speed, tacho, gas, mileage, turnSignalsStates, iconsStates)} width={940} height={260}/>
                 </div>
                 <div id="chatgpt" className="chatgpt">
                     <section className="chat">

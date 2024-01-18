@@ -6,19 +6,19 @@
 
 /* Dashboard */
 .dashboard{
-    width: 50%;
+    width: 940px; /* Use the same size of the canvas */
 }
 
 /* File Menu / Table */
 .data{
-    width: 50%;
+    width: 976px;
 }
 
 .canvas {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%; /* Ajusta esto según tus necesidades */
+    height: 360px; /* Ajusta esto según tus necesidades */
     width: 100%;
 }
 
@@ -48,7 +48,7 @@
 .input-container {
     position: relative;
     width: 100%;
-    max-width: 760px;
+    max-width: 840px;
 }
 
 input {
@@ -81,7 +81,8 @@ input:focus {
     overflow: auto;
     width: 100%;
     padding: 0;
-    max-height: 135px;
+    max-height: 200px;
+    max-width: 840px;
 }
 
 .feed li {

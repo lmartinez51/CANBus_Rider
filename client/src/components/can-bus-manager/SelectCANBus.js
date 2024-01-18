@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Form, Col, Row } from "react-bootstrap";
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import "./SelectCANBus.css";
+import axios from 'axios'
+import "./SelectCANBus.css"
+const url = 'http://localhost:8080/can'
 
 
 function SelectCAN() {
@@ -15,7 +16,7 @@ function SelectCAN() {
           console.log(CAN);
           console.log(rate);
           const data = {params: {CAN: CAN, rate: rate}};
-          axios.get('http://localhost:3001/can', data).then((response) => {
+          axios.get(url, data).then((response) => {
                console.log(response.data);
            });
       };

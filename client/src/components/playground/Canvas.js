@@ -5,7 +5,6 @@ const Canvas = ({ draw, height, width }) => {
   const canvasRef = useRef(null)
 
   useEffect(() => {
-    console.log('Canvas useEffect - draw:', draw)
     const canvas = canvasRef.current
 
     if (!canvas) {

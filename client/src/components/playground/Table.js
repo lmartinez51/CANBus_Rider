@@ -1,21 +1,23 @@
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import React, { useState, useMemo } from 'react';
-import { useTable, useGlobalFilter, useSortBy } from 'react-table';
+import Nav from "react-bootstrap/Nav"
+import Navbar from "react-bootstrap/Navbar"
+import NavDropdown from "react-bootstrap/NavDropdown"
+import React, { useState, useMemo } from 'react'
+import { useTable, useGlobalFilter, useSortBy } from 'react-table'
 import Table from 'react-bootstrap/Table';
-import {COLUMNS} from './Columns';
+import {COLUMNS} from './Columns'
 import "./Table.css"
-import { GlobalFilter } from './GlobalFilter';
-const url1 = 'http://localhost:3001/packets';
-const url2 = 'http://localhost:3001/logs';
+import { GlobalFilter } from './GlobalFilter'
+import axios from 'axios'
+const url = 'http://localhost:8080/upload'
+const playUrl = 'http://localhost:8080/play'
 let eventSource;  
 
-export default function CANTable() {    // The next function causes 4 renders, needs performance improvement
+export default function CANTable() {
   
-  const [message, setMessage] = useState([]);
-  const [info, setInfo] = useState([]);
-  const [fileName, setFileName] = useState('');
+  const [message, setMessage] = useState([])
+  const [info, setInfo] = useState([])
+  const [fileName, setFileName] = useState('')
+  const [logFileName, setLogFileName] = useState('')
 
   const handleMessage = (ecu, values) => {
     setMessage([]);
@@ -74,42 +76,102 @@ export default function CANTable() {    // The next function causes 4 renders, n
   }
 
   function handlePlayTraffic () {
-    eventSource= new EventSource(url1)
+    eventSource = new EventSource(playUrl)
     //Reset table values
     setInfo([]);
     setMessage([]);
     eventSource.onmessage = (e) => {
-      const parsedData = JSON.parse(e.data);
-      setInfo((data) => [...data,parsedData]);
+      const parsedData = JSON.parse(e.data)
+      setInfo((data) => [...data,parsedData])
     }
   };
   
   function handleStopTraffic () {
     eventSource.close(); 
     console.log("Connection closed");
-  };
-
-  function handleReplayPackets(){
-    //Reset table values
-    setInfo([]);
-    setMessage([]);
-
-    const eventSource2 = new EventSource(url2);
-    eventSource2.addEventListener('message', function(e) {
-      const parsedData = JSON.parse(e.data);
-      setInfo((data) => [...data,parsedData]);
-    });
-    eventSource2.addEventListener('close', function(e) {
-      eventSource2.close();
-      console.log("canplayer connection closed");
-    });
-    return () => {
-      eventSource2.close(); 
-    };
   }
 
-  const data = useMemo(() => [...info], [info]);
-  const columns = useMemo(() => COLUMNS, []);
+  async function handleOpenPackets () {
+    const options = {
+      types: [
+        {
+          description: 'Log files',
+          accept: {
+            'text/plain': ['.log'],
+          },
+        },
+      ],
+      excludeAcceptAllOption: true,
+      multiple: false,
+    }
+    const [fileHandle] = await window.showOpenFilePicker(options);
+    setLogFileName(fileHandle.name)
+    // Send the file name to the backend
+    const data = {params: {fileName: logFileName}}
+    axios.post(url, data).then((response) => {
+      console.log(response.data.message)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+    // Reset table values
+    setInfo([]);
+    setMessage([]);
+    
+    // Create a file reader
+    const fileReader = new FileReader();
+    fileReader.onload = (event) => {
+      // Split the file content by new line
+      const lines = event.target.result.split('\n');
+      // Iterate over each line
+      lines.forEach((line) => {
+        // Skip empty lines
+        if (line.trim() === '') return;
+        // Parse the line and add it to the info array
+        const parsedData = parseLine(line);
+        setInfo((data) => [...data, parsedData]);
+      });
+    };
+    
+    // Read the file
+    const file = await fileHandle.getFile();
+    fileReader.readAsText(file);
+  }
+  // Function to parse a line
+  function parseLine(line) {
+    // Split the line by space and extract the relevant parts
+    const parts = line.split(' ');
+    const time = parts[0];
+    const can = parts[1];
+    const id = parts[2].split('#')[0];
+    const data = parts[2].split('#')[1];
+    // Split the data into 8 parts
+    const dt = data.match(/.{1,2}/g);
+    // Return an object with the parsed data
+    return { time, can, id, dt1: dt[0], dt2: dt[1], dt3: dt[2], dt4: dt[3], dt5: dt[4], dt6: dt[5], dt7: dt[6], dt8: dt[7] };
+  }
+    
+  function handleReplayPackets () {
+    //Reset table values
+    setInfo([])
+    setMessage([])
+    const replayEventSource = new EventSource(playUrl)
+    replayEventSource.addEventListener('message', function(e) {
+      const parsedData = JSON.parse(e.data)
+      setInfo((data) => [...data,parsedData])
+    })
+    replayEventSource.addEventListener('close', function(e) {
+      replayEventSource.close();
+      console.log("canplayer connection closed")
+    })
+    return () => {
+      console.log('Component unmounted. Event Source finished')
+      replayEventSource.close()
+    }
+  }
+
+  const data = useMemo(() => [...info], [info])
+  const columns = useMemo(() => COLUMNS, [])
 
   const updateMyData = (rowIndex, columnId, value) => {
     // We also turn on the flag to not reset the page
@@ -157,7 +219,7 @@ export default function CANTable() {    // The next function causes 4 renders, n
                       <NavDropdown.Item>
                         Save Project
                       </NavDropdown.Item>
-                      <NavDropdown.Item>
+                      <NavDropdown.Item onClick={handleOpenPackets}>
                         Open Saved Packets
                       </NavDropdown.Item>
                     </NavDropdown>

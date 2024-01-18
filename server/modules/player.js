@@ -2,9 +2,9 @@ var spawn = require('child_process').spawn;
 const axios = require('axios');
 const { execFile } = require('node:child_process');
 
-function player(){
+function player(fileName){
     //We can use candump filters e.g. 'candump vcan0,9803FEFE:1ffffff' (extended version 29-bits) or 201:7ff (11-bit)
-    var child = execFile('canplayer',['-I', 'log-files/test.log', 'vcan0=vcan0', '-v']);
+    var child = execFile('canplayer',['-I', 'log-files/' + fileName, 'vcan0=vcan0', '-v']);
 
     child.stdout.on('data', function (data) {
         console.log(`${data}`);
@@ -15,7 +15,7 @@ function player(){
     });
 
     child.on('exit', () => {
-        console.log(`Done.`);
+        console.log(`Exiting canplayer...`);
     });
 
     child.on('close', (code) => {

@@ -5,12 +5,13 @@ const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const app = express()
-const httpServer = require('http').Server(app);
+const httpServer = require('http').Server(app)
 require('dotenv').config()
 const MONGODBURI = process.env.MONGODBURI
+const play = require('./modules/playPackets')
 const vcanconfig = require('./modules/vcanconfig')
 const startcangen = require('./modules/cangen')
-const chatAssistant = require('./chatAssistant.js');
+const chatAssistant = require('./chatAssistant')
 //const saveRawPackets = require('./modules/dataSaver')
 const io = require("socket.io")(httpServer, {
 	cors: {
@@ -22,6 +23,7 @@ const io = require("socket.io")(httpServer, {
 	})
 let pid = ''
 let now = new Date()
+let fileName = ''
 
 app.use(express.json())
 app.use(cors())
@@ -73,6 +75,17 @@ function dumpPacket(msg) {
 	  console.log(err)
 	})
 }
+
+// Recieve file name from the front-end
+app.post('/upload', (req, res) => {
+	fileName = req.body.params.fileName
+
+	res.status(200).send({ message: 'File name received' })
+  })
+
+app.get('/play', (req, res) => {
+  play(req, res, fileName)
+})
 
 //Connecting to virtual can bus interface 29-bit
 app.get('/vcan', (req,res) => {
