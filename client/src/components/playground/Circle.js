@@ -431,7 +431,7 @@ class Circle {
         ctx.lineTo(xMhw, yPhMr);
         ctx.bezierCurveTo(xMhw, yPhMr, xMhwPhr, yPhMhr, xMhwPr, yPh);
         ctx.closePath();
-        ctx.fillStyle="#2b2b2b";
+        ctx.fillStyle="#284df1";
         ctx.fill();
 
         value = `${value} ${this.speedUnit}`;
@@ -463,13 +463,13 @@ class Circle {
      * @param {number} offsetY Offset in px from center of circle by y-coordinate.
      */
     drawMultiplier(ctx, multiplier, offsetY) {
-        const value = `x${100 * multiplier} rpm`
+        const value = `RPMx${1000 * multiplier}`
 
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.font = `${this.markFontStyle} ${this.markFontSize / 1.75}px ${this.markFontFamily}`;
+        ctx.font = `${this.markFontStyle} ${this.markFontSize}px ${this.markFontFamily}`;
         ctx.fillStyle = this.markFontColor;
-        ctx.fillText(value, -ctx.measureText(value).width / 2 - 6, offsetY - 2);
+        ctx.fillText(value, -ctx.measureText(value).width / 2, offsetY - 2);
         ctx.restore();
     }
 }
@@ -491,7 +491,7 @@ class MainCircle extends Circle {
         this.radius = (ch / 2 +
             (ch / 2 - ch / 2 * Math.sin(deg2Rad(50))) / 2 -
             this.circleBorderWidth);
-        this.x = cw / 2;
+        this.x = cw / 2 + 460;
         this.y = (ch / 2 +
             (ch / 2 - this.radius * Math.sin(deg2Rad(50))) -
             this.circleBorderWidth);
@@ -503,6 +503,33 @@ class MainCircle extends Circle {
     }
 }
 export {MainCircle}
+
+/** Class representing a main circle that are bigger than others and positioned in the left.
+ * In the current and standard case it is a speedometer.
+ */
+class LMainCircle extends Circle {
+    /**
+     * Creating a main circle with the given params.
+     * @param {Object} options Parameters of the circle and contained elements. Same as in parent class.
+     */
+    constructor(options) {
+        super(options);
+        this.startAngle = deg2Rad(130);
+        this.endAngle = deg2Rad(50);
+        let cw = 580;
+        let ch = 260;
+        this.radius = (ch / 2 +
+            (ch / 2 - ch / 2 * Math.sin(deg2Rad(50))) / 2 - this.circleBorderWidth);
+        this.x = cw / 2 - 120;
+        this.y = (ch / 2 +
+            (ch / 2 - this.radius * Math.sin(deg2Rad(50))) - this.circleBorderWidth);
+        this.textMarksOffsetX = 12;
+        this.textMarksOffsetY = 0;
+
+        this.supportColor = 'red';
+    }
+}
+export {LMainCircle}
 
 /** Class representing a additional circle that are lower than main and positioned in one of the sides.
  * In the current and standard case it are tachometer on the one side and gas indicator on the another side.
@@ -516,7 +543,7 @@ class AdditionalCircle extends Circle {
      */
     constructor(options, side, mainCircleRadius) {
         super(options);
-
+        this.radius = this.radius * .75; //This setting controls the circle radius
         const cw = 580 / 2;
         const x = cw - (cw -
             mainCircleRadius / 2 -
@@ -524,14 +551,14 @@ class AdditionalCircle extends Circle {
             this.circleBorderWidth / 1.25);
 
         if (side === 'left') {
-            this.x = cw - x;
+            this.x = cw + 95;
         } else if (side === 'right') {
-            this.x = cw + x;
+            this.x = cw + x + 103.5;
         } else {
             throw new Error('Unknown circle side');
         }
         
-        this.y = 260 / 2 + this.radius / 2 - this.circleBorderWidth * 2;
+        this.y = 100 / 2 + this.radius / 2 - this.circleBorderWidth * 2;
 
         this.textMarksOffsetX = 8;
         this.textMarksOffsetY = 4;
@@ -551,7 +578,7 @@ class Icon {
      * @param {number} spritePosY Position of icon in px in icons sprite by y-coordinate.
      * @param {number} width Width of icon.
      * @param {number} height Height of icon.
-     * @param {2|3} states States of icon. There are only 3: 1 - Off, 2 - warning, 3 - critical/on. If 2, then only off and on.
+     * @param {2|3|4} states States of icon. There are only 4: 0 - Off/Not Set, 1 - Warning/Set, 2 - critical/on/Error, 3 - Not available. If 2, then only off and on.
      */
     constructor(offsetX, offsetY, spritePosX, spritePosY, width, height, states) {
         this.offset = {

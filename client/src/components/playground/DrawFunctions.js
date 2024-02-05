@@ -1,4 +1,4 @@
-   import {MainCircle, AdditionalCircle, Icon, TurnSignal} from "./Circle"
+   import {MainCircle, LMainCircle, AdditionalCircle, Icon, TurnSignal} from "./Circle"
     /**
      * Draws all circles.
      * @param {number} speedometerValue Current speed.
@@ -11,19 +11,84 @@
     export function draw(ctx, speedometerValue, tachometerValue, gasValue, mileage, turnSignals, iconStates) {
         clearCanvas(ctx);
 
-        const mCircle = new MainCircle(options);
-        drawLeftCircle(options, ctx, mCircle.radius, tachometerValue, iconStates);
-        drawRightCircle(options, ctx, mCircle.radius, gasValue, iconStates);
+        const lmCircle = new LMainCircle(options);
+        const rmCircle = new MainCircle(options);
+        drawLeftCircle(options, ctx, rmCircle.radius, tachometerValue, iconStates);
+        drawRightCircle(options, ctx, rmCircle.radius, gasValue, iconStates);
+
+        /* Left Main Circle - Tachometer */
+        lmCircle.draw(ctx);
+        const lAddMarksCount = 8;
+        const lAddMarksDegAngle = 180;
+        const lAddMarksAngles = rmCircle.calcMarksAngles(lAddMarksCount, lAddMarksDegAngle);
+
+        const lCountMain = 9;
+        const lDegAngleMain = 207;
+        const lMainMarksAngles = rmCircle.calcMarksAngles(lCountMain, lDegAngleMain);
+
+        const langles = lAddMarksAngles
+        const llength = 7.5
+        const llineWidth = 2
+        const lborder = true
+        const loffset = 4
+        const lfirstNMarks = 0
+        const llastNMarks = 2
+        lmCircle.drawMarks(ctx, langles, llength, llineWidth, lborder, loffset, lfirstNMarks, llastNMarks);
+
+        const langles2 = lMainMarksAngles
+        const llength2 = 6
+        const llineWidth2 = 3
+        const lborder2 = true
+        const loffset2 = 3
+        const lfirstNMarksDrawMarks1 = 0
+        const llastNMarksDrawMarks1 = 2
+        lmCircle.drawMarks(ctx, langles2, llength2, llineWidth2, lborder2, loffset2, lfirstNMarksDrawMarks1, llastNMarksDrawMarks1);
+
+        // Draw numbers 0 - 8
+        const lcountText = 9
+        const ldegAngleText = 207
+        const linnerOffset = 7.5
+        const ltextMarksAngles = rmCircle.calcTextMarksAngles(lcountText, ldegAngleText, linnerOffset);
+
+        const llength3 = 7.5
+        const langles3 = ltextMarksAngles
+        const lstep = 1
+        const loffset3 = 26
+
+        lmCircle.drawTextMarks(ctx, llength3, langles3, lstep, loffset3)
+
+        // Draw Icons
+        lmCircle.drawIcon(ctx, 'dippedBeam', iconStates['dippedBeam']);
+        lmCircle.drawIcon(ctx, 'highBeam', iconStates['highBeam']);
+        lmCircle.drawIcon(ctx, 'abs', iconStates['abs']);
+        lmCircle.drawIcon(ctx, 'trunk', iconStates['trunk']);
+        lmCircle.drawIcon(ctx, 'bonnet', iconStates['bonnet']);
+        lmCircle.drawIcon(ctx, 'doors', iconStates['doors']);
+        lmCircle.drawIcon(ctx, 'engineFail', iconStates['engineFail']);
+        lmCircle.drawIcon(ctx, 'lock', iconStates['lock']);
+        lmCircle.drawIcon(ctx, 'brake', iconStates['brake']);
+        lmCircle.drawIcon(ctx, 'drift', iconStates['drift']);
+        lmCircle.drawIcon(ctx, 'stab', iconStates['stab']);
+        lmCircle.drawIcon(ctx, 'oil', iconStates['oil']);
+        lmCircle.drawIcon(ctx, 'battery', iconStates['battery']);
+
+        lmCircle.drawMultiplier(ctx, 1, -65);
+        const lvalue = tachometerValue
+        const ldegAngleArrow = 207
+        const loffset4 = 10
+        lmCircle.drawArrow(ctx, lvalue, ldegAngleArrow, loffset4);
+        lmCircle.drawArrowBody(ctx);
         
-        mCircle.draw(ctx);
+        /* Right Main Circle - Speedometer */
+        rmCircle.draw(ctx);
 
         const addMarksCount = 10;
         const addMarksDegAngle = 180;
-        const addMarksAngles = mCircle.calcMarksAngles(addMarksCount, addMarksDegAngle);
+        const addMarksAngles = rmCircle.calcMarksAngles(addMarksCount, addMarksDegAngle);
 
         const countMain = 11;
         const degAngleMain = 200;
-        const mainMarksAngles = mCircle.calcMarksAngles(countMain, degAngleMain);
+        const mainMarksAngles = rmCircle.calcMarksAngles(countMain, degAngleMain);
 
         const angles = addMarksAngles
         const length = 7.5
@@ -33,49 +98,44 @@
         const firstNMarks = 0
         const lastNMarks = 0
 
-        mCircle.drawMarks(ctx, angles, length, lineWidth, border, offset, firstNMarks, lastNMarks);
+        rmCircle.drawMarks(ctx, angles, length, lineWidth, border, offset, firstNMarks, lastNMarks);
 
         const angles2 = mainMarksAngles
         const length2 = 7
         const lineWidth2 = 3
         const border2 = true
         const offset2 = 3
-        mCircle.drawMarks(ctx, angles2, length2, lineWidth2, border2, offset2);
+        rmCircle.drawMarks(ctx, angles2, length2, lineWidth2, border2, offset2);
         
         const countText = 11
         const degAngleText = 200
         const innerOffset = 7.5
-        const textMarksAngles = mCircle.calcTextMarksAngles(countText, degAngleText, innerOffset);
+        const textMarksAngles = rmCircle.calcTextMarksAngles(countText, degAngleText, innerOffset);
 
         const length3 = 7.5
         const angles3 = textMarksAngles
         const step = 20
         const offset3 = 22.5
 
-        mCircle.drawTextMarks(ctx, length3, angles3, step,offset3)
+        rmCircle.drawTextMarks(ctx, length3, angles3, step,offset3)
 
-        mCircle.drawTurnSignal(ctx, 35, -25, 25, 15, turnSignals['right']);
-        mCircle.drawTurnSignal(ctx, -35, -25, -25, 15, turnSignals['left']);
+        rmCircle.drawTurnSignal(ctx, 35, -25, 25, 15, turnSignals['right']);
+        rmCircle.drawTurnSignal(ctx, -35, -25, -25, 15, turnSignals['left']);
 
-        mCircle.drawIcon(ctx, 'dippedBeam', iconStates['dippedBeam']);
-        mCircle.drawIcon(ctx, 'brake', iconStates['brake']);
-        mCircle.drawIcon(ctx, 'drift', iconStates['drift']);
-        mCircle.drawIcon(ctx, 'highBeam', iconStates['highBeam']);
-        mCircle.drawIcon(ctx, 'lock', iconStates['lock']);
-        mCircle.drawIcon(ctx, 'seatBelt', iconStates['seatBelt']);
-        mCircle.drawIcon(ctx, 'engineTemp', iconStates['engineTemp']);
-        mCircle.drawIcon(ctx, 'stab', iconStates['stab']);
-        mCircle.drawIcon(ctx, 'abs', iconStates['abs']);
 
-        mCircle.drawMileage(ctx, mileage, 0, 60, 100, 20, 2);
+        // Draw Icons
+        rmCircle.drawIcon(ctx, 'seatBelt', iconStates['seatBelt'])
+        rmCircle.drawIcon(ctx, 'hazzard', iconStates['hazzard'])
+
+        rmCircle.drawMileage(ctx, mileage, 0, 60, 100, 20, 2)
         
-        mCircle.drawUnit(ctx, -25);
+        rmCircle.drawUnit(ctx, -25)
         
         const value = speedometerValue
         const degAngleArrow = 200
         const offset4 = 10
-        mCircle.drawArrow(ctx, value, degAngleArrow, offset4);
-        mCircle.drawArrowBody(ctx);
+        rmCircle.drawArrow(ctx, value, degAngleArrow, offset4);
+        rmCircle.drawArrowBody(ctx)
     }
 
    
@@ -97,27 +157,15 @@
         const lCircle = new AdditionalCircle(options, 'left', radius);
         lCircle.draw(ctx);
 
-        const addMarksCount = 8
-        const addMarksDegAngle = 140
-        const addMarksStartAngle = 300
+        const addMarksCount = 4
+        const addMarksDegAngle = 180
+        const addMarksStartAngle = 270
         const addMarksAngles = lCircle.calcMarksAngles(addMarksCount, addMarksDegAngle, addMarksStartAngle)
 
-        const countMain = 9
-        const degAngleMain = 160
-        const startAngleMain = 300
+        const countMain = 2
+        const degAngleMain = 180
+        const startAngleMain = 270
         const mainMarksAngles = lCircle.calcMarksAngles(countMain, degAngleMain, startAngleMain)
-
-        const anglesDangerZone = addMarksAngles
-        const offsetDangerZone = 6
-        const firstNMarksDangerZone = 0
-        const lastNMarksDangerZone = 2
-        lCircle.drawDangerZone(ctx, anglesDangerZone, offsetDangerZone, firstNMarksDangerZone, lastNMarksDangerZone)
-
-        const anglesDangerZone1 = mainMarksAngles
-        const offsetDangerZone1 = 6
-        const firstNMarksDangerZone1 = 0
-        const lastNMarksDangerZone1 = 2
-        lCircle.drawDangerZone(ctx, anglesDangerZone1, offsetDangerZone1, firstNMarksDangerZone1, lastNMarksDangerZone1)
 
         const anglesDrawMarks = addMarksAngles
         const lengthDrawMarks = 7.5
@@ -125,24 +173,22 @@
         const borderDrawMarks = true
         const offsetDrawMarks = 1
         const firstNMarksDrawMarks = 0
-        const lastNMarksDrawMarks = 2
+        const lastNMarksDrawMarks = 0
         lCircle.drawMarks(ctx, anglesDrawMarks, lengthDrawMarks, lineWidthDrawMarks, borderDrawMarks, offsetDrawMarks, firstNMarksDrawMarks, lastNMarksDrawMarks)
 
-        
         const anglesDrawMarks1 = mainMarksAngles
         const lengthDrawMarks1 = 6
         const lineWidthDrawMarks1 = 3
         const borderDrawMarks1 = true
         const offsetDrawMarks1 = 0
         const firstNMarksDrawMarks1 = 0
-        const lastNMarksDrawMarks1 = 2
+        const lastNMarksDrawMarks1 = 0
         lCircle.drawMarks(ctx, anglesDrawMarks1, lengthDrawMarks1, lineWidthDrawMarks1, borderDrawMarks1, offsetDrawMarks1, firstNMarksDrawMarks1, lastNMarksDrawMarks1)
-        
-        
-        const countText = 9
-        const degAngleText = 160
+
+        const countText = 2
+        const degAngleText = 180
         const innerOffset = 5
-        const startAngle =300
+        const startAngle = 270
         const textMarksAngles = lCircle.calcTextMarksAngles(countText, degAngleText, innerOffset, startAngle)
 
         const lengthTextMarks = 7.5
@@ -151,17 +197,13 @@
         const offsetTextMarks = 12.5
         lCircle.drawTextMarks(ctx, lengthTextMarks, anglesTextMarks, stepTextMarks, offsetTextMarks)
 
-        lCircle.drawIcon(ctx, 'battery', iconStates['battery']);
-        lCircle.drawIcon(ctx, 'oil', iconStates['oil']);
-        lCircle.drawIcon(ctx, 'engineFail', iconStates['engineFail']);
+        lCircle.drawIcon(ctx, 'engineTemp', iconStates['engineTemp'])
 
-        lCircle.drawMultiplier(ctx, 1, -20);
-
-        const degAngleArrow = 160
+        const degAngleArrow = 180
         const offsetAngleArrow = 5
-        const startAngleArrow = 300
+        const startAngleArrow = 270
         lCircle.drawArrow(ctx, value, degAngleArrow, offsetAngleArrow, startAngleArrow)
-        lCircle.drawArrowBody(ctx);
+        lCircle.drawArrowBody(ctx)
     }
 
     /**
@@ -242,9 +284,6 @@
 
 
         rCircle.drawIcon(ctx, 'gas', iconStates['gas']);
-        rCircle.drawIcon(ctx, 'trunk', iconStates['trunk']);
-        rCircle.drawIcon(ctx, 'bonnet', iconStates['bonnet']);
-        rCircle.drawIcon(ctx, 'doors', iconStates['doors']);
 
         const valueDrawArrow = Math.abs(value - 1)
         const degAngleArrow = 160
@@ -257,25 +296,33 @@
 
 
     const icons = {
-        // main circle
-        'dippedBeam': new Icon(-22.5, 47.5, 10, 150 * 0 + 10 * 1, 17.5, 17.5, 2),
-        'brake':      new Icon(-80, 47.5, 10, 150 * 1 + 10 * 2, 17.5, 17.5, 2),
-        'drift':      new Icon(0, 47.5, 10, 150 * 2 + 10 * 3, 17.5, 17.5, 2),
-        'highBeam':   new Icon(-45, 47.5, 10, 150 * 4 + 10 * 5, 17.5, 17.5, 2),
-        'lock':       new Icon(80, 47.5, 10, 150 * 6 + 10 * 7, 17.5, 17.5, 2),
-        'seatBelt':   new Icon(45, 47.5, 10, 150 * 8 + 10 * 9, 17.5, 17.5, 2),
-        'engineTemp': new Icon(62.5, 70, 10, 150 * 10 + 10 * 11, 17.5, 17.5, 3),
-        'stab':       new Icon(22.5, 47.5, 10, 150 * 12 + 10 * 13, 17.5, 17.5, 2),
-        'abs':        new Icon(-62.5, 70, 10, 150 * 14 + 10 * 15, 17.5, 17.5, 2),
-        // right circle
-        'gas':        new Icon(5, 55, 10, 150 * 3 + 10 * 4, 17.5, 17.5, 3),
-        'trunk':      new Icon(22.5, 25, 10, 150 * 7 + 10 * 8, 17.5, 17.5, 2),
-        'bonnet':     new Icon(-5, 25, 10, 150 * 11 + 10 * 12, 17.5, 17.5, 2),
-        'doors':      new Icon(-17.5, 47.5, 10, 150 * 15 + 10 * 16, 17.5, 17.5, 2),
-        // left circle
-        'battery':    new Icon(17.5, 50, 10, 150 * 5 + 10 * 6, 17.5, 17.5, 3),
-        'oil':        new Icon(5, 32.5, 10, 150 * 9 + 10 * 10, 17.5, 17.5, 3),
-        'engineFail': new Icon(-10, 50, 10, 150 * 13 + 10 * 14, 17.5, 17.5, 3)
+        // Left Main circle
+        'dippedBeam': new Icon(-15, -45, 10, 150 * 0 + 10 * 1, 23.5, 23.5, 2),
+        'highBeam':   new Icon(-50, -45, 10, 150 * 4 + 10 * 5, 23.5, 23.5, 2),
+        'abs':        new Icon(-50, -15, 10, 150 * 14 + 10 * 15, 23.5, 23.5, 2),
+
+        'drift':      new Icon(15, -45, 10, 150 * 2 + 10 * 3, 23.5, 23.5, 2),
+        'stab':       new Icon(47, -45, 10, 150 * 12 + 10 * 13, 22.5, 22.5, 2),
+        'engineFail': new Icon(47, -15, 10, 150 * 13 + 10 * 14, 23.5, 23.5, 3),
+        'lock':       new Icon(47, 10, 10, 150 * 6 + 10 * 7, 23.5, 23.5, 2),
+
+        'bonnet':     new Icon(-50, 45, 10, 150 * 11 + 10 * 12, 25.5, 25.5, 2),
+        'trunk':      new Icon(0, 45, 10, 150 * 7 + 10 * 8, 25.5, 25.5, 2),
+        'doors':      new Icon(47, 45, 10, 150 * 15 + 10 * 16, 23.5, 23.5, 2),
+
+        'brake':      new Icon(-50, 75, 10, 150 * 1 + 10 * 2, 23.5, 23.5, 4),
+        'oil':        new Icon(0, 75, 10, 150 * 9 + 10 * 10, 23.5, 23.5, 3),
+        'battery':    new Icon(47, 75, 10, 150 * 5 + 10 * 6, 23.5, 23.5, 3),
+
+        // Right Main Circle
+        'hazzard': new Icon(0, -60, 10, 150 * 16 + 10 * 17, 25.5, 25.5, 2),
+        'seatBelt':   new Icon(0, 42, 10, 150 * 8 + 10 * 9, 24.5, 24.5, 2),
+
+        // Right circle
+        'gas':        new Icon(-35, 0, 10, 150 * 3 + 10 * 4, 23.5, 23.5, 3),
+
+        // Left circle
+        'engineTemp': new Icon(35, 0, 10, 150 * 10 + 10 * 11, 22.5, 22.5, 3),
     }
 
     const turnSignals = {
@@ -285,7 +332,7 @@
 
     const options = {
         'circleBorderWidth': 4,
-        'circleBorderColor': '#8b8b8b',
+        'circleBorderColor': '#ffffff',//'#8b8b8b',
         'circleFillColor': '#000000',
         'markFillColor': '#ffffff',
         'markStrokeColor': '#000000',

@@ -1,36 +1,55 @@
 /* Entire available screen */
 .Playground{
     display: flex;
-    height: 100%;
+    height: 720px;
+    background: radial-gradient(circle at center, #336699, #182848);
 }
 
-/* Dashboard */
+/* Dashboard - Canvas/Chat */
 .dashboard{
-    width: 940px; /* Use the same size of the canvas */
+    width: 920px; /* Use the same size of the canvas in Playground.js line 153 */
+    max-height: 720px;
 }
 
-/* File Menu / Table */
+/* Data - Table Section*/
 .data{
-    width: 976px;
+    width: 974px;
+    max-height: 970px;
 }
 
+.rawTable {
+    width: 974px;;
+    height: 720px;
+}
+
+/* DASHOBOARD SECTION */
 .canvas {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 360px; /* Ajusta esto según tus necesidades */
-    width: 100%;
+    height: 360px;
+    width: 920px;
+    margin: 10px 10px 10px 10px;
+    border-radius: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    background: radial-gradient(circle at center, #336699, #182848);
+    padding-top: 15px;
 }
 
+/* Chat box Settings */
 .chatgpt {
-    margin-top: 0;
+    margin-top: 20px;
+    height: 330px;
+    max-height: 330px;
+    margin: 10px 10px 10px 10px;
+    border-radius: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); /* Ajusta el valor de la sombra */
+    background: radial-gradient(circle at center, #336699, #182848);
 }
 
 .chat {
     height: 100%;
     width: 100%;
-    /* background-color: blue; */
-    color: white;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -38,27 +57,57 @@
     text-align: center;
 }
 
+.help-text {
+    font-size: 1.5em;
+    color: white;
+}
+
+.chat h5 {
+    color: white;
+    text-shadow: 2px 2px 4px darkslategray; /* Añade una sombra a la letra para darle profundidad */
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 24px; /* Aumenta el tamaño de la letra */
+    font-weight: bold; /* Hace que la letra sea negrita */
+    letter-spacing: 1px; /* Aumenta el espacio entre las letras */
+    text-transform: uppercase; /* Transforma el texto a mayúsculas */
+}
+
 .bottom-section {
     width: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
-}
-.input-container {
-    position: relative;
-    width: 100%;
-    max-width: 840px;
+    justify-content: center;
+    height: 47px;
 }
 
-input {
+.input-container {
+    display: flex;
+    flex-grow: 1;
+    position: relative; /* Esto permite posicionar los elementos hijos de manera absoluta respecto a este contenedor */
+    width: 100%;
+    flex-direction: column;
+    max-width: 840px;
+    height: 47px;
+    margin-bottom: 10px;
+}
+
+.input-container textarea {
+    padding-right: 55px;
+}
+
+textarea {
     width: 100%;
     border: none;
     border-radius: 5px;
+    right: 100px;
     font-size: 14px;
+    font-weight: bold;
     color: white;
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: 10px 15px;
+    overflow-y: hidden;
+    max-height: 200px;
+    resize: none;
+    background-color: black;
+    padding: 10px 15px 10px 15px;
     box-shadow: rgba(0, 0, 0, 0.05) 0 54px 55px,
     rgba(0, 0, 0, 0.05) 0 -12px 30px,
     rgba(0, 0, 0, 0.05) 0 4px 6px,
@@ -66,40 +115,256 @@ input {
     rgba(0, 0, 0, 0.05) 0 -3px 5px;
 }
 
-input:focus {
-    outline: none
+textarea::placeholder {
+    color: #909090; 
+}
+
+.span2 {
+    width: 16px;
+    height: 16px;
+}
+
+.custom-button {
+    position: absolute;
+    display: flex;
+    width: 24px;
+    height: 24px;
+    right: 10px;
+    transform: translateY(35%);
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+    opacity: 1;
+    border-radius: 5px;
+    padding-top: 0.20rem;
+    padding-bottom: 0.25rem;
+    padding-right: 0;
+    padding-left: .2rem;
+}
+
+.custom-button:disabled {
+    background-color: #808080;
+    color: #C0C0C0;
+    border: 1px solid #C0C0C0;
+    opacity: 0.5;
 }
 
 #submit {
     position: absolute;
-    bottom: 10px;
+    color: white;
+    font-size:x-large;
+    bottom: 8px;
     right: 10px;
     cursor: pointer;
 }
 
 .feed {
     overflow: auto;
-    width: 100%;
+    width: 825px;
     padding: 0;
-    max-height: 200px;
+    max-height: 228px;
     max-width: 840px;
+    border-radius: 5px;
 }
 
 .feed li {
     display: flex;
-    background-color: #444654;
+    background-color: black;/*#444654;*/
     width: 100%;
     padding: 5px;
-    margin: 5px 0 5px 0;
+    margin: 0 0 5px 0;
+    border-radius: 5px;
 }
 
 .feed p {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: bold;
     text-align: left;
     margin: 0 0 5px;
 }
 
 .feed p.role {
     min-width: 100px;
+}
+
+/* The following two settings affect editable cells in the raw table */
+input {
+    width: 100%;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    background-color: #444; /* Darker than the background for contrast */
+    box-shadow: inset 0 3px 6px rgba(0,0,0,0.2); /* Inner shadow for depth */
+    transition: box-shadow 0.3s ease; /* Smooth transition */
+}
+  
+input:focus {
+    box-shadow: inset 0 5px 10px rgba(0,0,0,0.3); /* Deeper shadow on focus */
+}
+
+/* NUEVA SECCION PARA EL ASISTENTE */
+.projection-buttons-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.projection-button {
+    display: flex;
+    margin-right: 10px;
+    margin-left: 5px;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+}
+
+.projection-button span{
+    opacity: 1;
+    transform: none;
+}
+
+.btn {
+    position: relative;
+    align-items: center;
+    width: 400px;
+    white-space: nowrap;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 0.75rem;
+    text-align: left;
+    line-height: 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: inline-flex;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    pointer-events: auto;
+    cursor: pointer;
+    appearance: button;
+    text-transform: none;
+}
+
+.btn:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(0, 0, 0); /* Color de fondo cuando el cursor está encima */
+    color: white; /* Color del texto cuando el cursor está encima */
+    border-color: white; /* Color del borde cuando el cursor está encima */
+}
+
+.btn:hover .rounded1, .btn:hover .rounded1 * {
+    visibility: visible;
+}
+
+.btn:hover::after {
+    content: attr(data-title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: black;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap;
+    z-index: 1;
+    margin-bottom: 5px;
+}
+
+.flex1 {
+    display: flex;
+    width: 370px;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex2 {
+    display: flex;
+    width: 370px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flex3 {
+    overflow: hidden;
+    width: 300px;
+    flex-direction: column;
+    display: flex;
+}
+
+.truncateText1 {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.truncateText2 {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: .5!important;
+}
+
+.absolute {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    padding-left: 1.5rem;
+    padding-right: 1rem;
+    --tw-gradient-from-position: 60%;
+    --tw-gradient-from: #40414f var(--tw-gradient-from-position);
+    --tw-gradient-to: rgba(64,65,79,0) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-from),var(--tw-gradient-to);
+    background-image: linear-gradient(to left,var(--tw-gradient-stops));
+    border-radius: 0.75rem;
+    background-color: transparent;
+    color: white;
+    opacity: 1;
+}
+
+.absolute:hover {
+    --tw-bg-opacity: 1;
+}
+
+.span1 {
+    --tw-border-opacity: 1;
+    white-space: nowrap;
+    text-align: left;
+    text-transform: none;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    width: 24px;
+    height: 24px;
+}
+
+.rounded1 {
+    border-radius: 0.5rem;
+    padding-top: 0.20rem;
+    padding-bottom: 0.25rem;
+    padding-right: 0;
+    padding-left: .2rem;
+    border: 1px solid white;
+    opacity: 1;
+    border-radius: 5px;
+    background-color: black;
+    width: 24px;
+    height: 24px;
+}
+
+.rounded1, .rounded1 * {
+    visibility: hidden;
+}
+
+svg {
+    width: 1rem;
+    height: 1rem;
+    display: block;
 }

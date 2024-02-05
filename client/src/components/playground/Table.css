@@ -1,111 +1,156 @@
-
-
 .navigationBottomBar{
     left: 0;
-    width: 100%;
+    width: 972px;
     border: solid 2px #646464;
+    background-color: black;
 }
 
-/* Table Settings*/
 thead{
     display: block
 }
-  
-tbody {
+
+table {
+    border-top: 2px solid;
+    border-left: 2px solid;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
+}
+
+
+/* Raw Message Table */
+table.rawDataTable tbody {
     display:block;
-    max-height: 315px;
-    overflow-y:auto;
-    background-color: #212529; /*#343a40*/
+    height: 291px;
+    max-height: 291px;
+    overflow-y: auto;
+    background-color: black;
+}
+
+table.rawDataTable, table.decodedTable {
+    height: 249px;
+    max-height: 249px;
+    table-layout: fixed;
 }
 
 /* Table Header General Settings*/
-.rawTable th:nth-child(1), th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8), th:nth-child(9), th:nth-child(10), th:nth-child(11), th:nth-child(12), th:nth-child(13){
+.rawDataTable th:nth-child(1), th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8), th:nth-child(9), th:nth-child(10), th:nth-child(11), th:nth-child(12), th:nth-child(13){
     background-color: rgb(40, 77, 241);
     color: whitesmoke;
     font-size: 14px;
 }
   
 /* Customized Header Settings */
-.rawTable th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8), th:nth-child(9), th:nth-child(10), th:nth-child(11), th:nth-child(12){
+.rawDataTable th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8), th:nth-child(9), th:nth-child(10), th:nth-child(11), th:nth-child(12){
     text-align: center;
-    width: 70px;
+    width: 69px;
 }
 
-.rawTable th:nth-child(1){
-    width: 40px;
+.rawDataTable th:nth-child(1){
+    text-align: center;
+    width: 56px;
+    min-width: 56px;
+    max-width: 56px;
 }
 
-.rawTable th:nth-child(2){
+.rawDataTable th:nth-child(2){
     width: 136px;
 }
 
-.rawTable th:nth-child(3) {
-    width: 76px;
+.rawDataTable th:nth-child(3) {
+    text-align: center;
+    width: 60px;
 }
-.rawTable th:nth-child(4){
+.rawDataTable th:nth-child(4){
+    text-align: center;
     width: 76px;
 }
 
-.rawTable th:nth-child(13){
+.rawDataTable th:nth-child(13){
     text-align: center;
-    width: 88px;
+    width: 86px;
 }
   
 /* Default Row Settings */
-.rawTable td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9), td:nth-child(10), td:nth-child(11),td:nth-child(12),td:nth-child(13){
+.rawDataTable td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9), td:nth-child(10), td:nth-child(11),td:nth-child(12){
     text-align: center;
-    width: 70px;
-    color: white;
+    width: 69px;
 }
 
-.rawTable td:nth-child(1){
+.rawDataTable td:nth-child(1){
     text-align: center;
-    width: 40px;
+    width: 56px;
+    min-width: 56px;
+    max-width: 56px;
     color: white;
     font-size: 12px;
 }
 
-.rawTable td:nth-child(2){
+.rawDataTable td:nth-child(2){
     width: 136px;
     color: white;
     font-size: 12px;
 }
 
-.rawTable td:nth-child(3) {
+.rawDataTable td:nth-child(3) {
+    text-align: center;
+    width: 60px;
+    color: white;
+    font-size: 12px;
+}
+
+.rawDataTable td:nth-child(4){
     text-align: center;
     width: 76px;
     color: white;
     font-size: 12px;
 }
 
-.rawTable td:nth-child(4){
-    width: 76px;
+
+.rawDataTable td:nth-child(5){
+    text-align: center;
+    width: 69px;
     color: white;
     font-size: 12px;
 }
 
-.rawTable td:nth-child(5){
+.rawDataTable td:nth-child(13){
     text-align: center;
-    width: 70px;
-    color: white;
-    font-size: 12px;
+    width: 72px;
 }
   
-/* Hover color. Only affects the entire header right now. */
-.table-hover,table.rawTable tr:hover th{
+/* Hover color. Only affects the entire header right now. */ 
+.table-hover,table.rawDataTable tr:hover th{
   background-color: #262546;
 }
 
 /* Decoded Message Table */
 table.decodedTable tbody {
     display:block;
-    height: 230px;
-    max-height: 230px;
-    overflow-y:auto;
-    background-color: rgb(33,37,41) /*#212529; /*#343a40*/
+    height: 211px;
+    max-height: 211px;
+    overflow-y: auto;
+    font-weight: bold;
+    background-color: black;
 }
 
 /* Customized decoded table header */
+
+/* Estilos personalizados para el valor de ECU */
+table.decodedTable th.ecuValue {
+    background-color: rebeccapurple;
+    color: white;
+    font-size: 14px;
+    /* Agrega aquí cualquier otro estilo que desees */
+}
+
+table.decodedTable th.ecuValue.withValue {
+    border: 1px solid rgb(0, 247, 255); /* Borde para cuando la celda tiene un valor */
+}
+
+table.decodedTable th.ecuValue.withoutValue {
+    border: none; /* Borde para cuando la celda está vacía */
+}
+
 table.decodedTable th:nth-child(1), th:nth-child(2), th:nth-child(3){
     background-color: rgb(40, 77, 241);
     color: whitesmoke;
@@ -114,32 +159,33 @@ table.decodedTable th:nth-child(1), th:nth-child(2), th:nth-child(3){
 
 table.decodedTable th:nth-child(1){
     text-align: center;
-    width: 230px;
+    width: 260px;
+    border-right: none;
 }
 
 table.decodedTable th:nth-child(2) {
-    width: 640px;
+    width: 610px;
 }
 
 table.decodedTable th:nth-child(3){
-    width: 104px;
+    width: 99px;
 }
 
 /* Default Row Settings */
 table.decodedTable td:nth-child(1){
     text-align: center;
-    width: 230px;
+    width: 260px;
     color: white;
     font-size: 12px;
 }
 table.decodedTable td:nth-child(2){
-    width: 640px;
+    width: 610px;
     color: white;
     font-size: 12px;
 }
 table.decodedTable td:nth-child(3) {
     text-align: left;
-    width: 104px;
+    width: 88px;
     color: white;
     font-size: 12px;
 }
@@ -147,8 +193,40 @@ table.decodedTable td:nth-child(3) {
 /* Hover color */
 .table-hover,table.decodedTable tr:hover th{
     background-color: #262546;
-  }
-
-body{
-    background-color: rgb(58, 58, 58);
 }
+
+/* CONTEXT MENU - COPY */
+.context-menu {
+    position: absolute;
+    z-index: 1000;
+    background-color: #f0f0f0;
+    font-family: 'Roboto', sans-serif;
+    border-radius: 5px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    min-width: 100px;
+    overflow: auto;
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .context-menu:hover {
+    background-color: #e8e8e8;
+  }
+  
+  .context-menu button {
+    background: none;
+    color: #333;
+    border: none;
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    display: block;
+  }
+  
+  .context-menu button:hover {
+    background-color: #ddd;
+  }
+  

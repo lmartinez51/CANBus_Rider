@@ -1,13 +1,15 @@
 import Nav from "react-bootstrap/Nav"
 import Navbar from "react-bootstrap/Navbar"
 import NavDropdown from "react-bootstrap/NavDropdown"
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { useTable, useGlobalFilter, useSortBy } from 'react-table'
 import Table from 'react-bootstrap/Table';
 import {COLUMNS} from './Columns'
 import "./Table.css"
 import { GlobalFilter } from './GlobalFilter'
 import axios from 'axios'
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import Worker from 'worker-loader!./FileProcessingWorker'
 const url = 'http://localhost:8080/upload'
 const playUrl = 'http://localhost:8080/play'
 let eventSource;  
@@ -15,12 +17,70 @@ let eventSource;
 export default function CANTable() {
   
   const [message, setMessage] = useState([])
+  const [ecuState, setEcuState] = useState("")
   const [info, setInfo] = useState([])
   const [fileName, setFileName] = useState('')
   const [logFileName, setLogFileName] = useState('')
+  const [selectedRow, setSelectedRow] = useState(null)
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 })
+  const contextMenuRef = useRef(null)
+  const worker = new Worker()
+  // Añade o quita las clases dependiendo del valor de ecuState
+  let ecuClass = 'ecuValue';
+  if (ecuState) {
+    ecuClass += ' withValue';
+  } else {
+    ecuClass += ' withoutValue';
+  }
+  
+
+  /* Effect to terminate the File Processing Worker */
+  useEffect(() => {
+    // Cuando el componente se desmonte, termina el Web Worker
+    return () => {
+        worker.terminate()
+    }
+  // eslint-disable-next-line 
+  }, [])
+
+  /* Efect to handle the click of the mouse to close the Copy Row context menu */
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(event.target)) {
+        closeContextMenu()
+      }
+    }
+  
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  /* Effect to send the file name to the backend */
+  useEffect(() => {
+    if (logFileName) {
+      // Send the file name to the backend
+      console.log(`File Name: ${logFileName}`) // Ahora debería imprimir el nombre del archivo
+      const data = {params: {fileName: logFileName}}
+      axios.post(url, data).then((response) => {
+        console.log(response.data.message) // Response from the backend to confirm the file name was received
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    }
+  }, [logFileName]); // Este efecto se ejecuta cada vez que logFileName cambia
 
   const handleMessage = (ecu, values) => {
+    // En caso de que se abren raw packets. Verificar si ecu y values son undefined. 
+    if (ecu === undefined || values === undefined) {
+      // Si alguno es undefined, terminar la ejecución de la función
+      return;
+    }
     setMessage([]);
+    setEcuState(ecu); // Aquí se establece el valor de ECU
+    console.log(`Valores: ${values}`)
     var signal='';
     var valueUnit = null;
     var value='';
@@ -41,15 +101,44 @@ export default function CANTable() {
       };
     
       setMessage((infodata) => [...infodata, parsedMessage]);
-    };
-  };
+    }
+  }
+
+  const handleRightClick = (event, row) => {
+    event.preventDefault()
+
+    setSelectedRow(row)
+    setContextMenu({
+      visible: true,
+      x: event.clientX,
+      y: event.clientY
+    })
+  }
+
+  const closeContextMenu = () => {
+    setContextMenu({ visible: false, x: 0, y: 0 })
+  }
+
+  const copyRow = () => {
+    if (selectedRow) {
+      const rowValues = Object.values(selectedRow.original)
+      const formattedRowString = `${rowValues[0]} ${rowValues[1]} ${rowValues[2]}#${rowValues.slice(3).join('')}` 
+      navigator.clipboard.writeText(formattedRowString)
+        .then(() => {
+          console.log('Row copied to clipboard');
+          closeContextMenu(); // Close the context menu
+        })
+        .catch(err => {
+          console.error('Could not copy text: ', err);
+        })
+    }
+  }
 
   async function handleSavePackets () {
     var packet = ''
     info.map((x,y)=> (
       packet+=x.time+" "+x.can+" "+x.id+"#"+x.dt1+x.dt2+x.dt3+x.dt4+x.dt5+x.dt6+x.dt7+x.dt8+"\n"))
     const blob = new Blob([packet], {type:"text/plain"});
-    try {
     const options = {
       suggestedName:'test.log',
       types: [
@@ -61,7 +150,8 @@ export default function CANTable() {
         },
       ],
       excludeAcceptAllOption: true,
-    };
+    }
+    try {
     const handle = await window.showSaveFilePicker(options);
     setFileName(handle.name);
     //setDisable(false);
@@ -91,6 +181,7 @@ export default function CANTable() {
     console.log("Connection closed");
   }
 
+  /* Function to open raw log files - Optimized with the use of a worker */
   async function handleOpenPackets () {
     const options = {
       types: [
@@ -104,71 +195,54 @@ export default function CANTable() {
       excludeAcceptAllOption: true,
       multiple: false,
     }
-    const [fileHandle] = await window.showOpenFilePicker(options);
-    setLogFileName(fileHandle.name)
-    // Send the file name to the backend
-    const data = {params: {fileName: logFileName}}
-    axios.post(url, data).then((response) => {
-      console.log(response.data.message)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-    // Reset table values
-    setInfo([]);
-    setMessage([]);
+    try {
+      const [fileHandle] = await window.showOpenFilePicker(options);
+      setLogFileName(fileHandle.name) // Aqui si me imprime el nombre del archivo en la consola
+
+      // Reset table values
+      setInfo([])
+      setMessage([])
+      setEcuState("")
     
-    // Create a file reader
-    const fileReader = new FileReader();
-    fileReader.onload = (event) => {
-      // Split the file content by new line
-      const lines = event.target.result.split('\n');
-      // Iterate over each line
-      lines.forEach((line) => {
-        // Skip empty lines
-        if (line.trim() === '') return;
-        // Parse the line and add it to the info array
-        const parsedData = parseLine(line);
-        setInfo((data) => [...data, parsedData]);
-      });
-    };
-    
-    // Read the file
-    const file = await fileHandle.getFile();
-    fileReader.readAsText(file);
+      // Enviar el archivo al worker para su procesamiento
+      const file = await fileHandle.getFile();
+      worker.postMessage(file);
+    } catch (err) {
+      console.error(err);
+    }
   }
-  // Function to parse a line
-  function parseLine(line) {
-    // Split the line by space and extract the relevant parts
-    const parts = line.split(' ');
-    const time = parts[0];
-    const can = parts[1];
-    const id = parts[2].split('#')[0];
-    const data = parts[2].split('#')[1];
-    // Split the data into 8 parts
-    const dt = data.match(/.{1,2}/g);
-    // Return an object with the parsed data
-    return { time, can, id, dt1: dt[0], dt2: dt[1], dt3: dt[2], dt4: dt[3], dt5: dt[4], dt6: dt[5], dt7: dt[6], dt8: dt[7] };
-  }
+
+  // Escuchar mensajes del worker
+  worker.addEventListener('message', (event) => {
+      // Recibir los datos procesados del worker
+      const parsedData = event.data
+      // Actualizar el estado con los datos procesados
+      setInfo(parsedData)
+  })
     
   function handleReplayPackets () {
     //Reset table values
     setInfo([])
     setMessage([])
     const replayEventSource = new EventSource(playUrl)
+    let data = [];
     replayEventSource.addEventListener('message', function(e) {
       const parsedData = JSON.parse(e.data)
-      setInfo((data) => [...data,parsedData])
+      data = [...data, parsedData];
     })
     replayEventSource.addEventListener('close', function(e) {
+      setInfo(data);
       replayEventSource.close();
       console.log("canplayer connection closed")
+    })
+    replayEventSource.addEventListener('error', function(e) {
+      console.error("An error occurred: ", e);
     })
     return () => {
       console.log('Component unmounted. Event Source finished')
       replayEventSource.close()
     }
-  }
+}
 
   const data = useMemo(() => [...info], [info])
   const columns = useMemo(() => COLUMNS, [])
@@ -205,98 +279,99 @@ export default function CANTable() {
             hiddenColumns: ["values"],
         },
     }, useGlobalFilter, useSortBy);
-
     // Render the UI for the table
     return (
-        <>
-          {/* TABLE MENU */}
-          <div className="packetDropdowns">
-          <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
-              <Navbar.Collapse>
-                <div className="navigationBottomBar">
-                  <Nav>
-                    <NavDropdown title="File" id="file-dropdown">
-                      <NavDropdown.Item>
-                        Save Project
-                      </NavDropdown.Item>
-                      <NavDropdown.Item onClick={handleOpenPackets}>
-                        Open Saved Packets
-                      </NavDropdown.Item>
-                    </NavDropdown>
-                    <NavDropdown title="Packets" id="packets-dropdown">
-                      <NavDropdown.Item href="#Modal" data-toggle="Modal">
-                        Edit Packets
-                      </NavDropdown.Item>
-                      <NavDropdown.Item onClick={handleReplayPackets}>
-                        Replay Packets
-                      </NavDropdown.Item>
-                      <NavDropdown.Item onClick={handleSavePackets}>
-                        Save Packets
-                      </NavDropdown.Item>
-                      <NavDropdown.Item>
-                        Annotate Packets
-                      </NavDropdown.Item>
-                    </NavDropdown>
-                    <NavDropdown title="Play Traffic">
-                      <NavDropdown.Item onClick = {handlePlayTraffic}>
-                        Start
-                      </NavDropdown.Item>
-                      <NavDropdown.Item onClick = {handleStopTraffic}>
-                        Stop
-                      </NavDropdown.Item>
-                    </NavDropdown>
-                    <GlobalFilter globalFilter={state.globalFilter} setGlobalFilter={setGlobalFilter}/>
-                  </Nav>
-                </div>
-              </Navbar.Collapse>
-          </Navbar>
-        </div>
-          {/* TABLE*/}
-          <Table className="rawTable" striped bordered hover responsive variant = "dark" {...getTableProps()}>
-              <thead>
-              {headerGroups.map(headerGroup => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
-                    <th width='40'>No.</th>
-                    {headerGroup.headers.map(column => (
-                    <th {...column.getHeaderProps(column.getSortByToggleProps)}>{column.render('Header')}
-                        <span>{column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}</span>
-                    </th>
-                  ))}
-                  </tr>
-              ))}
-              </thead>
-              <tbody {...getTableBodyProps()}>
-              {rows.map((row, i) => {
-                  prepareRow(row)
-                  return (
-                  <tr key={i} className="rawrow" onClick = {() => handleMessage(row.original.ecu, row.original.values)} {...row.getRowProps()}>
-                      <td width='40'>{i+1}</td>
-                      {row.cells.map(cell => {
-                      return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                      })}
-                  </tr>
-                  )
-              })}
-              </tbody>
-          </Table>
-          <Table className="decodedTable" striped bordered hover responsive variant = "dark">
+      <>
+        {/* TABLE MENU */}
+        <div className="packetDropdowns">
+        <Navbar collapseOnSelect expand="lg" bg="transparent" variant="dark">
+            <Navbar.Collapse>
+              <div className="navigationBottomBar">
+                <Nav>
+                  <NavDropdown title="File" id="file-dropdown">
+                    <NavDropdown.Item onClick={handleOpenPackets}>
+                      Open Log File
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick={handleSavePackets}>
+                      Save Log File
+                    </NavDropdown.Item>
+                  </NavDropdown>
+                  <NavDropdown title="Packets" id="packets-dropdown">
+                    <NavDropdown.Item onClick={handleReplayPackets}>
+                      Replay Packets
+                    </NavDropdown.Item>
+                  </NavDropdown>
+                  <NavDropdown title="Play Live Traffic">
+                    <NavDropdown.Item onClick = {handlePlayTraffic}>
+                      Start
+                    </NavDropdown.Item>
+                    <NavDropdown.Item onClick = {handleStopTraffic}>
+                      Stop
+                    </NavDropdown.Item>
+                  </NavDropdown>
+                  <GlobalFilter globalFilter={state.globalFilter} setGlobalFilter={setGlobalFilter}/>
+                </Nav>
+              </div>
+            </Navbar.Collapse>
+        </Navbar>
+      </div>
+        {/* TABLE*/}
+        <Table className="rawDataTable" striped bordered hover responsive variant = "dark" {...getTableProps()}>
             <thead>
-              <tr>
-                <th>Signal</th>
-                <th>Values</th>
-                <th>Unit</th>
-              </tr>
+            {headerGroups.map(headerGroup => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  <th width='40'>No.</th>
+                  {headerGroup.headers.map(column => (
+                  <th {...column.getHeaderProps(column.getSortByToggleProps)}>{column.render('Header')}
+                      <span>{column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}</span>
+                  </th>
+                ))}
+                </tr>
+            ))}
             </thead>
-            <tbody>
-            {message.map(({Signal, Value, Unit}, idx) => (
-              <tr key={idx} className= 'signals'>
-                <td>{Signal}</td>
-                <td>{Value}</td>
-                <td>{Unit}</td>
-              </tr>
-              ))}
+            <tbody {...getTableBodyProps()}>
+            {rows.map((row, i) => {
+                prepareRow(row)
+                return (
+                <tr key={i} className="rawrow" onClick = {() => handleMessage(row.original.ecu, row.original.values)} onContextMenu={(event) => handleRightClick(event, row)} {...row.getRowProps()}>
+                    <td width='40'>{i+1}</td>
+                    {row.cells.map(cell => {
+                    return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    })}
+                </tr>
+                )
+            })}
             </tbody>
-          </Table>
-    </>
-    )
-  }
+        </Table>
+        
+        {contextMenu.visible && (
+          <div style={{ top: contextMenu.y, left: contextMenu.x }} ref={contextMenuRef} className="context-menu">
+            <button onClick={copyRow}>Copy Row</button>
+         </div>
+        )}
+
+        <Table className="decodedTable" striped bordered hover responsive variant = "dark">
+          <thead>
+            <tr>
+              <th>ECU</th>
+              <th className={ecuClass} colSpan={2}>{ecuState}</th>
+            </tr>
+            <tr>
+              <th>Signal</th>
+              <th>Values</th>
+              <th>Unit</th>
+            </tr>
+          </thead>
+          <tbody>
+          {message.map(({Signal, Value, Unit}, idx) => (
+            <tr key={idx} className= 'signals'>
+              <td>{Signal}</td>
+              <td>{Value}</td>
+              <td>{Unit}</td>
+            </tr>
+            ))}
+          </tbody>
+        </Table>
+  </>
+  )
+}

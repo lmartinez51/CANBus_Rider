@@ -24,7 +24,7 @@ const EditableCell = ({
     setValue(initialValue)
   }, [initialValue])
 
-  return <input className="edit" value={value} onChange={onChange} onBlur={onBlur} style={{ fontSize: '12px' }} />
+  return <input className="edit" value={value} onChange={onChange} onBlur={onBlur} style={{ fontSize: '13px', fontWeight: 'bold', color: '#00f7ff' }} />
 }
 
 export const COLUMNS = [
@@ -33,7 +33,7 @@ export const COLUMNS = [
       accessor: "time",
     },
     {
-      Header: "Interface",
+      Header: "I/F",
       accessor: "can",
       disableSortBy: true,
     },

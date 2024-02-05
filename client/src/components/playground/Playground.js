@@ -18,6 +18,8 @@ export default function Playground() {
 
     const [tacho, setTacho] = useState(0)  //Divide revs rpm / 8000.0.25=2, 0.5=4, 1=8
     const [speed, setSpeed] = useState(0)    //Divide speed km/h / 200 0.5 = 100; 0.25 = 50
+    const [brake, setBrake] = useState(0)
+    const [cruiseCtrl, setCruiseCtrl] = useState(0)
     const [gas, setGas] = useState(1)
     const [mileage, setMileage] = useState(0)
     const [turnSignalsStates, setTurnSignal] = useState({
@@ -30,6 +32,7 @@ export default function Playground() {
         'drift':      0,
         'highBeam':   0,
         'lock':       0,
+        'hazzard':    0,
         'seatBelt':   0,
         'engineTemp': 0,
         'stab':       0,
@@ -46,6 +49,9 @@ export default function Playground() {
     const [message, setMessage] = useState(null)
     const [previousChats, setPreviousChats] = useState([])
     const [currentTitle, setCurrentTitle] = useState(null)
+    const [iconsLoaded, setIconsLoaded] = useState(false) // Nuevo estado para manejar la carga de los iconos
+    const [isTextareaEmpty, setIsTextareaEmpty] = useState(true)
+    const [showHelpAndButtons, setShowHelpAndButtons] = useState(true)
 
     useEffect(() => {
         // Escuchar el evento del socket para actualizar los datos
@@ -81,12 +87,28 @@ export default function Playground() {
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [message, currentTitle])
+
+    useEffect(() => {
+        // Crea una nueva instancia de Image
+        const img = new Image();
+
+        // Define el manejador del evento onload
+        img.onload = () => {
+            // Una vez que la imagen se ha cargado, actualiza el estado
+            setIconsLoaded(true);
+        };
+
+        // Inicia la carga de la imagen
+        img.src = iconos;
+    }, []); // Este efecto se ejecuta una vez cuando el componente se monta
     
-    const getMessages = async () => {
+    const getMessages = async (message) => {
+        console.log(`Mensaje a enviar: ${message}`)
+        setShowHelpAndButtons(false)
         const options = {
             method: "POST",
             body: JSON.stringify({
-                message: value,
+                message: message,
             }),
             headers: {
                 "Content-Type": "application/json"
@@ -100,9 +122,25 @@ export default function Playground() {
             console.error(error)
         }
     }
+    
+    const handleButtonClick = (e) => {
+        // Prevenir la acción por defecto del botón
+        e.preventDefault();
+
+        // Prevenir la propagación del evento
+        e.stopPropagation();
+    
+        // Obtener el texto de los dos <div> dentro de .flex3
+        const text1 = e.currentTarget.querySelector('.truncateText1').textContent;
+        const text2 = e.currentTarget.querySelector('.truncateText2').textContent;
+
+        // Concatenar los dos textos
+        const buttonValue = text1 + ' ' + text2;
+        // Llamar a la función getMessages con buttonValue
+        getMessages(buttonValue);
+    }    
 
     const currentChat = previousChats.filter(previousChat => previousChat.title === currentTitle)
- 
     return (
         <>
         <div className="Playground">
@@ -112,11 +150,64 @@ export default function Playground() {
                     <img id="sprite" alt='icons' src={iconos}></img>
                 </div>
                 <div className="canvas">
-                    <Canvas draw={(ctx) => draw(ctx, speed, tacho, gas, mileage, turnSignalsStates, iconsStates)} width={940} height={260}/>
+                    {iconsLoaded && <Canvas draw={(ctx) => draw(ctx, speed, tacho, gas, mileage, turnSignalsStates, iconsStates)} width={920} height={310}/>}
                 </div>
                 <div id="chatgpt" className="chatgpt">
                     <section className="chat">
-                        <h6>BusWhizBot</h6>
+                        <h5>Mike The Mechanic's Chat Box</h5>
+                        {showHelpAndButtons && (
+                            <>
+                                <div className="help-text">How can I help you today?</div>
+                                <div className="projection-buttons-container">
+                                    <div className="projection-button">
+                                            <span data-projection-id="46">
+                                                <button className="btn" data-title="Click to send" onClick={handleButtonClick}>
+                                                    <div className="flex1">
+                                                        <div className="flex2">
+                                                            <div className="flex3">
+                                                                <div className="truncateText1">Analyze this CAN Bus message:</div>
+                                                                <div className="truncateText2">(1669891547.973723) vcan0 18FE4CFE#19B2DD1331876F1B</div>
+                                                            </div>
+                                                            <div className="absolute">
+                                                                <span className="span1" data-state="closed">
+                                                                    <div className="rounded1">
+                                                                        <svg viewBox="0 0 24 24" fill="none" className="icon-sm text-token-text-primary">
+                                                                            <path d="M7 11L12 6L17 11M12 18V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
+                                                                        </svg>
+                                                                    </div>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    <div className="projection-button">
+                                        <span data-projection-id="46">
+                                            <button className="btn" data-title="Click to send" onClick={handleButtonClick}>
+                                                <div className="flex1">
+                                                    <div className="flex2">
+                                                        <div className="flex3">
+                                                            <div className="truncateText1">Analiza el siguiente mensaje:</div>
+                                                            <div className="truncateText2">(1669891547.973723) vcan0 18FE4CFE#19B2DD1331876F1B</div>
+                                                        </div>
+                                                        <div className="absolute">
+                                                            <span className="span1" data-state="closed">
+                                                                <div className="rounded1">
+                                                                    <svg viewBox="0 0 24 24" fill="none" className="icon-sm text-token-text-primary">
+                                                                        <path d="M7 11L12 6L17 11M12 18V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
+                                                                    </svg>
+                                                                </div>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                         <ul className="feed">
                             {currentChat?.map((chatMessage, index) => <li key={index}>
                                 <p className="role">{chatMessage.role}</p>
@@ -125,13 +216,19 @@ export default function Playground() {
                         </ul>
                         <div className="bottom-section">
                             <div className="input-container">
-                                <input value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => {
+                                <textarea id="txtChatArea" value={value} onChange={(e) => {setValue(e.target.value); setIsTextareaEmpty(e.target.value === '')}} onKeyDown={(e) => {
                                     if (e.code === 'Enter') {
                                         e.preventDefault(); // Previene la acción por defecto del 'Enter'
-                                        getMessages();
+                                        getMessages(value);
                                     }
-                                }}/>
-                                <div id="submit" onClick={getMessages}>➢</div>
+                                }} rows="1" cols={10} placeholder="Message Mike..."/>
+                                <button disabled={isTextareaEmpty} onClick={() => getMessages(value)} className="custom-button" data-testid="send-button">
+                                    <span className="span2" data-state="closed">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-white dark:text-black">
+                                            <path d="M7 11L12 6L17 11M12 18V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
+                                        </svg>
+                                    </span>
+                                </button>
                             </div>
                         </div>
                     </section>

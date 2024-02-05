@@ -79,7 +79,7 @@ function dumpPacket(msg) {
 // Recieve file name from the front-end
 app.post('/upload', (req, res) => {
 	fileName = req.body.params.fileName
-
+	console.log(`File name: ${fileName}`)
 	res.status(200).send({ message: 'File name received' })
   })
 
