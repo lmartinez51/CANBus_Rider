@@ -16,7 +16,6 @@ table {
     border-right: 2px solid;
 }
 
-
 /* Raw Message Table */
 table.rawDataTable tbody {
     display:block;
@@ -27,9 +26,8 @@ table.rawDataTable tbody {
 }
 
 table.rawDataTable, table.decodedTable {
-    height: 249px;
-    max-height: 249px;
     table-layout: fixed;
+    background-color: black;
 }
 
 /* Table Header General Settings*/
@@ -66,8 +64,9 @@ table.rawDataTable, table.decodedTable {
 }
 
 .rawDataTable th:nth-child(13){
-    text-align: center;
-    width: 86px;
+    text-align: left;
+    text-indent: 8px;
+    width: 90px;
 }
   
 /* Default Row Settings */
@@ -115,18 +114,22 @@ table.rawDataTable, table.decodedTable {
 
 .rawDataTable td:nth-child(13){
     text-align: center;
-    width: 72px;
+    width: 73px;
 }
   
 /* Hover color. Only affects the entire header right now. */ 
-.table-hover,table.rawDataTable tr:hover th{
+.table-hover,table.rawDataTable tr:hover th, table.calcTable tr:hover th{
   background-color: #262546;
 }
 
 /* Decoded Message Table */
+table.decodedTable {
+    width: 530px;
+    height: 290px;
+}
+
 table.decodedTable tbody {
-    display:block;
-    height: 211px;
+    display: block;
     max-height: 211px;
     overflow-y: auto;
     font-weight: bold;
@@ -135,22 +138,21 @@ table.decodedTable tbody {
 
 /* Customized decoded table header */
 
-/* Estilos personalizados para el valor de ECU */
+/* Customized styles for ECU header */
 table.decodedTable th.ecuValue {
-    background-color: rebeccapurple;
+    /*background-color: rebeccapurple;*/
+    width: 265px;
+    background-color: rgb(40, 77, 241);
     color: white;
     font-size: 14px;
-    /* Agrega aquí cualquier otro estilo que desees */
 }
 
 table.decodedTable th.ecuValue.withValue {
-    border: 1px solid rgb(0, 247, 255); /* Borde para cuando la celda tiene un valor */
+    border: 2px solid rgb(0, 247, 255); /* Borde para cuando la celda tiene un valor */
+    text-align: left;
 }
 
-table.decodedTable th.ecuValue.withoutValue {
-    border: none; /* Borde para cuando la celda está vacía */
-}
-
+/* Decoded Table Headers - Signal - Values - Unit */
 table.decodedTable th:nth-child(1), th:nth-child(2), th:nth-child(3){
     background-color: rgb(40, 77, 241);
     color: whitesmoke;
@@ -159,33 +161,38 @@ table.decodedTable th:nth-child(1), th:nth-child(2), th:nth-child(3){
 
 table.decodedTable th:nth-child(1){
     text-align: center;
-    width: 260px;
+    width: 265px;
     border-right: none;
 }
 
 table.decodedTable th:nth-child(2) {
-    width: 610px;
+    text-align: left;
+    width: 181px;
 }
 
 table.decodedTable th:nth-child(3){
-    width: 99px;
+    text-align: center;
+    width: 84px;
 }
 
 /* Default Row Settings */
 table.decodedTable td:nth-child(1){
     text-align: center;
-    width: 260px;
+    width: 262.17px;
     color: white;
     font-size: 12px;
 }
+
 table.decodedTable td:nth-child(2){
-    width: 610px;
+    text-align: left;
+    width: 181px;
     color: white;
     font-size: 12px;
 }
+
 table.decodedTable td:nth-child(3) {
-    text-align: left;
-    width: 88px;
+    text-align: center;
+    width: 66px;
     color: white;
     font-size: 12px;
 }
@@ -193,6 +200,215 @@ table.decodedTable td:nth-child(3) {
 /* Hover color */
 .table-hover,table.decodedTable tr:hover th{
     background-color: #262546;
+}
+
+/* Form Styles Settings */
+.calcForm {
+    width: 389px;
+    height: 120px;
+}
+
+.titleContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+  
+.tableTitle, .tableSubtitle {
+    text-align: center;
+}
+
+.tableTitle {
+    color: white;
+    text-shadow: 2px 2px 4px darkslategray; /* Añade una sombra a la letra para darle profundidad */
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 24px; /* Aumenta el tamaño de la letra */
+    font-weight: bold; /* Hace que la letra sea negrita */
+    letter-spacing: 1px; /* Aumenta el espacio entre las letras */
+    text-transform: uppercase; /* Transforma el texto a mayúsculas */
+}
+  
+.tableSubtitle {
+    color: white;
+    text-shadow: 2px 2px 4px darkslategray; /* Añade una sombra a la letra para darle profundidad */
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px; /* Aumenta el tamaño de la letra */
+    font-weight: bold; /* Hace que la letra sea negrita */
+    letter-spacing: 1px; /* Aumenta el espacio entre las letras */
+    text-transform: uppercase; /* Transforma el texto a mayúsculas */
+}
+
+/* Calculator Table */
+table.calcTable {
+    width: 388px;
+    height: 123px;
+}
+
+table.calcTable tbody {
+    display:block;
+    height: 42px;
+    max-height: 42px;
+    overflow-y: auto;
+    font-weight: bold;
+    background-color: black;
+}
+
+/* Calculator Table Headers - Bit Pos - Hex Value - LSB - Scale - Offset - Value */
+table.calcTable th:nth-child(1), th:nth-child(2), th:nth-child(3){
+    background-color: rgb(40, 77, 241);
+    color: whitesmoke;
+    font-size: 14px;
+}
+
+/* Calculator Table Headers - First Row - Bit Pos - Hex Value */
+table.calcTable th.bitPosHeader {
+    width: 97px;
+}
+
+table.calcTable th.bitPos {
+    /*background-color: rebeccapurple;*/
+    background-color: rgb(40, 77, 241);
+    text-align: center;
+    width: 97px;
+    color: white;
+    font-size: 14px;
+}
+
+table.calcTable th.bitPos.withValue {
+    border: 1px solid rgb(0, 247, 255); /* Borde para cuando la celda tiene un valor */
+}
+
+table.calcTable th.hexValueHeader {
+    text-align: center;
+    width: 97px;
+    color: white;
+    font-size: 14px;
+}
+
+table.calcTable th.hexValue {
+    background-color: rgb(40, 77, 241);
+    text-align: center;
+    width: 97px;
+    color: white;
+    font-size: 14px;
+}
+
+table.calcTable th.hexValue.withoutValue {
+    border: none;
+}
+
+table.calcTable th.hexValue.withValue {
+    border: 2px solid rgb(0, 247, 255); /* Borde para cuando la celda tiene un valor */
+    text-align: center;
+}
+
+/* Calculator Table Headers - Second Row - LSB - Bit Length - New Value */
+table.calcTable th.lsb {
+    background-color: rgb(40, 77, 241);
+    width: 97px;
+    text-align: center;
+    color: whitesmoke;
+    font-size: 14px;
+}
+
+table.calcTable th.scale {
+    background-color: rgb(40, 77, 241);
+    width: 97px;
+    text-align: center;
+    color: whitesmoke;
+    font-size: 14px;
+}
+
+table.calcTable th.offset {
+    background-color: rgb(40, 77, 241);
+    width: 97px;
+    text-align: center;
+    color: whitesmoke;
+    font-size: 14px;
+}
+
+table.calcTable th.newValue {
+    background-color: rgb(40, 77, 241);
+    width: 97px;
+    text-align: center;
+    color: whitesmoke;
+    font-size: 14px;
+}
+
+/* Calculator Rows - LSB - Bit Length - Bit Pos */
+table.calcTable td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4){
+    color: #87CEFA;
+    font-size: 14px;
+}
+
+table.calcTable td:nth-child(1){
+    text-align: center;
+    width: 97px;
+}
+
+table.calcTable td:nth-child(2) {
+    text-align: center;
+    width: 97px;
+}
+
+table.calcTable td:nth-child(3){
+    text-align: center;
+    width: 97px;
+}
+
+table.calcTable td:nth-child(4){
+    text-align: center;
+    width: 97px;
+}
+
+/* Estilos para los elementos <input> dentro de la tabla */
+.calcTableInput {
+    width: 40px; /* Ajusta esto al ancho que prefieras */
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: #00f7ff;
+    width: 100%;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    background-color: #444; /* Darker than the background for contrast */
+    box-shadow: inset 0 3px 6px rgba(0,0,0,0.2); /* Inner shadow for depth */
+    transition: box-shadow 0.3s ease; /* Smooth transition */
+}
+
+.calcTableInput:focus {
+    box-shadow: inset 0 5px 10px rgba(0,0,0,0.3); /* Deeper shadow on focus */
+}
+
+button.calculate {
+    margin-right: 10px;
+    background-color: transparent;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+button.calculate:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(0, 0, 0); /* Color de fondo cuando el cursor está encima */
+    color: white; /* Color del texto cuando el cursor está encima */
+    border-color: white; /* Color del borde cuando el cursor está encima */
+}
+
+button.clear {
+    background-color: transparent;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+button.clear:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(0, 0, 0); /* Color de fondo cuando el cursor está encima */
+    color: white; /* Color del texto cuando el cursor está encima */
+    border-color: white; /* Color del borde cuando el cursor está encima */
 }
 
 /* CONTEXT MENU - COPY */

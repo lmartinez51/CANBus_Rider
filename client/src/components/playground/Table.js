@@ -1,10 +1,11 @@
 import Nav from "react-bootstrap/Nav"
 import Navbar from "react-bootstrap/Navbar"
 import NavDropdown from "react-bootstrap/NavDropdown"
-import React, { useState, useMemo, useRef, useEffect } from 'react'
+import React, { useState, useMemo, useRef, useEffect, useContext } from 'react'
 import { useTable, useGlobalFilter, useSortBy } from 'react-table'
 import Table from 'react-bootstrap/Table';
 import {COLUMNS} from './Columns'
+import SignalContext from './SignalContext';
 import "./Table.css"
 import { GlobalFilter } from './GlobalFilter'
 import axios from 'axios'
@@ -24,16 +25,30 @@ export default function CANTable() {
   const [selectedRow, setSelectedRow] = useState(null)
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 })
   const contextMenuRef = useRef(null)
+  const { setSignal } = useContext(SignalContext)
+  const [lsb, setLsb] = useState('')
+  const [scale, setScale] = useState('')
+  const [offset, setOffset] = useState('')
+  const [newValue, setNewValue] = useState('')
+  const [result, setResult] = useState('')
+  const [bitPosition, setBitPosition] = useState('')
   const worker = new Worker()
-  // Añade o quita las clases dependiendo del valor de ecuState
+
+  // Modifica el nombre de la clase dependiendo del valor de ecuState
   let ecuClass = 'ecuValue';
   if (ecuState) {
     ecuClass += ' withValue';
   } else {
     ecuClass += ' withoutValue';
   }
-  
 
+  let hexValueClass = 'hexValue';
+  if (result) {
+    hexValueClass += ' withValue';
+  } else {
+    hexValueClass += ' withoutValue';
+  }
+  
   /* Effect to terminate the File Processing Worker */
   useEffect(() => {
     // Cuando el componente se desmonte, termina el Web Worker
@@ -72,7 +87,49 @@ export default function CANTable() {
     }
   }, [logFileName]); // Este efecto se ejecuta cada vez que logFileName cambia
 
-  const handleMessage = (ecu, values) => {
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    const hexValue = inverseCalculator(parseFloat(newValue), parseInt(lsb), parseFloat(scale), parseFloat(offset))
+    const bitPosition = calculateBitPosition(parseInt(lsb))
+    setResult(hexValue)
+    setBitPosition(bitPosition)
+  }
+  
+  const calculateBitPosition = (lsb) => {
+    let lowerBound = Math.floor(lsb / 8) * 8
+    let upperBound = lowerBound + 7
+    return `${lowerBound}-${upperBound}`
+  }
+
+  const handleClear = () => {
+    setLsb('')
+    setScale('')
+    setOffset('')
+    setNewValue('')
+    setResult('')
+    setBitPosition('')
+  }
+
+  const inverseCalculator = (newValue, lsb, scale, offset) => {
+    console.log(`New Value: ${newValue}`)
+    console.log(`LSB: ${lsb}`)
+    // Restar el offset y dividir por la escala
+    let originalAfterShift = (newValue - offset) / scale
+  
+    // Realizar un desplazamiento de bits a la izquierda
+    let original = originalAfterShift << (lsb % 8)
+  
+    // Convertir el resultado a hexadecimal
+    let dataHex = original.toString(16).toUpperCase()
+    console.log(`Hex Value: ${dataHex}`)
+    // Asegúrate de que el resultado tenga al menos dos caracteres
+    dataHex = dataHex.padStart(2, '0')
+    console.log(`Hex Value: ${dataHex}`)
+    return dataHex
+  }
+  
+
+  const handleMessage = (ecu, values, dt1, dt2, dt3, dt4, dt5, dt6, dt7, dt8) => {
     // En caso de que se abren raw packets. Verificar si ecu y values son undefined. 
     if (ecu === undefined || values === undefined) {
       // Si alguno es undefined, terminar la ejecución de la función
@@ -203,7 +260,6 @@ export default function CANTable() {
       setInfo([])
       setMessage([])
       setEcuState("")
-    
       // Enviar el archivo al worker para su procesamiento
       const file = await fileHandle.getFile();
       worker.postMessage(file);
@@ -279,6 +335,7 @@ export default function CANTable() {
             hiddenColumns: ["values"],
         },
     }, useGlobalFilter, useSortBy);
+
     // Render the UI for the table
     return (
       <>
@@ -314,7 +371,7 @@ export default function CANTable() {
               </div>
             </Navbar.Collapse>
         </Navbar>
-      </div>
+        </div>
         {/* TABLE*/}
         <Table className="rawDataTable" striped bordered hover responsive variant = "dark" {...getTableProps()}>
             <thead>
@@ -333,7 +390,8 @@ export default function CANTable() {
             {rows.map((row, i) => {
                 prepareRow(row)
                 return (
-                <tr key={i} className="rawrow" onClick = {() => handleMessage(row.original.ecu, row.original.values)} onContextMenu={(event) => handleRightClick(event, row)} {...row.getRowProps()}>
+                <tr key={i} className="rawrow" onClick = {() => handleMessage(row.original.ecu, row.original.values, row.original.dt1,
+                row.original.dt2, row.original.dt3, row.original.dt4, row.original.dt5, row.original.dt6, row.original.dt7, row.original.dt8)} onContextMenu={(event) => handleRightClick(event, row)} {...row.getRowProps()}>
                     <td width='40'>{i+1}</td>
                     {row.cells.map(cell => {
                     return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
@@ -343,35 +401,67 @@ export default function CANTable() {
             })}
             </tbody>
         </Table>
-        
         {contextMenu.visible && (
           <div style={{ top: contextMenu.y, left: contextMenu.x }} ref={contextMenuRef} className="context-menu">
             <button onClick={copyRow}>Copy Row</button>
          </div>
         )}
-
-        <Table className="decodedTable" striped bordered hover responsive variant = "dark">
-          <thead>
-            <tr>
-              <th>ECU</th>
-              <th className={ecuClass} colSpan={2}>{ecuState}</th>
-            </tr>
-            <tr>
-              <th>Signal</th>
-              <th>Values</th>
-              <th>Unit</th>
-            </tr>
-          </thead>
-          <tbody>
-          {message.map(({Signal, Value, Unit}, idx) => (
-            <tr key={idx} className= 'signals'>
-              <td>{Signal}</td>
-              <td>{Value}</td>
-              <td>{Unit}</td>
-            </tr>
-            ))}
-          </tbody>
-        </Table>
+        <div style={{ display: 'flex', justifyContent: 'space-between', height: '310px' }}>
+          <Table className="decodedTable" striped bordered hover responsive variant = "dark">
+            <thead>
+              <tr>
+                <th>ECU</th>
+                <th className={ecuClass} colSpan={2}>{ecuState}</th>
+              </tr>
+              <tr>
+                <th>Signal</th>
+                <th>Values</th>
+                <th>Unit</th>
+              </tr>
+            </thead>
+            <tbody className="tbodyHeight">
+                {message.map(({Signal, Value, Unit}, idx) => (
+                  <tr key={idx} className= 'signals' onClick={() => setSignal(Signal)}>
+                    <td>{Signal}</td>
+                    <td>{Value}</td>
+                    <td>{Unit}</td>
+                  </tr>
+                  ))}
+            </tbody>
+          </Table>
+          <form className="calcForm" onSubmit={handleSubmit}>
+            <div className="titleContainer">
+              <h5 className="tableTitle">BitWise Whisperer</h5>
+              <h4 className="tableSubtitle">Hack the CAN Bus</h4>
+            </div>
+            <Table className="calcTable"striped bordered hover responsive variant="dark">
+              <thead>
+                <tr>
+                  <th className="bitPosHeader">Bit Position</th>
+                  <th className="bitPos">{bitPosition}</th>
+                  <th className="hexValueHeader">Hex Value</th>
+                  <th className={hexValueClass}>{result}</th>
+                </tr>
+                <tr>
+                  <th className="lsb">LSB</th>
+                  <th className="scale">Scale</th>
+                  <th className="offset">Offset</th>
+                  <th className="newValue">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input className="calcTableInput" value={lsb} onChange={e => setLsb(e.target.value)} /></td>
+                  <td><input className="calcTableInput" value={scale} onChange={e => setScale(e.target.value)} /></td>
+                  <td><input className="calcTableInput" value={offset} onChange={e => setOffset(e.target.value)} /></td>
+                  <td><input className="calcTableInput" value={newValue} onChange={e => setNewValue(e.target.value)} /></td>
+                </tr>
+              </tbody>
+            </Table>
+            <button className="calculate" type="submit">Calculate</button>
+            <button className="clear" type="button" onClick={handleClear}>Clear</button>
+          </form>
+        </div>
   </>
   )
 }

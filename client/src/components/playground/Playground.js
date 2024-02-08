@@ -1,4 +1,5 @@
 import CANTable from "./Table"
+import SignalContext from './SignalContext'
 import Canvas from "./Canvas"
 import React, { useEffect, useState } from 'react'
 import "./Playground.css"
@@ -52,6 +53,7 @@ export default function Playground() {
     const [iconsLoaded, setIconsLoaded] = useState(false) // Nuevo estado para manejar la carga de los iconos
     const [isTextareaEmpty, setIsTextareaEmpty] = useState(true)
     const [showHelpAndButtons, setShowHelpAndButtons] = useState(true)
+    const [signal, setSignal] = useState('WheelBasedVehicleSpeed');
 
     useEffect(() => {
         // Escuchar el evento del socket para actualizar los datos
@@ -142,7 +144,7 @@ export default function Playground() {
 
     const currentChat = previousChats.filter(previousChat => previousChat.title === currentTitle)
     return (
-        <>
+        <SignalContext.Provider value={{ signal, setSignal }}>
         <div className="Playground">
             {/** DASHBOARD REGION **/}
             <div id="dashboard">
@@ -188,8 +190,8 @@ export default function Playground() {
                                                 <div className="flex1">
                                                     <div className="flex2">
                                                         <div className="flex3">
-                                                            <div className="truncateText1">Analiza el siguiente mensaje:</div>
-                                                            <div className="truncateText2">(1669891547.973723) vcan0 18FE4CFE#19B2DD1331876F1B</div>
+                                                            <div className="truncateText1">Find the LSB, scale and offset</div>
+                                                            <div className="truncateText2">of the {signal} signal.</div>
                                                         </div>
                                                         <div className="absolute">
                                                             <span className="span1" data-state="closed">
@@ -242,6 +244,6 @@ export default function Playground() {
                 </div>
             </div>
         </div>
-        </>
+        </SignalContext.Provider>
     )
 }

@@ -28,75 +28,75 @@ const EditableCell = ({
 }
 
 export const COLUMNS = [
-   {
-      Header: "Time",
-      accessor: "time",
-    },
-    {
-      Header: "I/F",
-      accessor: "can",
-      disableSortBy: true,
-    },
-    {
-      Header: "ID",
-      accessor: "id",
-      enableSorting: true,
-    },
-    {
-      Header: "ECU",
-      accessor: "ecu",
-    },
-    {
-      Header: "00",
-      accessor: "dt1",
-      disableSortBy: true,
-      Cell: EditableCell,
-    },
-    {
-      Header: "01",
-      accessor: "dt2",
-      disableSortBy: true,
-      Cell: EditableCell, 
-    },
-    {
-      Header: "02",
-      accessor: "dt3",
-      disableSortBy: true,
-      Cell: EditableCell,
-    },
-    {
-      Header: "03",
-      accessor: "dt4",
-      disableSortBy: true,
-      Cell: EditableCell,
-    },
-    {
-      Header: "04",
-      accessor: "dt5",
-      disableSortBy: true,
-      Cell: EditableCell,
-    },
-    {
-      Header: "05",
-      accessor: "dt6",
-      disableSortBy: true,
-      Cell: EditableCell,
-    },
-    {
-      Header: "06",
-      accessor: "dt7",
-      disableSortBy: true,
-      Cell: EditableCell,
-    },
-    {
-      Header: "07",
-      accessor: "dt8",
-      disableSortBy: true,
-      Cell: EditableCell,
-    },
-    {
-      Header: "Values",
-      accessor: "values",
-      disableSortBy: true,
-    },
-  ];
+  {
+    Header: "Time",
+    accessor: "time",
+  },
+  {
+    Header: "I/F",
+    accessor: "can",
+    disableSortBy: true,
+  },
+  {
+    Header: "ID",
+    accessor: "id",
+    enableSorting: true,
+  },
+  {
+    Header: "ECU",
+    accessor: "ecu",
+  },
+  {
+    Header: "0-7",
+    accessor: "dt1",
+    disableSortBy: true,
+    Cell: EditableCell,
+  },
+  {
+    Header: "08-15",
+    accessor: "dt2",
+    disableSortBy: true,
+    Cell: EditableCell,
+  },
+  {
+    Header: "16-23",
+    accessor: "dt3",
+    disableSortBy: true,
+    Cell: EditableCell,
+  },
+  {
+    Header: "24-31",
+    accessor: "dt4",
+    disableSortBy: true,
+    Cell: EditableCell,
+  },
+  {
+    Header: "32-39",
+    accessor: "dt5",
+    disableSortBy: true,
+    Cell: EditableCell,
+  },
+  {
+    Header: "40-47",
+    accessor: "dt6",
+    disableSortBy: true,
+    Cell: EditableCell,
+  },
+  {
+    Header: "48-55",
+    accessor: "dt7",
+    disableSortBy: true,
+    Cell: EditableCell,
+  },
+  {
+    Header: "56-63",
+    accessor: "dt8",
+    disableSortBy: true,
+    Cell: EditableCell,
+  },
+  {
+    Header: "Values",
+    accessor: "values",
+    disableSortBy: true,
+  },
+];

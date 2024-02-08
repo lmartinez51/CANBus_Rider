@@ -51,8 +51,9 @@ let self = module.exports = {
                 'Authorization': `Bearer ${process.env.CHATGPT_API_KEY}`,
                 'OpenAI-Beta': 'assistants=v1'
             }
-            await self.delay(5000);  // Wait for 5 seconds
+            await self.delay(5000);  // Wait for 5 seconds (Suppose to fix failed errors)
             let response = await axios.get(url, { headers: headers })
+            console.log(`Assitant response: ${response.data.data[0].content[0].text.value}`)
             res.send({ message: response.data.data[0].content[0].text.value })
         } catch (error) {
             console.log(error)
@@ -155,7 +156,7 @@ let self = module.exports = {
                     console.log("Submit output");
                     await axios.post(action_url, tools_outputs, {headers: action_headers})
                 }
-                await self.delay(30000) // Consider making this delay configurable                    
+                await self.delay(20000) // Consider making this delay configurable                    
             }
             
         } catch (error) {
@@ -215,7 +216,7 @@ let self = module.exports = {
         let formattedValues = finalValues.map(value => value.padStart(2, '0'));
         let result = formattedValues.join('');
         
-        // Aplica la función de Excel transformada a Python
+        // Realizar el desplazamiento de bits a la derecha
         result = parseInt(result, 16) >> (lsb % 8);
         
         // Convierte el resultado a decimal

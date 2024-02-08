@@ -169,7 +169,7 @@ textarea::placeholder {
 
 .feed li {
     display: flex;
-    background-color: black;/*#444654;*/
+    background-color: black;
     width: 100%;
     padding: 5px;
     margin: 0 0 5px 0;
