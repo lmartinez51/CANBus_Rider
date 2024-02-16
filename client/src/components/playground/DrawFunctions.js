@@ -72,8 +72,12 @@
         lmCircle.drawIcon(ctx, 'oil', iconStates['oil']);
         lmCircle.drawIcon(ctx, 'battery', iconStates['battery']);
 
+        // Draw electronic tachometer value
+        lmCircle.drawRPM(ctx, tachometerValue, 0, 60, 100, 20, 2);
+
+
         lmCircle.drawMultiplier(ctx, 1, -65);
-        const lvalue = tachometerValue
+        const lvalue = tachometerValue / 8000
         const ldegAngleArrow = 207
         const loffset4 = 10
         lmCircle.drawArrow(ctx, lvalue, ldegAngleArrow, loffset4);
@@ -294,33 +298,31 @@
         rCircle.drawArrowBody(ctx);
     }
 
-
     const icons = {
         // Left Main circle
         'dippedBeam': new Icon(-15, -45, 10, 150 * 0 + 10 * 1, 23.5, 23.5, 2),
         'highBeam':   new Icon(-50, -45, 10, 150 * 4 + 10 * 5, 23.5, 23.5, 2),
-        'abs':        new Icon(-50, -15, 10, 150 * 14 + 10 * 15, 23.5, 23.5, 2),
-
+        'abs':        new Icon(-45, -15, 10, 150 * 14 + 10 * 15, 23.5, 23.5, 2),
+        'brake':      new Icon(-75, -15, 10, 150 * 1 + 10 * 2, 23.5, 23.5, 2),
+    
         'drift':      new Icon(15, -45, 10, 150 * 2 + 10 * 3, 23.5, 23.5, 2),
         'stab':       new Icon(47, -45, 10, 150 * 12 + 10 * 13, 22.5, 22.5, 2),
         'engineFail': new Icon(47, -15, 10, 150 * 13 + 10 * 14, 23.5, 23.5, 3),
         'lock':       new Icon(47, 10, 10, 150 * 6 + 10 * 7, 23.5, 23.5, 2),
-
-        'bonnet':     new Icon(-50, 45, 10, 150 * 11 + 10 * 12, 25.5, 25.5, 2),
-        'trunk':      new Icon(0, 45, 10, 150 * 7 + 10 * 8, 25.5, 25.5, 2),
-        'doors':      new Icon(47, 45, 10, 150 * 15 + 10 * 16, 23.5, 23.5, 2),
-
-        'brake':      new Icon(-50, 75, 10, 150 * 1 + 10 * 2, 23.5, 23.5, 4),
-        'oil':        new Icon(0, 75, 10, 150 * 9 + 10 * 10, 23.5, 23.5, 3),
-        'battery':    new Icon(47, 75, 10, 150 * 5 + 10 * 6, 23.5, 23.5, 3),
-
+    
+        'bonnet':     new Icon(-65, 42, 10, 150 * 11 + 10 * 12, 25.5, 25.5, 2),
+        'trunk':      new Icon(-30, 42, 10, 150 * 7 + 10 * 8, 25.5, 25.5, 2),
+        'doors':      new Icon(0, 42, 10, 150 * 15 + 10 * 16, 23.5, 23.5, 2),
+        'oil':        new Icon(30, 42, 10, 150 * 9 + 10 * 10, 23.5, 23.5, 3),
+        'battery':    new Icon(65, 42, 10, 150 * 5 + 10 * 6, 23.5, 23.5, 3),
+    
         // Right Main Circle
         'hazzard': new Icon(0, -60, 10, 150 * 16 + 10 * 17, 25.5, 25.5, 2),
-        'seatBelt':   new Icon(0, 42, 10, 150 * 8 + 10 * 9, 24.5, 24.5, 2),
-
+        'seatBelt':   new Icon(0, 42, 10, 150 * 8 + 10 * 9, 23.5, 23.5, 2),
+    
         // Right circle
         'gas':        new Icon(-35, 0, 10, 150 * 3 + 10 * 4, 23.5, 23.5, 3),
-
+    
         // Left circle
         'engineTemp': new Icon(35, 0, 10, 150 * 10 + 10 * 11, 22.5, 22.5, 3),
     }
@@ -349,6 +351,7 @@
         'dangerZoneWidth': 5,
         'turnSignalColor': '#57d53f',
         'speedUnit': 'km',
+        'rpm': 'rpm',
         'icons': icons,
         'turnSignal': turnSignals
     }

@@ -19,8 +19,10 @@ const io = require("socket.io")(httpServer, {
 		methods: ["GET", "POST"],
 		allowedHeaders: ["my-custom-header"],
 		credentials: true
-	  }
+	  },
+	  pingTimeout: 90000,
 	})
+
 let pid = ''
 let now = new Date()
 let fileName = ''
@@ -164,8 +166,12 @@ db_bus.messages["CCVS"].signals["ParkingBrakeSwitch"].onUpdate(function(s) {
 	decodedInfo.parking=(s.value)
 })
 
-/* Esta seccion es para imprimir las senales en la terminal */
+/* Esta seccion es para imprimir las senales en la terminal
 // Asegurarse de poner todas las senales de cada mensaje para no ver tantos mensajes de error
+db_bus.messages["ASC1"].signals["DoorRelease"].onUpdate(function(s) {
+    console.log("Door Release: " + (s.value === 1 ? "Door Opened" : s.value === 0 ? "Door closed" : "Not available"));
+})
+
 db_bus.messages["EEC2"].signals["AccelPedalPos2"].onUpdate(function(s) {
     console.log("Accelerator Pedal 2 Position: " + s.value)
 })
@@ -181,9 +187,9 @@ db_bus.messages["EEC2"].signals["AccelPedalPos1"].onUpdate(function(s) {
 db_bus.messages["EEC1"].signals["EngSpeed"].onUpdate(function(s) {
     console.log("Engine Speed: " + s.value)
 })
- 
-db_bus.messages["ETC1"].signals["PercentClutchSlip"].onUpdate(function(s) {
-    console.log("Percent Clutch Slip Error: " + s.error)
+
+db_bus.messages["CCVS"].signals["CruiseCtrlActive"].onUpdate(function(s) {
+	console.log("Cruise Control: " + s.value)
 })
 
 db_bus.messages["CCVS"].signals["WheelBasedVehicleSpeed"].onUpdate(function(s) {
@@ -195,7 +201,15 @@ db_bus.messages["CCVS"].signals["CruiseCtrlSetSpeed"].onUpdate(function(s) {
 })
 
 db_bus.messages["CCVS"].signals["ParkingBrakeSwitch"].onUpdate(function(s) {
-	console.log("Parking Brake: " + s.value)
+	console.log("Parking Brake Switch: " + s.value)
+})
+
+db_bus.messages["CCVS"].signals["BrakeSwitch"].onUpdate(function(s) {
+	console.log("Brake Switch: " + s.value)
+})
+
+db_bus.messages["CCVS"].signals["ClutchSwitch"].onUpdate(function(s) {
+	console.log("Clutch Switch: " + s.value)
 })
 
 db_bus.messages["VD"].signals["TotalVehicleDistance"].onUpdate(function(s) {
@@ -204,7 +218,7 @@ db_bus.messages["VD"].signals["TotalVehicleDistance"].onUpdate(function(s) {
 
 db_bus.messages["VD"].signals["TripDistance"].onUpdate(function(s) {
 	console.log("Trip Distance: " + s.value)
-})
+}) */
 
 // Connect to MongoDB
 mongoose.connect(MONGODBURI).then(() => console.log("Connected to the MONGODB CAN Bus database")).catch(console.error)

@@ -31,6 +31,7 @@ class Circle {
      * @param {number} options.dangerZoneWidth Width of danger zone.
      * @param {string} options.turnSignalColor Color of enabled turn signal.
      * @param {string} options.speedUnit Speed unit (km, etc).
+     * @param {string} options.rpm revs (revs, etc).
      * @param {Object} options.icons Dictionary with icons names as key and icons objects as value.
      * @param {Object} options.turnSignal Dictionary with side of turn signal as key and turn signal object as value.
      */
@@ -59,6 +60,7 @@ class Circle {
         this.turnSignalColor = options.turnSignalColor;
 
         this.speedUnit = options.speedUnit;
+        this.rpm = options.rpm;
 
         this.icons = options.icons;
 
@@ -387,6 +389,66 @@ class Circle {
     }
 
     /**
+     * Draws rpm rectangle and value.
+     * @param {number} value Value of mileage.
+     * @param {number} offsetX Offset in px from center of circle by x-coordinate.
+     * @param {number} offsetY Offset in px from center of circle by y-coordinate.
+     * @param {number} width Width in px of rpm rectangle.
+     * @param {number} height Height in px of rpm rectangle.
+     * @param {number} radius Border radius in px of rpm rectangle.
+     */
+    drawRPM(ctx, value, offsetX, offsetY, width, height, radius) {
+        const halfWidth = width / 2;
+        const halfRadius = radius / 2;
+
+        const xPhw = offsetX + halfWidth;
+        const xMhw = offsetX - halfWidth;
+
+        const xMhwPr = xMhw + radius;
+        const xPhwMr = xPhw - radius;
+
+        const xPhwMhr = xPhw - halfRadius;
+        const xMhwPhr = xMhw + halfRadius;
+
+        const yPh = offsetY + height;
+        
+        const yPr = offsetY + radius;
+
+        const yPhr = offsetY + halfRadius;
+
+        const yPhMhr = yPh - halfRadius;
+
+        const yPhMr = yPh - radius;
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.beginPath();
+        ctx.moveTo(offsetX, yPh);
+        ctx.lineTo(xPhwMr, yPh);
+        ctx.bezierCurveTo(xPhwMr, yPh, xPhwMhr, yPhMhr, xPhw, yPhMr);
+        ctx.lineTo(xPhw, yPr);
+        ctx.bezierCurveTo(xPhw, yPr, xPhwMhr, yPhr, xPhwMr, offsetY);
+        ctx.lineTo(xMhwPr, offsetY);
+        ctx.bezierCurveTo(xMhwPr, offsetY, xMhwPhr, yPhr, xMhw, yPr);
+        ctx.lineTo(xMhw, yPhMr);
+        ctx.bezierCurveTo(xMhw, yPhMr, xMhwPhr, yPhMhr, xMhwPr, yPh);
+        ctx.closePath();
+        ctx.fillStyle="#284df1";
+        ctx.strokeStyle="#ffffff"
+        ctx.fill();
+        ctx.lineWidth = 1; // Grosor del borde
+        ctx.strokeStyle = '#ffffff'; // Color blanco
+        ctx.strokeRect(offsetX - 50, offsetY, width, height);
+
+        value = `${parseInt(value)} ${this.rpm}`;
+
+        ctx.font = `normal ${height - 6}px ${this.markFontFamily}`;
+        ctx.fillStyle = this.markFontColor;
+        ctx.fillText(value, halfWidth - ctx.measureText(value).width - 4, yPh - 5);
+        ctx.restore();
+    }
+
+    /**
      * Draws mileage rectangle and value.
      * @param {number} value Value of mileage.
      * @param {number} offsetX Offset in px from center of circle by x-coordinate.
@@ -433,6 +495,9 @@ class Circle {
         ctx.closePath();
         ctx.fillStyle="#284df1";
         ctx.fill();
+        ctx.lineWidth = 1; // Grosor del borde
+        ctx.strokeStyle = '#ffffff'; // Color blanco
+        ctx.strokeRect(offsetX - 50, offsetY, width, height);
 
         value = `${value} ${this.speedUnit}`;
 

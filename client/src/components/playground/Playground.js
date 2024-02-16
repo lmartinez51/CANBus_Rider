@@ -12,7 +12,11 @@ const socket = io(ENDPOINT, {
   withCredentials: true,
   extraHeaders: {
     "my-custom-header": "abcd"
-  }
+  },
+  autoConnect: true,
+  reconnection: true, // Habilitar la reconexión automática
+  reconnectionAttempts: Infinity, // Número de intentos de reconexión
+  reconnectionDelay: 1000, // Tiempo de espera antes de intentar la reconexión
 })
 
 export default function Playground() {
@@ -59,7 +63,7 @@ export default function Playground() {
         // Escuchar el evento del socket para actualizar los datos
         socket.on('message', (data) => {
             //console.log(data)
-            setTacho(data.revs/8000)
+            setTacho(data.revs)
             setMileage(data.dist)
         });
     
@@ -82,7 +86,7 @@ export default function Playground() {
                     content: value
                 }, {
                     title: currentTitle,
-                    role: "Assistant:",
+                    role: "Mike:",
                     content: message
                 }]
             ))
@@ -139,6 +143,9 @@ export default function Playground() {
         // Concatenar los dos textos
         const buttonValue = text1 + ' ' + text2;
         // Llamar a la función getMessages con buttonValue
+        // Actualizar el estado value
+        setValue(buttonValue);
+
         getMessages(buttonValue);
     }    
 
@@ -167,8 +174,8 @@ export default function Playground() {
                                                     <div className="flex1">
                                                         <div className="flex2">
                                                             <div className="flex3">
-                                                                <div className="truncateText1">Analyze this CAN Bus message:</div>
-                                                                <div className="truncateText2">(1669891547.973723) vcan0 18FE4CFE#19B2DD1331876F1B</div>
+                                                                <div className="truncateText1">Find the description</div>
+                                                                <div className="truncateText2">of the {signal} signal.</div>
                                                             </div>
                                                             <div className="absolute">
                                                                 <span className="span1" data-state="closed">

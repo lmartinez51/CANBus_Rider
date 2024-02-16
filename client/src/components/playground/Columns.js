@@ -43,7 +43,7 @@ export const COLUMNS = [
     enableSorting: true,
   },
   {
-    Header: "ECU",
+    Header: "MSG",
     accessor: "ecu",
   },
   {

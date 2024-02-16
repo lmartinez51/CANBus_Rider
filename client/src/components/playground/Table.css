@@ -1,6 +1,7 @@
 .navigationBottomBar{
     left: 0;
     width: 972px;
+    height: 45px;
     border: solid 2px #646464;
     background-color: black;
 }
@@ -16,11 +17,19 @@ table {
     border-right: 2px solid;
 }
 
+.margins {
+    margin-bottom: 0px;
+}
+
+.customRow {
+    height: 41.5px;
+}
+
 /* Raw Message Table */
 table.rawDataTable tbody {
     display:block;
-    height: 291px;
-    max-height: 291px;
+    height: 250px;
+    max-height: 250px;
     overflow-y: auto;
     background-color: black;
 }
@@ -123,17 +132,41 @@ table.rawDataTable, table.decodedTable {
 }
 
 /* Decoded Message Table */
+.decodedTableContainer {
+    width: 550px;
+    height: 330px;
+    margin-top: 20px;
+    border-radius: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); /* Ajusta el valor de la sombra */
+    background: radial-gradient(circle at center, #336699, #182848);
+}
+
+.decodedTitleContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 table.decodedTable {
-    width: 530px;
-    height: 290px;
+    width: 504px;
+    height: 255px;
+}
+
+.dtmargins {
+    margin-left: 23px; /* Affects Calc Table left margin */
+    margin-top: 10px;
 }
 
 table.decodedTable tbody {
     display: block;
-    max-height: 211px;
-    overflow-y: auto;
+    max-height: 176px;
+    overflow-y: scroll;
     font-weight: bold;
     background-color: black;
+}
+
+.table.decodedTable tbody::-webkit-scrollbar {
+    display: none; /* Oculta la barra de desplazamiento */
 }
 
 /* Customized decoded table header */
@@ -141,14 +174,14 @@ table.decodedTable tbody {
 /* Customized styles for ECU header */
 table.decodedTable th.ecuValue {
     /*background-color: rebeccapurple;*/
-    width: 265px;
+    width: 262px;
     background-color: rgb(40, 77, 241);
     color: white;
     font-size: 14px;
 }
 
 table.decodedTable th.ecuValue.withValue {
-    border: 2px solid rgb(0, 247, 255); /* Borde para cuando la celda tiene un valor */
+    /* border: 1px solid rgb(0, 247, 255); Borde para cuando la celda tiene un valor PENDIENTE DE SI LO DEJO O NO */
     text-align: left;
 }
 
@@ -161,38 +194,38 @@ table.decodedTable th:nth-child(1), th:nth-child(2), th:nth-child(3){
 
 table.decodedTable th:nth-child(1){
     text-align: center;
-    width: 265px;
+    width: 262px;
     border-right: none;
 }
 
 table.decodedTable th:nth-child(2) {
     text-align: left;
-    width: 181px;
+    width: 161px;
 }
 
 table.decodedTable th:nth-child(3){
     text-align: center;
-    width: 84px;
+    width: 80px;
 }
 
 /* Default Row Settings */
 table.decodedTable td:nth-child(1){
     text-align: center;
-    width: 262.17px;
+    width: 262px;
     color: white;
     font-size: 12px;
 }
 
 table.decodedTable td:nth-child(2){
     text-align: left;
-    width: 181px;
+    width: 161px;
     color: white;
     font-size: 12px;
 }
 
 table.decodedTable td:nth-child(3) {
     text-align: center;
-    width: 66px;
+    width: 80px;
     color: white;
     font-size: 12px;
 }
@@ -204,18 +237,36 @@ table.decodedTable td:nth-child(3) {
 
 /* Form Styles Settings */
 .calcForm {
-    width: 389px;
-    height: 120px;
+    width: 390px;
+    height: 280px;
+    border-radius: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); /* Ajusta el valor de la sombra */
+    background: radial-gradient(circle at center, #336699, #182848);
+}
+
+.formMargin {
+    margin-right: 16px;
+    margin-top: 45px;
+}
+
+.marginLeft {
+    margin-left: 8px; /* Affects Calc Table left margin */
 }
 
 .titleContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 15px;
 }
   
 .tableTitle, .tableSubtitle {
     text-align: center;
+    
+}
+
+.italicText {
+    font-style: italic;
 }
 
 .tableTitle {
@@ -236,18 +287,28 @@ table.decodedTable td:nth-child(3) {
     font-weight: bold; /* Hace que la letra sea negrita */
     letter-spacing: 1px; /* Aumenta el espacio entre las letras */
     text-transform: uppercase; /* Transforma el texto a mayúsculas */
+    opacity: .5!important;
 }
 
 /* Calculator Table */
 table.calcTable {
-    width: 388px;
-    height: 123px;
+    width: 369px;
+    height: 116px;
+    align-items: center;
+}
+
+.customCalcHeader {
+    width: 369px;
+}
+  
+.customCalcRow {
+    width: 369px;
 }
 
 table.calcTable tbody {
     display:block;
-    height: 42px;
-    max-height: 42px;
+    height: 41px;
+    max-height: 41px;
     overflow-y: auto;
     font-weight: bold;
     background-color: black;
@@ -262,77 +323,84 @@ table.calcTable th:nth-child(1), th:nth-child(2), th:nth-child(3){
 
 /* Calculator Table Headers - First Row - Bit Pos - Hex Value */
 table.calcTable th.bitPosHeader {
-    width: 97px;
+    text-align: center;
+    width: 92px;
+    color: white;
+    font-size: 13px;
 }
 
 table.calcTable th.bitPos {
     /*background-color: rebeccapurple;*/
     background-color: rgb(40, 77, 241);
     text-align: center;
-    width: 97px;
+    width: 92px;
     color: white;
-    font-size: 14px;
+    font-size: 13px;
 }
 
-table.calcTable th.bitPos.withValue {
-    border: 1px solid rgb(0, 247, 255); /* Borde para cuando la celda tiene un valor */
+@keyframes highlight {
+    from {background-color: rgb(5, 29, 187);} 
+    to {background-color: rgb(40, 77, 241);} 
+}
+
+table.calcTable th.bitPosValue.withValue {
+    animation: highlight 2s infinite;
+    text-align: center;
+    font-size: 14px;
 }
 
 table.calcTable th.hexValueHeader {
     text-align: center;
-    width: 97px;
+    width: 92px;
     color: white;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 table.calcTable th.hexValue {
     background-color: rgb(40, 77, 241);
     text-align: center;
-    width: 97px;
+    width: 92px;
     color: white;
-    font-size: 14px;
-}
-
-table.calcTable th.hexValue.withoutValue {
-    border: none;
+    font-size: 13px;
 }
 
 table.calcTable th.hexValue.withValue {
-    border: 2px solid rgb(0, 247, 255); /* Borde para cuando la celda tiene un valor */
+    animation: highlight 2s infinite;
     text-align: center;
+    font-size: 14px;
 }
 
 /* Calculator Table Headers - Second Row - LSB - Bit Length - New Value */
 table.calcTable th.lsb {
     background-color: rgb(40, 77, 241);
-    width: 97px;
+    width: 92px;
     text-align: center;
     color: whitesmoke;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 table.calcTable th.scale {
     background-color: rgb(40, 77, 241);
-    width: 97px;
+    width: 92px;
     text-align: center;
     color: whitesmoke;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 table.calcTable th.offset {
     background-color: rgb(40, 77, 241);
-    width: 97px;
+    width: 92px;
     text-align: center;
     color: whitesmoke;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 table.calcTable th.newValue {
     background-color: rgb(40, 77, 241);
-    width: 97px;
+    width: 92px;
     text-align: center;
     color: whitesmoke;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 /* Calculator Rows - LSB - Bit Length - Bit Pos */
@@ -343,27 +411,26 @@ table.calcTable td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(
 
 table.calcTable td:nth-child(1){
     text-align: center;
-    width: 97px;
+    width: 92px;
 }
 
 table.calcTable td:nth-child(2) {
     text-align: center;
-    width: 97px;
+    width: 92px;
 }
 
 table.calcTable td:nth-child(3){
     text-align: center;
-    width: 97px;
+    width: 92px;
 }
 
 table.calcTable td:nth-child(4){
     text-align: center;
-    width: 97px;
+    width: 92px;
 }
 
 /* Estilos para los elementos <input> dentro de la tabla */
 .calcTableInput {
-    width: 40px; /* Ajusta esto al ancho que prefieras */
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
     color: #00f7ff;
@@ -371,7 +438,7 @@ table.calcTable td:nth-child(4){
     border: none;
     border-radius: 5px;
     text-align: center;
-    background-color: #444; /* Darker than the background for contrast */
+    background-color: black;/* #444; Darker than the background for contrast */
     box-shadow: inset 0 3px 6px rgba(0,0,0,0.2); /* Inner shadow for depth */
     transition: box-shadow 0.3s ease; /* Smooth transition */
 }
@@ -424,13 +491,13 @@ button.clear:hover {
     padding: 6px 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-  }
+}
   
-  .context-menu:hover {
+.context-menu:hover {
     background-color: #e8e8e8;
-  }
+}
   
-  .context-menu button {
+.context-menu button {
     background: none;
     color: #333;
     border: none;
@@ -440,9 +507,8 @@ button.clear:hover {
     font-size: 16px;
     width: 100%;
     display: block;
-  }
+}
   
-  .context-menu button:hover {
+.context-menu button:hover {
     background-color: #ddd;
-  }
-  
+}

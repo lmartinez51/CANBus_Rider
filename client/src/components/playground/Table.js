@@ -5,7 +5,7 @@ import React, { useState, useMemo, useRef, useEffect, useContext } from 'react'
 import { useTable, useGlobalFilter, useSortBy } from 'react-table'
 import Table from 'react-bootstrap/Table';
 import {COLUMNS} from './Columns'
-import SignalContext from './SignalContext';
+import ContextValues from './SignalContext';
 import "./Table.css"
 import { GlobalFilter } from './GlobalFilter'
 import axios from 'axios'
@@ -25,7 +25,7 @@ export default function CANTable() {
   const [selectedRow, setSelectedRow] = useState(null)
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 })
   const contextMenuRef = useRef(null)
-  const { setSignal } = useContext(SignalContext)
+  const { setSignal } = useContext(ContextValues)
   const [lsb, setLsb] = useState('')
   const [scale, setScale] = useState('')
   const [offset, setOffset] = useState('')
@@ -35,20 +35,10 @@ export default function CANTable() {
   const worker = new Worker()
 
   // Modifica el nombre de la clase dependiendo del valor de ecuState
-  let ecuClass = 'ecuValue';
-  if (ecuState) {
-    ecuClass += ' withValue';
-  } else {
-    ecuClass += ' withoutValue';
-  }
+  let ecuClass = `ecuValue ${ecuState ? 'withValue' : 'withoutValue'}`;
+  let hexValueClass = `hexValue ${result ? 'withValue' : 'withoutValue'}`;  
+  let bitPosClass = `bitPosValue ${bitPosition ? 'withValue' : 'withoutValue'}`;
 
-  let hexValueClass = 'hexValue';
-  if (result) {
-    hexValueClass += ' withValue';
-  } else {
-    hexValueClass += ' withoutValue';
-  }
-  
   /* Effect to terminate the File Processing Worker */
   useEffect(() => {
     // Cuando el componente se desmonte, termina el Web Worker
@@ -73,19 +63,19 @@ export default function CANTable() {
   }, [])
 
   /* Effect to send the file name to the backend */
-  useEffect(() => {
-    if (logFileName) {
-      // Send the file name to the backend
-      console.log(`File Name: ${logFileName}`) // Ahora debería imprimir el nombre del archivo
-      const data = {params: {fileName: logFileName}}
-      axios.post(url, data).then((response) => {
-        console.log(response.data.message) // Response from the backend to confirm the file name was received
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    }
-  }, [logFileName]); // Este efecto se ejecuta cada vez que logFileName cambia
+  // useEffect(() => {
+  //   if (logFileName) {
+  //     // Send the file name to the backend
+  //     console.log(`File Name: ${logFileName}`) // Ahora debería imprimir el nombre del archivo
+  //     const data = {params: {fileName: logFileName}}
+  //     axios.post(url, data).then((response) => {
+  //       console.log(response.data.message) // Response from the backend to confirm the file name was received
+  //     })
+  //     .catch((error) => {
+  //       console.log(error)
+  //     })
+  //   }
+  // }, [logFileName]); // Este efecto se ejecuta cada vez que logFileName cambia
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -128,7 +118,6 @@ export default function CANTable() {
     return dataHex
   }
   
-
   const handleMessage = (ecu, values, dt1, dt2, dt3, dt4, dt5, dt6, dt7, dt8) => {
     // En caso de que se abren raw packets. Verificar si ecu y values son undefined. 
     if (ecu === undefined || values === undefined) {
@@ -254,15 +243,28 @@ export default function CANTable() {
     }
     try {
       const [fileHandle] = await window.showOpenFilePicker(options);
-      setLogFileName(fileHandle.name) // Aqui si me imprime el nombre del archivo en la consola
-
+      setLogFileName(fileHandle.name)
+      const fileName = fileHandle.name; // Almacena el nombre del archivo en una variable local
       // Reset table values
       setInfo([])
       setMessage([])
       setEcuState("")
       // Enviar el archivo al worker para su procesamiento
-      const file = await fileHandle.getFile();
+      const file = await fileHandle.getFile()
       worker.postMessage(file);
+
+      // Send the file name to the backend only if it's available
+      if (fileName) {
+        // Send the file name to the backend
+        console.log(`File Name: ${fileName}`) // Ahora debería imprimir el nombre del archivo
+        const data = {params: {fileName: fileName}}
+        axios.post(url, data).then((response) => {
+          console.log(response.data.message) // Response from the backend to confirm the file name was received
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+      }
     } catch (err) {
       console.error(err);
     }
@@ -270,10 +272,10 @@ export default function CANTable() {
 
   // Escuchar mensajes del worker
   worker.addEventListener('message', (event) => {
-      // Recibir los datos procesados del worker
-      const parsedData = event.data
-      // Actualizar el estado con los datos procesados
-      setInfo(parsedData)
+    // Recibir los datos procesados del worker
+    const parsedData = event.data;
+    // Agregar los datos procesados al estado existente
+    setInfo(info => [...info, ...parsedData]);
   })
     
   function handleReplayPackets () {
@@ -298,8 +300,61 @@ export default function CANTable() {
       console.log('Component unmounted. Event Source finished')
       replayEventSource.close()
     }
-}
+  }
 
+  async function handleOpenPlay () {
+    const options = {
+      types: [
+        {
+          description: 'Log files',
+          accept: {
+            'text/plain': ['.log'],
+          },
+        },
+      ],
+      excludeAcceptAllOption: true,
+      multiple: false,
+    }
+    try {
+      const [fileHandle] = await window.showOpenFilePicker(options);
+      setLogFileName(fileHandle.name)
+      const fileName = fileHandle.name; // Almacena el nombre del archivo en una variable local
+      // Reset table values
+      setInfo([])
+      setMessage([])
+      setEcuState("")
+      // Send the file name to the backend
+      console.log(`File Name: ${fileName}`) // Ahora debería imprimir el nombre del archivo
+      const data = {params: {fileName: fileName}}
+      axios.post(url, data).then((response) => {
+        console.log(response.data.message) // Response from the backend to confirm the file name was received
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    } catch (err) {
+      console.error(err);
+    }
+    const replayEventSource = new EventSource(playUrl)
+    let data = [];
+    replayEventSource.addEventListener('message', function(e) {
+      const parsedData = JSON.parse(e.data)
+      data = [...data, parsedData];
+    })
+    replayEventSource.addEventListener('close', function(e) {
+      setInfo(data);
+      replayEventSource.close();
+      console.log("canplayer connection closed")
+    })
+    replayEventSource.addEventListener('error', function(e) {
+      console.error("An error occurred: ", e);
+    })
+    return () => {
+      console.log('Component unmounted. Event Source finished')
+      replayEventSource.close()
+    }
+  }
+  
   const data = useMemo(() => [...info], [info])
   const columns = useMemo(() => COLUMNS, [])
 
@@ -346,19 +401,19 @@ export default function CANTable() {
               <div className="navigationBottomBar">
                 <Nav>
                   <NavDropdown title="File" id="file-dropdown">
-                    <NavDropdown.Item onClick={handleOpenPackets}>
-                      Open Log File
+                    <NavDropdown.Item onClick={handleOpenPlay}>
+                      Open Log File and Play
                     </NavDropdown.Item>
                     <NavDropdown.Item onClick={handleSavePackets}>
                       Save Log File
                     </NavDropdown.Item>
                   </NavDropdown>
-                  <NavDropdown title="Packets" id="packets-dropdown">
+                  <NavDropdown title="Messages" id="packets-dropdown">
                     <NavDropdown.Item onClick={handleReplayPackets}>
-                      Replay Packets
+                      Play & Decode
                     </NavDropdown.Item>
                   </NavDropdown>
-                  <NavDropdown title="Play Live Traffic">
+                  <NavDropdown title="Live Traffic">
                     <NavDropdown.Item onClick = {handlePlayTraffic}>
                       Start
                     </NavDropdown.Item>
@@ -373,10 +428,10 @@ export default function CANTable() {
         </Navbar>
         </div>
         {/* TABLE*/}
-        <Table className="rawDataTable" striped bordered hover responsive variant = "dark" {...getTableProps()}>
-            <thead>
+        <Table className="rawDataTable margins" striped bordered hover responsive variant = "dark" {...getTableProps()}>
+            <thead className="headerHeight">
             {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
+                <tr {...headerGroup.getHeaderGroupProps()} className="customRow">
                   <th width='40'>No.</th>
                   {headerGroup.headers.map(column => (
                   <th {...column.getHeaderProps(column.getSortByToggleProps)}>{column.render('Header')}
@@ -392,7 +447,7 @@ export default function CANTable() {
                 return (
                 <tr key={i} className="rawrow" onClick = {() => handleMessage(row.original.ecu, row.original.values, row.original.dt1,
                 row.original.dt2, row.original.dt3, row.original.dt4, row.original.dt5, row.original.dt6, row.original.dt7, row.original.dt8)} onContextMenu={(event) => handleRightClick(event, row)} {...row.getRowProps()}>
-                    <td width='40'>{i+1}</td>
+                  <td width='40'>{i+1}</td>
                     {row.cells.map(cell => {
                     return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                     })}
@@ -407,46 +462,51 @@ export default function CANTable() {
          </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', height: '310px' }}>
-          <Table className="decodedTable" striped bordered hover responsive variant = "dark">
-            <thead>
-              <tr>
-                <th>ECU</th>
-                <th className={ecuClass} colSpan={2}>{ecuState}</th>
-              </tr>
-              <tr>
-                <th>Signal</th>
-                <th>Values</th>
-                <th>Unit</th>
-              </tr>
-            </thead>
-            <tbody className="tbodyHeight">
-                {message.map(({Signal, Value, Unit}, idx) => (
-                  <tr key={idx} className= 'signals' onClick={() => setSignal(Signal)}>
-                    <td>{Signal}</td>
-                    <td>{Value}</td>
-                    <td>{Unit}</td>
-                  </tr>
-                  ))}
-            </tbody>
-          </Table>
-          <form className="calcForm" onSubmit={handleSubmit}>
-            <div className="titleContainer">
-              <h5 className="tableTitle">BitWise Whisperer</h5>
-              <h4 className="tableSubtitle">Hack the CAN Bus</h4>
+          <div className="decodedTableContainer">
+            <div className="decodedTitleContainer">
+                <h5 className="tableTitle">Decoded Values</h5>
             </div>
-            <Table className="calcTable"striped bordered hover responsive variant="dark">
+            <Table className="decodedTable dtmargins" striped bordered hover responsive variant = "dark">
               <thead>
                 <tr>
+                  <th>Message</th>
+                  <th className={ecuClass} colSpan={2}>{ecuState}</th>
+                </tr>
+                <tr>
+                  <th>Signal</th>
+                  <th>Values</th>
+                  <th>Unit</th>
+                </tr>
+              </thead>
+              <tbody className="tbodyHeight">
+                  {message.map(({Signal, Value, Unit}, idx) => (
+                    <tr key={idx} className= 'signals' onClick={() => setSignal(Signal)}>
+                      <td>{Signal}</td>
+                      <td>{Value}</td>
+                      <td>{Unit}</td>
+                    </tr>
+                    ))}
+              </tbody>
+            </Table>
+          </div>
+          <form className="calcForm formMargin" onSubmit={handleSubmit}>
+            <div className="titleContainer">
+              <h5 className="tableTitle">BitWise Whisperer</h5>
+              <h4 className="tableSubtitle"><span className="italicText">Selected Message: {ecuState}</span></h4>
+            </div>
+            <Table className="calcTable marginLeft"striped bordered hover responsive variant="dark">
+              <thead className="customCalcHeader">
+                <tr className="customCalcRow">
                   <th className="bitPosHeader">Bit Position</th>
-                  <th className="bitPos">{bitPosition}</th>
-                  <th className="hexValueHeader">Hex Value</th>
+                  <th className={bitPosClass}>{bitPosition}</th>
+                  <th className="hexValueHeader">New Hex Val</th>
                   <th className={hexValueClass}>{result}</th>
                 </tr>
                 <tr>
                   <th className="lsb">LSB</th>
                   <th className="scale">Scale</th>
                   <th className="offset">Offset</th>
-                  <th className="newValue">Value</th>
+                  <th className="newValue">Expected Val</th>
                 </tr>
               </thead>
               <tbody>
@@ -458,8 +518,10 @@ export default function CANTable() {
                 </tr>
               </tbody>
             </Table>
-            <button className="calculate" type="submit">Calculate</button>
-            <button className="clear" type="button" onClick={handleClear}>Clear</button>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button className="calculate" type="submit">Calculate</button>
+              <button className="clear" type="button" onClick={handleClear}>Clear</button>
+            </div>  
           </form>
         </div>
   </>
