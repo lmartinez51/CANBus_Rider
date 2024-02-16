@@ -1,4 +1,4 @@
-import Fraction from "fraction.js"
+import Fraction from "./Helpers/fraction"
 
 /**
  * Converts angle in degrees to radians.

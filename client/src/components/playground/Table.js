@@ -3,14 +3,15 @@ import Navbar from "react-bootstrap/Navbar"
 import NavDropdown from "react-bootstrap/NavDropdown"
 import React, { useState, useMemo, useRef, useEffect, useContext } from 'react'
 import { useTable, useGlobalFilter, useSortBy } from 'react-table'
-import Table from 'react-bootstrap/Table';
-import {COLUMNS} from './Columns'
-import ContextValues from './SignalContext';
+import Table from 'react-bootstrap/Table'
+import {COLUMNS} from './Helpers/Columns'
+import ContextValues from './Helpers/SignalContext'
+import { MVECUs } from "./Helpers/MVECUs"
 import "./Table.css"
-import { GlobalFilter } from './GlobalFilter'
+import { GlobalFilter } from './Helpers/GlobalFilter'
 import axios from 'axios'
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import Worker from 'worker-loader!./FileProcessingWorker'
+import Worker from 'worker-loader!./Helpers/FileProcessingWorker'
 const url = 'http://localhost:8080/upload'
 const playUrl = 'http://localhost:8080/play'
 let eventSource;  

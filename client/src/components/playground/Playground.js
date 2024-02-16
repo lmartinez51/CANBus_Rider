@@ -1,6 +1,6 @@
 import CANTable from "./Table"
-import SignalContext from './SignalContext'
-import Canvas from "./Canvas"
+import SignalContext from "./Helpers/SignalContext"
+import Canvas from "./Helpers/Canvas"
 import React, { useEffect, useState } from 'react'
 import "./Playground.css"
 import { draw } from "./DrawFunctions"
