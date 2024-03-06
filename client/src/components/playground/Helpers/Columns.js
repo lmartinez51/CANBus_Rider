@@ -24,7 +24,7 @@ const EditableCell = ({
     setValue(initialValue)
   }, [initialValue])
 
-  return <input className="edit" value={value} onChange={onChange} onBlur={onBlur} style={{ fontSize: '13px', fontWeight: 'bold', color: '#00f7ff' }} />
+  return <input className="edit" value={value} onChange={onChange} onBlur={onBlur} style={{ fontSize: '13px', fontWeight: 'bold', width:'49px', height:"22px", color: '#00f7ff' }} />
 }
 
 export const COLUMNS = [

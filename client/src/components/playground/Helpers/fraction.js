@@ -229,14 +229,14 @@ var parse = function(p1, p2) {
             A++;
 
             // Check for decimal places
-            if (A + 1 === B.length || B[A + 1] === '(' && B[A + 3] === ')' || B[A + 1] === "'" && B[A + 3] === "'") {
+            if (A + 1 === B.length || (B[A + 1] === '(' && B[A + 3] === ')') || (B[A + 1] === "'" && B[A + 3] === "'")) {
               w = assign(B[A], s);
               y = Math.pow(10, B[A].length);
               A++;
             }
 
             // Check for repeating places
-            if (B[A] === '(' && B[A + 2] === ')' || B[A] === "'" && B[A + 2] === "'") {
+            if ((B[A] === '(' && B[A + 2] === ')') || (B[A] === "'" && B[A + 2] === "'")) {
               x = assign(B[A + 1], s);
               z = Math.pow(10, B[A + 1].length) - 1;
               A+= 3;
@@ -648,7 +648,7 @@ Fraction.prototype = {
     // Exponentiate and take root for n and d individually
     var n = 1;
     var d = 1;
-    for (var k in N) {
+    for (let k in N) {
       if (k === '1') continue;
       if (k === '0') {
         n = 0;
@@ -662,7 +662,7 @@ Fraction.prototype = {
       n*= Math.pow(k, N[k]);
     }
 
-    for (var k in D) {
+    for (let k in D) {
       if (k === '1') continue;
       D[k]*= P['n'];
 
@@ -867,20 +867,20 @@ Fraction.prototype = {
 
     if (cycLen) {
 
-      for (var i = cycOff; i--;) {
+      for (let i = cycOff; i--;) {
         str+= N / D | 0;
         N%= D;
         N*= 10;
       }
       str+= "(";
-      for (var i = cycLen; i--;) {
+      for (let i = cycLen; i--;) {
         str+= N / D | 0;
         N%= D;
         N*= 10;
       }
       str+= ")";
     } else {
-      for (var i = dec; N && i--;) {
+      for (let i = dec; N && i--;) {
         str+= N / D | 0;
         N%= D;
         N*= 10;

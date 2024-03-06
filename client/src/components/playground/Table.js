@@ -1,9 +1,11 @@
 import Nav from "react-bootstrap/Nav"
 import Navbar from "react-bootstrap/Navbar"
 import NavDropdown from "react-bootstrap/NavDropdown"
+import { DropdownSubmenu, NavDropdownMenu} from "react-bootstrap-submenu";
 import React, { useState, useMemo, useRef, useEffect, useContext } from 'react'
 import { useTable, useGlobalFilter, useSortBy } from 'react-table'
 import Table from 'react-bootstrap/Table'
+import { FixedSizeList as List } from 'react-window'
 import {COLUMNS} from './Helpers/Columns'
 import ContextValues from './Helpers/SignalContext'
 import { MVECUs } from "./Helpers/MVECUs"
@@ -11,17 +13,22 @@ import "./Table.css"
 import { GlobalFilter } from './Helpers/GlobalFilter'
 import axios from 'axios'
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import Worker from 'worker-loader!./Helpers/FileProcessingWorker'
+//import Worker from 'worker-loader!./Helpers/FileProcessingWorker'
 const url = 'http://localhost:8080/upload'
 const playUrl = 'http://localhost:8080/play'
-let eventSource;  
+const viewFileUrl = 'http://localhost:8080/viewFile'
+let eventSource
+const filterData = {
+  'DashFilters': MVECUs,
+  'NoFilters': ['0:0'],
+  'EngineFilters': {} // Reemplazar esto con datos para 'EngineFilters' si se agregan mas ECUs despues
+}
 
 export default function CANTable() {
   
   const [message, setMessage] = useState([])
   const [ecuState, setEcuState] = useState("")
   const [info, setInfo] = useState([])
-  const [fileName, setFileName] = useState('')
   const [logFileName, setLogFileName] = useState('')
   const [selectedRow, setSelectedRow] = useState(null)
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 })
@@ -33,51 +40,65 @@ export default function CANTable() {
   const [newValue, setNewValue] = useState('')
   const [result, setResult] = useState('')
   const [bitPosition, setBitPosition] = useState('')
-  const worker = new Worker()
+  const [filters, setFilters] = useState([])
 
   // Modifica el nombre de la clase dependiendo del valor de ecuState
   let ecuClass = `ecuValue ${ecuState ? 'withValue' : 'withoutValue'}`;
   let hexValueClass = `hexValue ${result ? 'withValue' : 'withoutValue'}`;  
   let bitPosClass = `bitPosValue ${bitPosition ? 'withValue' : 'withoutValue'}`;
+  // Acceder a la descripción correspondiente en el objeto MVECUs
+  const ecuDescription = MVECUs[ecuState]?.ecuDescription;
 
-  /* Effect to terminate the File Processing Worker */
   useEffect(() => {
-    // Cuando el componente se desmonte, termina el Web Worker
-    return () => {
-        worker.terminate()
+    if (!logFileName) {
+      return; // No hacer nada si no hay archivo seleccionado.
     }
-  // eslint-disable-next-line 
-  }, [])
+    let url;
+    if (filters.length === 0) {
+      url = viewFileUrl; // Usar viewFileUrl si no hay filtros
+    } else {
+      url = playUrl; // Usar playUrl si hay filtros
+    }
+  
+    const playEventSource = new EventSource(url);
+    let data = [];
+  
+    playEventSource.addEventListener('message', function(e) {
+      const parsedData = JSON.parse(e.data);
+      data = [...data, parsedData];
+      setInfo(data);
+    });
+  
+    playEventSource.addEventListener('close', function(e) {
+      playEventSource.close();
+      console.log("canplayer connection closed");
+    });
+  
+    playEventSource.addEventListener('error', function(e) {
+      console.error("An error occurred: ", e);
+    });
+  
+    return () => {
+      console.log('Component unmounted. Event Source finished');
+      playEventSource.close();
+    };
+  }, [logFileName, filters]); // Dependencia en filters para re-crear el EventSource cuando cambien los filtros. 
+  //Recordar que si tiene dependencias el useEffect se dispara cada que cambia el valor de esa dependencia en este caso el valor de 'filters'
 
-  /* Efect to handle the click of the mouse to close the Copy Row context menu */
+  /* Effect to handle the click of the mouse to close the Copy Row context menu */
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (contextMenuRef.current && !contextMenuRef.current.contains(event.target)) {
         closeContextMenu()
       }
     }
-  
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
 
-  /* Effect to send the file name to the backend */
-  // useEffect(() => {
-  //   if (logFileName) {
-  //     // Send the file name to the backend
-  //     console.log(`File Name: ${logFileName}`) // Ahora debería imprimir el nombre del archivo
-  //     const data = {params: {fileName: logFileName}}
-  //     axios.post(url, data).then((response) => {
-  //       console.log(response.data.message) // Response from the backend to confirm the file name was received
-  //     })
-  //     .catch((error) => {
-  //       console.log(error)
-  //     })
-  //   }
-  // }, [logFileName]); // Este efecto se ejecuta cada vez que logFileName cambia
-
+  /* HEX CALCULATOR SECTION */
   const handleSubmit = (event) => {
     event.preventDefault()
     const hexValue = inverseCalculator(parseFloat(newValue), parseInt(lsb), parseFloat(scale), parseFloat(offset))
@@ -92,6 +113,7 @@ export default function CANTable() {
     return `${lowerBound}-${upperBound}`
   }
 
+  // Helper function to clear values
   const handleClear = () => {
     setLsb('')
     setScale('')
@@ -101,6 +123,7 @@ export default function CANTable() {
     setBitPosition('')
   }
 
+  // Function to caculate hex values
   const inverseCalculator = (newValue, lsb, scale, offset) => {
     console.log(`New Value: ${newValue}`)
     console.log(`LSB: ${lsb}`)
@@ -119,7 +142,9 @@ export default function CANTable() {
     return dataHex
   }
   
-  const handleMessage = (ecu, values, dt1, dt2, dt3, dt4, dt5, dt6, dt7, dt8) => {
+  /* TABLES SECTION */
+  // Helper function to display decoded messages
+  const handleMessage = (ecu, values) => {
     // En caso de que se abren raw packets. Verificar si ecu y values son undefined. 
     if (ecu === undefined || values === undefined) {
       // Si alguno es undefined, terminar la ejecución de la función
@@ -151,6 +176,7 @@ export default function CANTable() {
     }
   }
 
+  // Helper function to handle the mouse rigth click to copy row content
   const handleRightClick = (event, row) => {
     event.preventDefault()
 
@@ -166,6 +192,7 @@ export default function CANTable() {
     setContextMenu({ visible: false, x: 0, y: 0 })
   }
 
+  //Function to copy raw row content
   const copyRow = () => {
     if (selectedRow) {
       const rowValues = Object.values(selectedRow.original)
@@ -181,7 +208,97 @@ export default function CANTable() {
     }
   }
 
-  async function handleSavePackets () {
+  //Helper Function to manage filters before pass them to the main function
+  function handleFilterSelection(filterKey) {
+    let filters = [];
+    if (filterKey === 'DashFilters') {
+      // Extraer solo los valores de 'filter' de cada índice en MVECUs
+      filters = Object.values(MVECUs).map(item => item.filter);
+    } else if (filterKey === 'NoFilters') {
+      filters = filterData.NoFilters;
+    }
+    // Llamar a handleOpenPlay con los filtros seleccionados
+    handleOpenPlay(filters);
+  }
+
+  //Function to open, play and decode filtered raw log files (Dashboard Filters)
+  async function handleOpenPlay (newFilters) {
+    const options = {
+      types: [
+        {
+          description: 'Log files',
+          accept: {
+            'text/plain': ['.log'],
+          },
+        },
+      ],
+      excludeAcceptAllOption: true,
+      multiple: false,
+    }
+    try {
+      const [fileHandle] = await window.showOpenFilePicker(options)
+      setLogFileName(fileHandle.name)
+      const fileName = fileHandle.name // Almacena el nombre del archivo en una variable local
+      // Reset table values
+      setInfo([])
+      setMessage([])
+      setEcuState("")
+      // Send the file name to the backend
+      console.log(`Sending File Name: ${fileName}`) 
+      const data = {params: {fileName: fileName, filters: newFilters}}
+
+      axios.post(url, data).then((response) => {
+        console.log(response.data.message) // Response from the backend to confirm the file name and the filters was received
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    } catch (err) {
+      console.error(err);
+    }
+    setFilters(newFilters)
+  }
+
+  /* Function to view raw log files NO PROCESSING / NO FILTERS */
+  async function handleViewRawFiles () {
+    const options = {
+      types: [
+        {
+          description: 'Log files',
+          accept: {
+            'text/plain': ['.log'],
+          },
+        },
+      ],
+      excludeAcceptAllOption: true,
+      multiple: false,
+    }
+    try {
+      const [fileHandle] = await window.showOpenFilePicker(options)
+      setLogFileName(fileHandle.name)
+      const fileName = fileHandle.name // Almacena el nombre del archivo en una variable local
+      // Reset table values
+      setInfo([])
+      setMessage([])
+      setEcuState("")  
+      // Send the file name to the backend
+      console.log(`File Name: ${fileName}`) 
+      const data = {params: {fileName: fileName}}
+      axios.post(url, data).then((response) => {
+        console.log(response.data.message) // Response from the backend to confirm the file name and the filters was received
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+
+    } catch (err) {
+      console.error(err);
+    }
+    setFilters([])
+  }
+
+  // Function to save raw log files
+  async function handleSaveRawFiles () {
     var packet = ''
     info.map((x,y)=> (
       packet+=x.time+" "+x.can+" "+x.id+"#"+x.dt1+x.dt2+x.dt3+x.dt4+x.dt5+x.dt6+x.dt7+x.dt8+"\n"))
@@ -200,86 +317,18 @@ export default function CANTable() {
     }
     try {
     const handle = await window.showSaveFilePicker(options);
-    setFileName(handle.name);
-    //setDisable(false);
     const writable = await handle.createWritable();
     await writable.write(blob);
     await writable.close();
-    console.log("Packets file saved.");
+    console.log("Log Raw file saved.");
     return handle;
     } catch (err) {
       console.error(err.name, err.message)
     }
   }
-
-  function handlePlayTraffic () {
-    eventSource = new EventSource(playUrl)
-    //Reset table values
-    setInfo([]);
-    setMessage([]);
-    eventSource.onmessage = (e) => {
-      const parsedData = JSON.parse(e.data)
-      setInfo((data) => [...data,parsedData])
-    }
-  };
   
-  function handleStopTraffic () {
-    eventSource.close(); 
-    console.log("Connection closed");
-  }
-
-  /* Function to open raw log files - Optimized with the use of a worker */
-  async function handleOpenPackets () {
-    const options = {
-      types: [
-        {
-          description: 'Log files',
-          accept: {
-            'text/plain': ['.log'],
-          },
-        },
-      ],
-      excludeAcceptAllOption: true,
-      multiple: false,
-    }
-    try {
-      const [fileHandle] = await window.showOpenFilePicker(options);
-      setLogFileName(fileHandle.name)
-      const fileName = fileHandle.name; // Almacena el nombre del archivo en una variable local
-      // Reset table values
-      setInfo([])
-      setMessage([])
-      setEcuState("")
-      // Enviar el archivo al worker para su procesamiento
-      const file = await fileHandle.getFile()
-      worker.postMessage(file);
-
-      // Send the file name to the backend only if it's available
-      if (fileName) {
-        // Send the file name to the backend
-        console.log(`File Name: ${fileName}`) // Ahora debería imprimir el nombre del archivo
-        const data = {params: {fileName: fileName}}
-        axios.post(url, data).then((response) => {
-          console.log(response.data.message) // Response from the backend to confirm the file name was received
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  // Escuchar mensajes del worker
-  worker.addEventListener('message', (event) => {
-    // Recibir los datos procesados del worker
-    const parsedData = event.data;
-    // Agregar los datos procesados al estado existente
-    setInfo(info => [...info, ...parsedData]);
-  })
-    
-  function handleReplayPackets () {
+  // Function to replay raw log files
+  function handleReplayRawFiles () {
     //Reset table values
     setInfo([])
     setMessage([])
@@ -303,57 +352,22 @@ export default function CANTable() {
     }
   }
 
-  async function handleOpenPlay () {
-    const options = {
-      types: [
-        {
-          description: 'Log files',
-          accept: {
-            'text/plain': ['.log'],
-          },
-        },
-      ],
-      excludeAcceptAllOption: true,
-      multiple: false,
-    }
-    try {
-      const [fileHandle] = await window.showOpenFilePicker(options);
-      setLogFileName(fileHandle.name)
-      const fileName = fileHandle.name; // Almacena el nombre del archivo en una variable local
-      // Reset table values
-      setInfo([])
-      setMessage([])
-      setEcuState("")
-      // Send the file name to the backend
-      console.log(`File Name: ${fileName}`) // Ahora debería imprimir el nombre del archivo
-      const data = {params: {fileName: fileName}}
-      axios.post(url, data).then((response) => {
-        console.log(response.data.message) // Response from the backend to confirm the file name was received
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-    } catch (err) {
-      console.error(err);
-    }
-    const replayEventSource = new EventSource(playUrl)
-    let data = [];
-    replayEventSource.addEventListener('message', function(e) {
+  // Function to play live traffic from the CAN Bus
+  function handlePlayTraffic () {
+    eventSource = new EventSource(playUrl)
+    //Reset table values
+    setInfo([]);
+    setMessage([]);
+    eventSource.onmessage = (e) => {
       const parsedData = JSON.parse(e.data)
-      data = [...data, parsedData];
-    })
-    replayEventSource.addEventListener('close', function(e) {
-      setInfo(data);
-      replayEventSource.close();
-      console.log("canplayer connection closed")
-    })
-    replayEventSource.addEventListener('error', function(e) {
-      console.error("An error occurred: ", e);
-    })
-    return () => {
-      console.log('Component unmounted. Event Source finished')
-      replayEventSource.close()
+      setInfo((data) => [...data,parsedData])
     }
+  }
+  
+  // Function to stop play live traffic from the CAN Bus
+  function handleStopTraffic () {
+    eventSource.close(); 
+    console.log("Connection closed");
   }
   
   const data = useMemo(() => [...info], [info])
@@ -374,27 +388,27 @@ export default function CANTable() {
     )
   }
     
-    // State and functions returned from useTable to build the UI
-    const {
-      getTableProps,
-      getTableBodyProps,
-      headerGroups,
-      rows,
-      prepareRow,
-      state,
-      setGlobalFilter,
-    } = useTable({
-        columns,
-        data,
-        updateMyData,
-        initialState: {
-            hiddenColumns: ["values"],
-        },
+  // State and functions returned from useTable to build the UI
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    state,
+    setGlobalFilter,
+  } = useTable({
+      columns,
+      data,
+      updateMyData,
+      initialState: {
+        hiddenColumns: ["values"],
+      },
     }, useGlobalFilter, useSortBy);
 
-    // Render the UI for the table
-    return (
-      <>
+  // Render the UI for the table
+  return (
+    <>
         {/* TABLE MENU */}
         <div className="packetDropdowns">
         <Navbar collapseOnSelect expand="lg" bg="transparent" variant="dark">
@@ -402,18 +416,26 @@ export default function CANTable() {
               <div className="navigationBottomBar">
                 <Nav>
                   <NavDropdown title="File" id="file-dropdown">
-                    <NavDropdown.Item onClick={handleOpenPlay}>
-                      Open Log File and Play
+                    <NavDropdown.Item onClick={handleViewRawFiles}>
+                      View Log File
                     </NavDropdown.Item>
-                    <NavDropdown.Item onClick={handleSavePackets}>
+                    <NavDropdown.Item onClick={handleSaveRawFiles}>
                       Save Log File
                     </NavDropdown.Item>
                   </NavDropdown>
-                  <NavDropdown title="Messages" id="packets-dropdown">
-                    <NavDropdown.Item onClick={handleReplayPackets}>
-                      Play & Decode
-                    </NavDropdown.Item>
-                  </NavDropdown>
+                  <NavDropdownMenu title="Actions" id="packets-dropdown">
+                    <DropdownSubmenu title="Play And Decode">
+                      <NavDropdown.Item onClick={() => handleFilterSelection('DashFilters')}>
+                        Dashboard Filters
+                      </NavDropdown.Item>
+                      <NavDropdown.Item onClick={()=> handleFilterSelection('NoFilters')}>
+                        Without Filters
+                      </NavDropdown.Item>
+                    </DropdownSubmenu>
+                      <NavDropdown.Item>
+                        Hack (cansend)
+                      </NavDropdown.Item>
+                  </NavDropdownMenu>
                   <NavDropdown title="Live Traffic">
                     <NavDropdown.Item onClick = {handlePlayTraffic}>
                       Start
@@ -422,41 +444,60 @@ export default function CANTable() {
                       Stop
                     </NavDropdown.Item>
                   </NavDropdown>
+                  {logFileName && <span className="logFileName">File Name: {logFileName}</span>}
                   <GlobalFilter globalFilter={state.globalFilter} setGlobalFilter={setGlobalFilter}/>
                 </Nav>
               </div>
             </Navbar.Collapse>
         </Navbar>
         </div>
-        {/* TABLE*/}
-        <Table className="rawDataTable margins" striped bordered hover responsive variant = "dark" {...getTableProps()}>
-            <thead className="headerHeight">
+        {/* TABLES*/}
+        <div {...getTableProps()} className="rawDataTable marginBottom">
+          <div className="tableHeader">
             {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()} className="customRow">
-                  <th width='40'>No.</th>
-                  {headerGroup.headers.map(column => (
-                  <th {...column.getHeaderProps(column.getSortByToggleProps)}>{column.render('Header')}
+              <div {...headerGroup.getHeaderGroupProps()} className="headerContainer">
+                <div style={{width: '40px', borderRight: '1px solid #4d5154', textAlign: 'center', paddingTop: '6px'}}>No.</div>
+                {headerGroup.headers.map((column, i) => {
+                  const headerClass = `header${i}`;
+                  return (
+                    <div {...column.getHeaderProps(column.getSortByToggleProps())} className={`headerLine ${headerClass}`}>
+                      {column.render('Header')}
                       <span>{column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}</span>
-                  </th>
-                ))}
-                </tr>
+                    </div>
+                  )
+                })}
+              </div>
             ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-            {rows.map((row, i) => {
+          </div>
+          <div {...getTableBodyProps()} className="listBody">
+            <List
+              height={265} // Alto de la ventana
+              itemCount={rows.length}
+              itemSize={37.8} // Alto de cada renglon
+              width={969} // Ancho de la ventana
+            >
+              {({ index, style }) => {
+                const row = rows[index]
                 prepareRow(row)
                 return (
-                <tr key={i} className="rawrow" onClick = {() => handleMessage(row.original.ecu, row.original.values, row.original.dt1,
-                row.original.dt2, row.original.dt3, row.original.dt4, row.original.dt5, row.original.dt6, row.original.dt7, row.original.dt8)} onContextMenu={(event) => handleRightClick(event, row)} {...row.getRowProps()}>
-                  <td width='40'>{i+1}</td>
-                    {row.cells.map(cell => {
-                    return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                  <div {...row.getRowProps({ style })} className="listRow" onClick = {(event) => {
+                    if (event.target.nodeName !== 'INPUT') {
+                      handleMessage(row.original.ecu, row.original.values);
+                    }
+                  }} onContextMenu={(event) => handleRightClick(event, row)}>
+                    <div className="indexCell">{index + 1}</div>
+                    {row.cells.map((cell, i) => {
+                      const cellClass = `listCell${i}`;
+                      return (
+                        <div {...cell.getCellProps()} className={`${cellClass} listCells`}>{cell.render('Cell')}</div>
+                      )
                     })}
-                </tr>
+                  </div>
                 )
-            })}
-            </tbody>
-        </Table>
+              }}
+            </List>
+          </div>
+        </div>
         {contextMenu.visible && (
           <div style={{ top: contextMenu.y, left: contextMenu.x }} ref={contextMenuRef} className="context-menu">
             <button onClick={copyRow}>Copy Row</button>
@@ -471,7 +512,7 @@ export default function CANTable() {
               <thead>
                 <tr>
                   <th>Message</th>
-                  <th className={ecuClass} colSpan={2}>{ecuState}</th>
+                  <th className={ecuClass} colSpan={2}>{ecuState} {ecuDescription ? `(${ecuDescription})` : ''}</th>
                 </tr>
                 <tr>
                   <th>Signal</th>
@@ -525,6 +566,6 @@ export default function CANTable() {
             </div>  
           </form>
         </div>
-  </>
+    </>
   )
 }

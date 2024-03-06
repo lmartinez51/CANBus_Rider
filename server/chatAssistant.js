@@ -53,7 +53,7 @@ let self = module.exports = {
             }
             await self.delay(5000);  // Wait for 5 seconds (Suppose to fix failed errors)
             let response = await axios.get(url, { headers: headers })
-            console.log(`Assitant response: ${response.data.data[0].content[0].text.value}`)
+            console.log(`Assistant response: ${response.data.data[0].content[0].text.value}`)
             res.send({ message: response.data.data[0].content[0].text.value })
         } catch (error) {
             console.log(error)

@@ -3,18 +3,19 @@
      * Draws all circles.
      * @param {number} speedometerValue Current speed.
      * @param {number} tachometerValue Curent engine revs.
+     * @param {number} engTempValue Current engine temperature.
      * @param {number} gasValue Current gas tank fullness.
      * @param {number} mileage Current mileage.
      * @param {Object} turnSignals Current state of turn signals.
      * @param {Object} iconStates Current state of icons.
      */
-    export function draw(ctx, speedometerValue, tachometerValue, gasValue, mileage, turnSignals, iconStates) {
+    export function draw(ctx, speedometerValue, tachometerValue, engTempValue, gasValue, mileage, turnSignals, iconStates) {
         clearCanvas(ctx);
 
-        const lmCircle = new LMainCircle(options);
-        const rmCircle = new MainCircle(options);
-        drawLeftCircle(options, ctx, rmCircle.radius, tachometerValue, iconStates);
-        drawRightCircle(options, ctx, rmCircle.radius, gasValue, iconStates);
+        const lmCircle = new LMainCircle(options); // Tachometer
+        const rmCircle = new MainCircle(options);  // Speedometer
+        drawLeftCircle(options, ctx, rmCircle.radius, engTempValue, iconStates);  // Engine Temperature
+        drawRightCircle(options, ctx, rmCircle.radius, gasValue, iconStates); // Gas Tank
 
         /* Left Main Circle - Tachometer */
         lmCircle.draw(ctx);
@@ -151,10 +152,10 @@
     }
 
     /**
-     * Draws left circle (tachometer).
+     * Draws left circle (Engine Temperature).
      * @param {Object} options Circle options such as colors, font etc. In more detail in the description of the class.
      * @param {number} radius Radius of main circle (speedometer). Required to correctly calculate the radius of a circle.
-     * @param {number} value Current value of tachometer. Min is 0 (lowest), max is 1 (highest).
+     * @param {number} value Current value of the Engine Temperature. Min is 0 (lowest), max is 256 (highest).
      * @param {Object} iconStates States of icons displayed on circle.
      */
     function drawLeftCircle(options, ctx, radius, value, iconStates) {
@@ -203,10 +204,11 @@
 
         lCircle.drawIcon(ctx, 'engineTemp', iconStates['engineTemp'])
 
+        const tempValueArrow = value / 210 // Valor maximo de la temperatura (hay que checar el valor absoluto para el valor minimo. PENDIENTE)
         const degAngleArrow = 180
         const offsetAngleArrow = 5
-        const startAngleArrow = 270
-        lCircle.drawArrow(ctx, value, degAngleArrow, offsetAngleArrow, startAngleArrow)
+        const startAngleArrow = 270 
+        lCircle.drawArrow(ctx, tempValueArrow, degAngleArrow, offsetAngleArrow, startAngleArrow)
         lCircle.drawArrowBody(ctx)
     }
 

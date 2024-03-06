@@ -1,29 +1,32 @@
-.container {
+.managerContainer {
     /* background-image: url('../images/backgroundLogo.png'); */
-    background-repeat: no-repeat;
-    margin-top: 0%;
-    margin-bottom: 0%;
-    width: 630px;
-    height: 662px;
-    background-color: rgb(58,58,58);
-    background-position: center;
-    background-size: 662px;
-    background-attachment: fixed;
-    background-position-y: 77px;
+    height: 720px;
+    background: radial-gradient(circle at center, #336699, #182848);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.header{
-    text-align: center;
+
+.interfaces{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 625px;
+    height: 700px;
+    margin: 10px 10px 10px 10px; 
+    border-radius: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    background: radial-gradient(circle at center, #336699, #182848);
 }
+
 .text{
     color:white;
-    display: inline-block;
-    padding: 0 20px;
     font-family: Serif;
 	font-size: x-large;
-    padding-bottom: 10px;
     border-bottom: 2px solid #fffd03;
-    position: relative; top: 0px;
 }
+
 .card{
     height: 500px;
     color: white;

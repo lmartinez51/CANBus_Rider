@@ -31,13 +31,18 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="nav-item p-2 bd-highlight">
-                <Link className="nav-link" to="/SplitView">
-                  CAN Map Visualizer
+                <Link className="nav-link" to="/Visualizer">
+                  CAN Bus Visualizer
                 </Link>
               </li>
               <li className="nav-item p-2 bd-highlight">
                 <Link className="nav-link" to="/Playground">
                   Playground
+                </Link>
+              </li>
+              <li className="nav-item p-2 bd-highlight">
+                <Link className="nav-link" to="/AboutUs">
+                  About Us
                 </Link>
               </li>
             </ul>

@@ -1,0 +1,61 @@
+/* Entire available screen */
+.Visualizer{
+    width: 1920px;
+    max-width: 1920px; /* Ancho total */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 720px;
+    background: radial-gradient(circle at center, #336699, #182848);
+}
+
+.map {
+    width: 1920px; 
+    max-height: 720px;
+}
+
+.carMap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 700px;
+    width: 1900px;
+    margin: 10px 10px 10px 10px; 
+    border-radius: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    background: radial-gradient(circle at center, #336699, #182848);
+
+}
+
+/* Car container */
+.carMap svg{
+    width: 1162.5px;
+    height: 372.5px;
+}
+
+/* This element contains the car itself */
+.carMap g {
+    transform: scale(2.5);
+    transform-origin: 0 0;
+    opacity: 0.2;
+}
+
+/* Agregar al final de Visualizer.css */
+
+.connectButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: darkgreen;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}

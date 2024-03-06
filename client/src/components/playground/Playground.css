@@ -36,6 +36,12 @@
     padding-top: 15px;
 }
 
+.centralGauges {
+    margin-top: -180px;
+    display: flex;
+    justify-content: space-around;
+}
+
 /* Chat box Settings */
 .chatgpt {
     margin-top: 20px;

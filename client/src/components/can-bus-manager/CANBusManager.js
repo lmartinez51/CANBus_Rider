@@ -9,26 +9,26 @@ const CANBusManager = () => {
     return (
         <>
         <Transitions>
-          <div className="container">
-               <div className='header'> 
+          <div className="managerContainer">
+               <div className='interfaces'>
                     <h3 className='text'>CAN Bus Manager</h3>
+                    <Row className="card">
+                         <Col className="mx-auto">
+                              <h2 className="menu">
+                                   CAN Bus Menu
+                              </h2>
+                              <hr />
+                              <Tabs className='tabs' defaultActiveKey="select" id="tab">
+                                   <Tab eventKey="select" title="CAN Bus">
+                                        <SelectCAN />
+                                   </Tab>
+                                   <Tab eventKey="virtual" title="Virtual CAN Bus">
+                                        <SelectVirtualCAN />
+                                   </Tab>
+                              </Tabs>
+                         </Col>
+                    </Row>
                </div>
-               <Row className="card">
-                    <Col className="mx-auto">
-                         <h2 className="menu">
-                              CAN Bus Menu
-                         </h2>
-                         <hr />
-                         <Tabs className='tabs' defaultActiveKey="select" id="tab">
-                              <Tab eventKey="select" title="CAN Bus">
-                                   <SelectCAN />
-                              </Tab>
-                              <Tab eventKey="virtual" title="Virtual CAN Bus">
-                                   <SelectVirtualCAN />
-                              </Tab>
-                         </Tabs>
-                    </Col>
-               </Row>
           </div>
         </Transitions>
         </>

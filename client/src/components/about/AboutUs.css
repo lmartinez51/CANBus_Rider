@@ -1,0 +1,6 @@
+/* Entire available screen */
+.About{
+    display: flex;
+    height: 720px;
+    background: radial-gradient(circle at center, #336699, #182848);
+}

@@ -1,10 +1,11 @@
 import CANTable from "./Table"
+import Speedometer from "./Helpers/Speedometer"
+import Tachometer from "./Helpers/Tachometer"
+import Thermometer from "./Helpers/Thermometer"
+import FuelGauge from "./Helpers/FuelGauge"
 import SignalContext from "./Helpers/SignalContext"
-import Canvas from "./Helpers/Canvas"
 import React, { useEffect, useState } from 'react'
 import "./Playground.css"
-import { draw } from "./DrawFunctions"
-import iconos from './assets/icons.svg'
 import io from 'socket.io-client'
 
 const ENDPOINT = 'http://localhost:8080/'
@@ -21,57 +22,38 @@ const socket = io(ENDPOINT, {
 
 export default function Playground() {
 
-    const [tacho, setTacho] = useState(0)  //Divide revs rpm / 8000.0.25=2, 0.5=4, 1=8
+    const [revs, setRevs] = useState(0)  //Divide revs rpm / 8000.0.25=2, 0.5=4, 1=8
     const [speed, setSpeed] = useState(0)    //Divide speed km/h / 200 0.5 = 100; 0.25 = 50
-    const [brake, setBrake] = useState(0)
-    const [cruiseCtrl, setCruiseCtrl] = useState(0)
-    const [gas, setGas] = useState(1)
-    const [mileage, setMileage] = useState(0)
-    const [turnSignalsStates, setTurnSignal] = useState({
-        'left':  false,
-        'right': false
-    })
-    const [iconsStates, setIcons] = useState({
-        'dippedBeam': 0,
-        'brake':      0,
-        'drift':      0,
-        'highBeam':   0,
-        'lock':       0,
-        'hazzard':    0,
-        'seatBelt':   0,
-        'engineTemp': 0,
-        'stab':       0,
-        'abs':        0,
-        'gas':        0,
-        'trunk':      0,
-        'bonnet':     0,
-        'doors':      0,
-        'battery':    0,
-        'oil':        0,
-        'engineFail': 0
-    })
+    const [distance, setDistance] = useState(0)
+    const [engTemp, setEngTemp] = useState(0)
+    const [engLamp, setEngLamp] = useState(0)
+    const [hazardLamp, setHazardLamp] = useState(0)
+    const [fuel, setFuel] = useState(100)
     const [value, setValue] = useState("")
     const [message, setMessage] = useState(null)
     const [previousChats, setPreviousChats] = useState([])
     const [currentTitle, setCurrentTitle] = useState(null)
-    const [iconsLoaded, setIconsLoaded] = useState(false) // Nuevo estado para manejar la carga de los iconos
     const [isTextareaEmpty, setIsTextareaEmpty] = useState(true)
     const [showHelpAndButtons, setShowHelpAndButtons] = useState(true)
-    const [signal, setSignal] = useState('WheelBasedVehicleSpeed');
+    const [signal, setSignal] = useState('WheelBasedVehicleSpeed')
 
     useEffect(() => {
         // Escuchar el evento del socket para actualizar los datos
         socket.on('message', (data) => {
-            //console.log(data)
-            setTacho(data.revs)
-            setMileage(data.dist)
+            setRevs(data.revs);
+            setSpeed(data.speed)
+            setDistance(data.dist)
+            setEngTemp(data.engCoolantTemp)
+            setFuel(data.fuelLevel)
+            setEngLamp(data.engLamp)
+            setHazardLamp(data.hazardLamp)
         });
     
         // Limpiar el evento del socket al desmontar el componente
         return () => {
           socket.off('message');
         };
-      }, []); // Dependencia vacía para ejecutarlo solo una vez
+     }, [])
 
     useEffect(() => {
         if(!currentTitle && value && message) {
@@ -93,20 +75,6 @@ export default function Playground() {
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [message, currentTitle])
-
-    useEffect(() => {
-        // Crea una nueva instancia de Image
-        const img = new Image();
-
-        // Define el manejador del evento onload
-        img.onload = () => {
-            // Una vez que la imagen se ha cargado, actualiza el estado
-            setIconsLoaded(true);
-        };
-
-        // Inicia la carga de la imagen
-        img.src = iconos;
-    }, []); // Este efecto se ejecuta una vez cuando el componente se monta
     
     const getMessages = async (message) => {
         console.log(`Mensaje a enviar: ${message}`)
@@ -155,18 +123,20 @@ export default function Playground() {
         <div className="Playground">
             {/** DASHBOARD REGION **/}
             <div id="dashboard">
-                <div style={{display: "none"}}>
-                    <img id="sprite" alt='icons' src={iconos}></img>
-                </div>
                 <div className="canvas">
-                    {iconsLoaded && <Canvas draw={(ctx) => draw(ctx, speed, tacho, gas, mileage, turnSignalsStates, iconsStates)} width={920} height={310}/>}
+                    <Tachometer revs={revs} engLamp={engLamp} />
+                    <div className="centralGauges">
+                        <Thermometer engTemp={engTemp} />
+                        <FuelGauge fuel={fuel} />
+                    </div>
+                    <Speedometer speed={speed} distance={distance} hazardLamp={hazardLamp}/>
                 </div>
                 <div id="chatgpt" className="chatgpt">
                     <section className="chat">
                         <h5>Mike The Mechanic's Chat Box</h5>
                         {showHelpAndButtons && (
                             <>
-                                <div className="help-text">How can I help you today?</div>
+                                <div className="help-text">How can 'AI' help you today?</div>
                                 <div className="projection-buttons-container">
                                     <div className="projection-button">
                                             <span data-projection-id="46">

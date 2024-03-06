@@ -13425,7 +13425,7 @@
             </Signal>
             <Signal length="8" name="EngCoolantTemp" offset="0">
                 <Notes>Temperature of liquid found in engine cooling system.</Notes>
-                <Value slope="0.03125" intercept="-273.0" unit="deg C" min="-273.0" max="-265.03125"/>
+                <Value intercept="-40.0" unit="deg C" min="-40.0" max="210.0"/>
             </Signal>
         </Message>
         <Message id="0x18FE07FE" name="ET" length="8" interval="500" format="extended">
