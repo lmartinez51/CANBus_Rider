@@ -1,9 +1,24 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as go from 'gojs';
 import { ReactDiagram } from 'gojs-react';
-import "./SimpleDiagram.css"
+import "./ECUsDiagram.css"
+import io from 'socket.io-client'
 
-function SimpleDiagram() {
+const ENDPOINT = 'http://localhost:8080/'
+const socket = io(ENDPOINT, {
+  withCredentials: true,
+  extraHeaders: {
+    "my-custom-header": "abcd"
+  },
+  autoConnect: true,
+  reconnection: true, // Habilitar la reconexión automática
+  reconnectionAttempts: Infinity, // Número de intentos de reconexión
+  reconnectionDelay: 1000, // Tiempo de espera antes de intentar la reconexión
+})
+
+export default function ECUsDiagram() {
+  const [vin, setVin] = useState('12345678')
+  const [coolantTemp, setCoolantTemp] = useState (0)
 //   const [nodeDataArray, setNodeDataArray] = useState([
 //     { key: '1', name: 'Node 1', source: 'cat1.png' },
 //     { key: '2', parent: '1', name: 'Node 2', source: 'cat2.png' },
@@ -12,8 +27,8 @@ function SimpleDiagram() {
 
   const nodeDataArray = [
     { key: 'CPU', text: 'CPU', movable: false, isReadOnly: true},
-    { key: 'vin', text: 'VIN: 0', parent: 'CPU' },
-    { key: 'coolantTemp', text: 'Coolant Temperature: 0', parent: 'CPU' },
+    { key: 'vin', text: `VIN: ${vin}`, parent: 'CPU' },
+    { key: 'coolantTemp', text: `Coolant Temp: ${coolantTemp}`, parent: 'CPU' },
     // Agrega más nodos aquí
   ];
 
@@ -26,7 +41,17 @@ function SimpleDiagram() {
   useEffect(() => {
     // Aquí podrías cargar los datos del diagrama desde tu backend
     // Por ahora, dejaremos los datos de prueba que definimos arriba
-  }, []);
+    // Escuchar el evento del socket para actualizar los datos
+    socket.on('obdData', (data) => {
+      setCoolantTemp(data.coolantTemp)
+      setVin(data.vin)
+    });
+
+    // Limpiar el evento del socket al desmontar el componente
+    return () => {
+      socket.off('message');
+    };
+  }, [])
 
   function handleModelChange(changes) {
     // Aquí podrías manejar los cambios en el modelo del diagrama
@@ -36,8 +61,10 @@ function SimpleDiagram() {
   function initDiagram() {
     const $ = go.GraphObject.make;
     const diagram = $(go.Diagram, {
-      'initialContentAlignment': go.Spot.Center,
+      'initialContentAlignment': new go.Spot(0.35, 0.5),
       'undoManager.isEnabled': true,
+      'allowVerticalScroll': false,
+      'allowHorizontalScroll': false,
       model: $(go.TreeModel)
     });
 
@@ -45,7 +72,7 @@ function SimpleDiagram() {
         $(go.Node, 'Auto',
         new go.Binding('movable', 'movable'),
         new go.Binding('isReadOnly', 'isReadOnly'), 
-        $(go.Shape, 'RoundedRectangle', { strokeWidth: 0, fill: 'white' }),
+        $(go.Shape, 'RoundedRectangle', { strokeWidth: 1, fill: 'white' }),
         $(go.TextBlock, { margin: 8 }, new go.Binding('text')),
     );
 
@@ -63,8 +90,7 @@ function SimpleDiagram() {
       divClassName='diagram-component'
       nodeDataArray={nodeDataArray}
       onModelChange={handleModelChange}
+      style={{ border: 'none' }}
     />
   );
 }
-
-export default SimpleDiagram;

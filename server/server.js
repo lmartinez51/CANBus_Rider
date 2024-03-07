@@ -110,8 +110,8 @@ app.get('/vcan', (req,res) => {
 })
 
 app.get('/can', (req, res) => {
-    connectToObd()
     res.send('Intentando conectar al adaptador OBDII ELM327...')
+	connectToObd()
 })
 
 //Store Decoded Information in a list. Initial default values

@@ -12,8 +12,6 @@ import { MVECUs } from "./Helpers/MVECUs"
 import "./Table.css"
 import { GlobalFilter } from './Helpers/GlobalFilter'
 import axios from 'axios'
-// eslint-disable-next-line import/no-webpack-loader-syntax
-//import Worker from 'worker-loader!./Helpers/FileProcessingWorker'
 const url = 'http://localhost:8080/upload'
 const playUrl = 'http://localhost:8080/play'
 const viewFileUrl = 'http://localhost:8080/viewFile'
