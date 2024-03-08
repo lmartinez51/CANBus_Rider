@@ -9,16 +9,6 @@ import "./Playground.css"
 import io from 'socket.io-client'
 
 const ENDPOINT = 'http://localhost:8080/'
-const socket = io(ENDPOINT, {
-  withCredentials: true,
-  extraHeaders: {
-    "my-custom-header": "abcd"
-  },
-  autoConnect: true,
-  reconnection: true, // Habilitar la reconexión automática
-  reconnectionAttempts: Infinity, // Número de intentos de reconexión
-  reconnectionDelay: 1000, // Tiempo de espera antes de intentar la reconexión
-})
 
 export default function Playground() {
 
@@ -38,6 +28,22 @@ export default function Playground() {
     const [signal, setSignal] = useState('WheelBasedVehicleSpeed')
 
     useEffect(() => {
+        const socket = io(ENDPOINT, {
+            withCredentials: true,
+            extraHeaders: {
+              "my-custom-header": "abcd"
+            },
+            autoConnect: true,
+            reconnection: true, // Habilitar la reconexión automática
+            reconnectionAttempts: Infinity, // Número de intentos de reconexión
+            reconnectionDelay: 1000, // Tiempo de espera antes de intentar la reconexión
+        })
+
+        // Asignar un nombre significativo al socket
+        socket.on('connect', () => {
+            socket.emit('introduce', 'Playground');
+        })
+
         // Escuchar el evento del socket para actualizar los datos
         socket.on('message', (data) => {
             setRevs(data.revs);
@@ -47,13 +53,15 @@ export default function Playground() {
             setFuel(data.fuelLevel)
             setEngLamp(data.engLamp)
             setHazardLamp(data.hazardLamp)
-        });
+        })
     
         // Limpiar el evento del socket al desmontar el componente
         return () => {
           socket.off('message');
+          socket.off('connect');
+          socket.disconnect();
         };
-     }, [])
+    }, [])
 
     useEffect(() => {
         if(!currentTitle && value && message) {

@@ -12,9 +12,11 @@ let socket;
 
 export default function Visualizer () {
 
-    const [adapterVer, setAdapaterVer] = useState('1.4v')
-    const [protocol, setProtocol] = useState('ISO 15765-4')
-    const [vin, setVin] = useState('12345678')
+    const [isConnected, setIsConnected] = useState(false);
+    const [isConnecting, setIsConnecting] = useState(false);
+    const [adapterVer, setAdapaterVer] = useState('')
+    const [protocol, setProtocol] = useState('')
+    const [vin, setVin] = useState('0')
 
     useEffect(() => {
         // Conectar el socket al servidor
@@ -29,6 +31,11 @@ export default function Visualizer () {
             reconnectionDelay: 1000, // Tiempo de espera antes de intentar la reconexión
         });
 
+        // Asignar un nombre significativo al socket
+        socket.on('connect', () => {
+            socket.emit('introduce', 'Visualizer');
+        })
+
         // Manejar errores de conexión del socket
         socket.on('connect_error', (err) => {
             console.log(`Error de conexión del socket: ${err.message}`);
@@ -36,24 +43,41 @@ export default function Visualizer () {
 
         // Escuchar el evento del socket para actualizar los datos
         socket.on('obdData', (data) => {
+            console.log(data)
             setAdapaterVer(data.adapterVer)
             setProtocol(data.protocol)
             setVin(data.vin)
         });
-    
+
         // Limpiar el evento del socket al desmontar el componente
         return () => {
             socket.off('obdData');
+            socket.off('connect');
+            socket.off('connect_error');
+            socket.disconnect();
         };
     }, [])
 
     function handleCanButton() {
+        setIsConnecting(true);
         axios.get(canUrl)
             .then(response => {
-                console.log(response.data);
+                setIsConnecting(false);
+                if (response.status === 200) {
+                    console.log(response.data);
+                    setIsConnected(true);
+                    alert('Conexión exitosa');
+                } else {
+                    console.error('Error al conectar al adaptador: ', response.data);
+                    setIsConnected(false);
+                    alert('Error al conectar al adaptador: ' + response.data);
+                }
             })
             .catch(error => {
-                console.error('Error al conectar al adaptador: ', error);
+                setIsConnecting(false);
+                console.error('There was an error while attempting to make an HTTP request. ', error);
+                setIsConnected(false);
+                alert('There was an error when trying to make an HTTP request. Please verify your network connection. ' + error.message);
             });
     }
 
@@ -68,7 +92,9 @@ export default function Visualizer () {
                                 <p>Protocol: {protocol}</p>
                                 <p>VIN: {vin}</p>
                             </div>
-                            <button className="connectButton" onClick={handleCanButton}>Connect</button>
+                            <button className={`connectButton ${isConnected ? 'connected' : isConnecting ? 'connecting' : ''}`} onClick={handleCanButton}>
+                                {isConnected ? 'Connected' : isConnecting ? 'Connecting...' : 'Connect'}
+                            </button>
                             <Sentra/>
                             <ECUsDiagram />
                         </div>

@@ -60,6 +60,15 @@
     border-radius: 5px;
 }
 
+.connectButton.connected {
+    background-color: limegreen;
+}
+
+.connectButton.connecting {
+    background-color: red;
+}
+
+
 .infoPanel {
     position: absolute;
     top: 100px;

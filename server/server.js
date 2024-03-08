@@ -8,7 +8,8 @@ const app = express()
 const httpServer = require('http').Server(app)
 require('dotenv').config()
 const MONGODBURI = process.env.MONGODBURI
-const { connectToObd } = require('./modules/ODBIIConnSetup')
+//const { connectToObd } = require('./modules/ODBIIConnSetup')
+const { ObdClient } = require('./modules/ODB2ConnSetup');
 const play = require('./modules/playPackets')
 const viewFile = require('./modules/streamRawFile')
 const vcanconfig = require('./modules/vcanconfig')
@@ -27,26 +28,39 @@ const io = require("socket.io")(httpServer, {
 	  pingTimeout: 90000,
 })
 
+const obdClient = new ObdClient();
+
 let pid = ''
 //let now = new Date()
 let fileName = ''
 let filters= []
+let clientNames = {}
 
 app.use(express.json())
 app.use(cors())
 
-app.post('/playground', chatAssistant.createChatCompletion)
 //setupSocketIO(httpServer)
 //setupSocketCAN()
 
 io.on('connection', (socket) => {
-	console.log(`Client Connected: ${socket.id}`)  
 	// Almacenar el socket en una variable global o similar
 	global.connectedSocket = socket;
-	socket.on('disconnect', ()=> {
-		console.log("Client Disconnected")
-	})
-})
+    socket.on('introduce', (name) => {
+        clientNames[socket.id] = name;
+        console.log(`Client Connected: ${name}`);
+    });
+
+    socket.on('disconnect', () => {
+        const name = clientNames[socket.id] || 'Home Page';
+        if (name === 'Home Page') {
+            console.log('Client Connected: Home Page');
+        } else {
+            console.log(`Client Disconnected: ${name}`);
+        }
+        delete clientNames[socket.id];
+    });
+});
+
 
 // Parse CAN signals database
 var network = can.parseNetworkDescription("./dbc-files/j1939.kcd")
@@ -82,6 +96,9 @@ channel.start()
 // 	})
 // }
 
+// Run the AI Assistant
+app.post('/playground', chatAssistant.createChatCompletion)
+
 // Recieve file name from the front-end
 app.post('/upload', (req, res) => {
 	fileName = req.body.params.fileName
@@ -109,10 +126,26 @@ app.get('/vcan', (req,res) => {
 	res.send("Virtual CAN Bus 29-bits initialized")
 })
 
+obdClient.on('error', (err) => {
+    console.log('Error: ', err.message);
+    // Aquí puedes agregar el código para notificar al usuario
+});
+
+obdClient.on('connected', () => {
+    console.log('Conexión exitosa');
+    // Aquí puedes agregar el código para notificar al usuario
+});
+
 app.get('/can', (req, res) => {
-    res.send('Intentando conectar al adaptador OBDII ELM327...')
-	connectToObd()
+    obdClient.start();
+    obdClient.once('error', (err) => {
+        res.status(500).send('Error: ' + err.message);
+    });
+    obdClient.once('connected', () => {
+        res.status(200).send('Successful init!');
+    });
 })
+
 
 //Store Decoded Information in a list. Initial default values
 let decodedInfo = {
