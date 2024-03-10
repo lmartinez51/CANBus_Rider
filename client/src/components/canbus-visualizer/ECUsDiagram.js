@@ -5,19 +5,8 @@ import "./ECUsDiagram.css"
 import io from 'socket.io-client'
 
 const ENDPOINT = 'http://localhost:8080/'
-const socket = io(ENDPOINT, {
-  withCredentials: true,
-  extraHeaders: {
-    "my-custom-header": "abcd"
-  },
-  autoConnect: true,
-  reconnection: true, // Habilitar la reconexión automática
-  reconnectionAttempts: Infinity, // Número de intentos de reconexión
-  reconnectionDelay: 1000, // Tiempo de espera antes de intentar la reconexión
-})
 
 export default function ECUsDiagram() {
-  const [vin, setVin] = useState('12345678')
   const [coolantTemp, setCoolantTemp] = useState (0)
 //   const [nodeDataArray, setNodeDataArray] = useState([
 //     { key: '1', name: 'Node 1', source: 'cat1.png' },
@@ -27,7 +16,6 @@ export default function ECUsDiagram() {
 
   const nodeDataArray = [
     { key: 'CPU', text: 'CPU', movable: false, isReadOnly: true},
-    { key: 'vin', text: `VIN: ${vin}`, parent: 'CPU' },
     { key: 'coolantTemp', text: `Coolant Temp: ${coolantTemp}`, parent: 'CPU' },
     // Agrega más nodos aquí
   ];
@@ -40,16 +28,26 @@ export default function ECUsDiagram() {
 
   useEffect(() => {
     // Aquí podrías cargar los datos del diagrama desde tu backend
-    // Por ahora, dejaremos los datos de prueba que definimos arriba
     // Escuchar el evento del socket para actualizar los datos
+    const socket = io(ENDPOINT, {
+      withCredentials: true,
+      extraHeaders: {
+        "my-custom-header": "abcd"
+      },
+      autoConnect: true,
+      reconnection: true, // Habilitar la reconexión automática
+      reconnectionAttempts: Infinity, // Número de intentos de reconexión
+      reconnectionDelay: 1000, // Tiempo de espera antes de intentar la reconexión
+    })
+
     socket.on('obdData', (data) => {
       setCoolantTemp(data.coolantTemp)
-      setVin(data.vin)
     });
 
     // Limpiar el evento del socket al desmontar el componente
     return () => {
-      socket.off('message');
+      socket.off('obdData');
+      socket.disconnect();
     };
   }, [])
 

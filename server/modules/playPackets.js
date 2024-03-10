@@ -23,6 +23,7 @@ function emitSSE(res, index, time, can, id, dt1, dt2, dt3, dt4, dt5, dt6, dt7, d
     child.stdout.on('data', function (data) {
         scriptchild.stdin.write(data);
     });
+    
     // Save decoded packets.
     //var writeStream = fs.createWriteStream('./packets/replayeddecoded.pcap',{flags: 'w'});
 

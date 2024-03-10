@@ -6,7 +6,7 @@ import ECUsDiagram from './ECUsDiagram'
 import React, { useEffect, useState } from 'react'
 import io from 'socket.io-client'
 
-const canUrl = 'http://localhost:8080/can'
+const canUrl = 'http://localhost:8080/connectOBD2'
 const ENDPOINT = 'http://localhost:8080/'
 let socket;
 
@@ -16,7 +16,7 @@ export default function Visualizer () {
     const [isConnecting, setIsConnecting] = useState(false);
     const [adapterVer, setAdapaterVer] = useState('')
     const [protocol, setProtocol] = useState('')
-    const [vin, setVin] = useState('0')
+    const [vin, setVin] = useState('')
 
     useEffect(() => {
         // Conectar el socket al servidor
@@ -41,7 +41,7 @@ export default function Visualizer () {
             console.log(`Error de conexión del socket: ${err.message}`);
         });
 
-        // Escuchar el evento del socket para actualizar los datos
+        // Escuchar el evento del socketOBD2 para actualizar los datos
         socket.on('obdData', (data) => {
             console.log(data)
             setAdapaterVer(data.adapterVer)
@@ -67,11 +67,7 @@ export default function Visualizer () {
                     console.log(response.data);
                     setIsConnected(true);
                     alert('Conexión exitosa');
-                } else {
-                    console.error('Error al conectar al adaptador: ', response.data);
-                    setIsConnected(false);
-                    alert('Error al conectar al adaptador: ' + response.data);
-                }
+                } 
             })
             .catch(error => {
                 setIsConnecting(false);
