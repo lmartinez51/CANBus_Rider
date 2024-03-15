@@ -130,7 +130,7 @@ class SocketCANSetup {
         console.log("Trip Distance: " + s.value)
       }) */
     } catch (err) {
-      console.log('Error: ', err.message);
+      console.log('Error:', err.message);
       console.log('Error: Please ensure that the virtual CAN interface is created and the CAN kernel module is loaded.')
     }
   }

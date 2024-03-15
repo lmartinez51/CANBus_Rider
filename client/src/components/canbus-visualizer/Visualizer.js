@@ -7,16 +7,24 @@ import React, { useEffect, useState } from 'react'
 import io from 'socket.io-client'
 
 const canUrl = 'http://localhost:8080/connectOBD2'
+const commandsUrl = 'http://localhost:8080/monitorVehicle'
 const ENDPOINT = 'http://localhost:8080/'
 let socket;
 
 export default function Visualizer () {
 
-    const [isConnected, setIsConnected] = useState(false);
-    const [isConnecting, setIsConnecting] = useState(false);
+    const [isConnected, setIsConnected] = useState(false)
+    const [isConnecting, setIsConnecting] = useState(false)
+    const [status, setStatus] = useState(false)
+    const [isStarted, setIsStarted] = useState(false)
+    const [isStartButtonActive, setIsStartButtonActive] = useState(false);
     const [adapterVer, setAdapaterVer] = useState('')
     const [protocol, setProtocol] = useState('')
     const [vin, setVin] = useState('')
+
+    const [coolantTemp, setCoolantTemp] = useState (0)
+    const [revs, setRevs] = useState(0)
+    const [speed, setSpeed] = useState(0)
 
     useEffect(() => {
         // Conectar el socket al servidor
@@ -47,6 +55,25 @@ export default function Visualizer () {
             setAdapaterVer(data.adapterVer)
             setProtocol(data.protocol)
             setVin(data.vin)
+            setStatus(data.processStatus)
+            // Si processStatus es true, restablecer isConnected e isConnecting
+            if (data.processStatus) {
+                setIsConnected(false);
+                setIsConnecting(false);
+            }
+        });
+
+        socket.on('monitorData', (data) => {
+            console.log(data)
+            if (data.temp !== undefined) {
+            setCoolantTemp(data.temp);
+            }
+            if (data.revs !== undefined) {
+            setRevs(data.revs);
+            }
+            if (data.speed !== undefined) {
+            setSpeed(data.speed);
+            }
         });
 
         // Limpiar el evento del socket al desmontar el componente
@@ -54,9 +81,24 @@ export default function Visualizer () {
             socket.off('obdData');
             socket.off('connect');
             socket.off('connect_error');
+            socket.off('monitorData');
             socket.disconnect();
         };
     }, [])
+
+    useEffect(() => {
+        if (status) {
+            // Cambia status a false después de un retraso
+            const timeoutId = setTimeout(() => {
+                //setStatus(false);
+                setIsStartButtonActive(true);  // Habilita el botón 'startButton'
+            }, 1000);  // Puedes ajustar el retraso según tus necesidades
+    
+            // Limpia el temporizador si el componente se desmonta
+            return () => clearTimeout(timeoutId);
+        }
+    }, [status]);
+    
 
     function handleCanButton() {
         setIsConnecting(true);
@@ -73,9 +115,31 @@ export default function Visualizer () {
                 setIsConnecting(false);
                 console.error('There was an error while attempting to make an HTTP request. ', error);
                 setIsConnected(false);
-                alert('There was an error when trying to make an HTTP request. Please verify your network connection. ' + error.message);
+                alert('There was an error while attempting to make an HTTP request. Please verify your network connection. ' + error.message);
             });
     }
+
+    function handleStartButton() {
+        setIsStarted(true);
+        axios.get(commandsUrl)
+            .then(response => {
+                if (response.status === 200) {
+                    console.log(response.data);
+                } 
+            })
+            .catch(error => {
+                console.error('There was an error while attempting to make the request. ', error);
+                alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message);
+            })
+            .finally(() => {
+                setIsStarted(false);
+            });
+    }
+
+    function handleRefreshButton() {
+        window.location.reload();
+    }
+    
 
     return (
         <>
@@ -88,11 +152,19 @@ export default function Visualizer () {
                                 <p>Protocol: {protocol}</p>
                                 <p>VIN: {vin}</p>
                             </div>
-                            <button className={`connectButton ${isConnected ? 'connected' : isConnecting ? 'connecting' : ''}`} onClick={handleCanButton}>
+                            <button
+                                className={`connectButton ${isConnected ? 'connected' : isConnecting ? 'connecting' : status ? 'statusTrue' : ''}`}
+                                onClick={handleCanButton}
+                                disabled={isConnected || isConnecting || status}
+                            >
                                 {isConnected ? 'Connected' : isConnecting ? 'Connecting...' : 'Connect'}
                             </button>
+                            <button className= "refresh" onClick={handleRefreshButton}>Refresh</button>
                             <Sentra/>
-                            <ECUsDiagram />
+                            <ECUsDiagram coolantTemp={coolantTemp} revs={revs} speed={speed}/>
+                            <button className={`startButton ${isStarted ? 'started' : ''}`} onClick={handleStartButton} disabled={!isStartButtonActive}>
+                                {isStarted ? 'Stop' : 'Start'}
+                            </button>
                         </div>
                     </div>
                 </div>
