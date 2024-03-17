@@ -8,6 +8,10 @@ class SocketOBD2Connection extends EventEmitter{
         this.OBD_IP = host;
         this.isConnected = false;
         this.socket = new net.Socket();
+
+        // Guardar una referencia a la función con el contexto correcto
+        this.boundListen = this.listen.bind(this);
+
         this.socket.on('error', (err) => {
             this.isConnected = false;
             this.socket.end();
@@ -15,10 +19,9 @@ class SocketOBD2Connection extends EventEmitter{
         });
         this.socket.on('connect', () => this.emit('connected'));
         this.socket.on('close', () => {
-            // this.emit('disconnected'); // Parece no ser necesario, vamos a probarlo
             console.log('Desconectado del adaptador OBDII ELM327 WiFi'); // Mensaje de cierre
         });
-        this.socket.on('data', this.listen.bind(this));
+        this.socket.on('data', this.boundListen);
     }
 
     connect() {
@@ -31,12 +34,14 @@ class SocketOBD2Connection extends EventEmitter{
 
     disconnect() {
         this.isConnected = false;
+        this.socket.off('data', this.boundListen);
         this.socket.end();
         this.socket.on('end', () => {
             this.emit('disconnected');
         });
     }
     
+    // ANTES. ESTO FUNCIONABA CORRECTAMENTE. PROBAR CAMBIOS ANTES DE BORRAR LOS SIGUIENTES COMENTARIOS
     send(data) {
         try {
             this.socket.write(data);
@@ -44,6 +49,14 @@ class SocketOBD2Connection extends EventEmitter{
             this.emit('error', err);
         }
     }
+
+    // send(data) {
+    //     if (this.isConnected) {
+    //         this.socket.write(data);
+    //     } else {
+    //         this.emit('error', new Error('Socket is not connected'));
+    //     }
+    // }
 
     listen(data) {
         // Personalized event to listen for data

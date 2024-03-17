@@ -3,68 +3,16 @@ import * as go from 'gojs';
 import { ReactDiagram } from 'gojs-react';
 import "./ECUsDiagram.css"
 import iconCPU from './assets/cpu.png'
-//import io from 'socket.io-client'
 
-//const ENDPOINT = 'http://localhost:8080/'
-
-export default function ECUsDiagram({ coolantTemp, revs, speed }) {
-  // const [coolantTemp, setCoolantTemp] = useState (0)
-  // const [revs, setRevs] = useState(0)
-	// const [speed, setSpeed] = useState(0)
-//   const [nodeDataArray, setNodeDataArray] = useState([
-//     { key: '1', name: 'Node 1', source: 'cat1.png' },
-//     { key: '2', parent: '1', name: 'Node 2', source: 'cat2.png' },
-//     // Agrega más nodos aquí
-//   ]);
+export default function ECUsDiagram({ coolantTemp, revs, speed, fuel}) {
 
   const nodeDataArray = [
     { key: 'CPU', source: iconCPU, movable: false, isReadOnly: true, loc: "610 280"},
-    { key: 'coolantTemp', text: `Temp: ${coolantTemp} °C`, movable: false, parent: 'CPU', loc: "380 372"},
-    { key: 'revs', text: `Engine: ${revs} RPM`, movable: false, parent: 'CPU', loc: "420 290"},
-    { key: 'speed', text: `Speed: ${speed} Km/h`, movable: false, parent: 'CPU', loc: "504 425"}
-    // Agrega más nodos aquí
+    { key: 'coolantTemp', text: `Temp: `, value: `${coolantTemp} °C`, movable: false, parent: 'CPU', loc: "380 372"},
+    { key: 'revs', text: `Engine: `, value: `${revs} RPM`, movable: false, parent: 'CPU', loc: "420 290"},
+    { key: 'speed', text: `Speed: `, value: `${speed} Km/h`, movable: false, parent: 'CPU', loc: "504 425"},
+    { key: 'fuel', text: `Fuel: `, value: `${fuel} %`, movable: false, parent: 'CPU', loc: "1265 280"}
   ];
-
-//   const linkDataArray = [
-//     { from: 'vin', to: 'coolantTemp' },
-//     // Agrega más enlaces aquí
-//   ];
-
-
-  // useEffect(() => {
-  //   // Aquí podrías cargar los datos del diagrama desde tu backend
-  //   // Escuchar el evento del socket para actualizar los datos
-  //   const socket = io(ENDPOINT, {
-  //     withCredentials: true,
-  //     extraHeaders: {
-  //       "my-custom-header": "abcd"
-  //     },
-  //     autoConnect: true,
-  //     reconnection: true, // Habilitar la reconexión automática
-  //     reconnectionAttempts: Infinity, // Número de intentos de reconexión
-  //     reconnectionDelay: 1000, // Tiempo de espera antes de intentar la reconexión
-  //   })
-
-  //     // Escuchar el evento monitorData para actualizar los datos (por ahora solo la temperatura del refrigerante)
-  //     socket.on('monitorData', (data) => {
-  //       console.log(data)
-  //       if (data.temp !== undefined) {
-  //         setCoolantTemp(data.temp);
-  //       }
-  //       if (data.revs !== undefined) {
-  //         setRevs(data.revs);
-  //       }
-  //       if (data.speed !== undefined) {
-  //         setSpeed(data.speed);
-  //       }
-  //     });
-
-  //   // Limpiar el evento del socket al desmontar el componente
-  //   return () => {
-  //     socket.off('monitorData');
-  //     socket.disconnect();
-  //   };
-  // }, [])
 
   function handleModelChange(changes) {
     // Aquí podrías manejar los cambios en el modelo del diagrama
@@ -74,7 +22,7 @@ export default function ECUsDiagram({ coolantTemp, revs, speed }) {
   function initDiagram() {
     const $ = go.GraphObject.make;
     const diagram = $(go.Diagram, {
-      'initialContentAlignment': new go.Spot(0.27, 0.7), //new go.Spot(0.35, 0.5),
+      'initialContentAlignment': new go.Spot(0.53, 0.7), //new go.Spot(0.35, 0.5),
       'undoManager.isEnabled': true,
       'allowVerticalScroll': false,
       'allowHorizontalScroll': false,
@@ -88,8 +36,13 @@ export default function ECUsDiagram({ coolantTemp, revs, speed }) {
         new go.Binding('isReadOnly', 'isReadOnly'), 
         $(go.Shape, 'RoundedRectangle', { strokeWidth: 1, fill: 'white' }),
         $(go.Picture, { margin: 3, width: 24, height: 24, background: 'white'}, new go.Binding('source')),
+        //$(go.TextBlock, { margin: 8, stroke: 'red' }, new go.Binding('text')),
+        $(go.Panel, "Horizontal",
         $(go.TextBlock, { margin: 8 }, new go.Binding('text')),
-    );
+        $(go.TextBlock, { margin: 8, stroke: 'blue', font: 'bold 12px sans-serif' }, new go.Binding('text', 'value'))
+      )
+
+      );
 
     diagram.linkTemplate =
     $(go.Link,

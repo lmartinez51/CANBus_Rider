@@ -7,7 +7,8 @@ const app = express()
 const httpServer = require('http').Server(app)
 const MONGODBURI = process.env.MONGODBURI
 const initializationCommandsList = ['AT WS\r', 'AT SP 0\r', 'AT DP\r', 'AT E0\r', 'AT S0\r', 'AT H0\r', 'AT CAF1\r', '09 02\r']
-const monitoringCommandsList = ['AT WS\r', 'AT E0\r', 'AT S0\r', 'AT H0\r', 'AT CAF1\r', '01 05 1\r', '01 0C 1\r', '01 0D 1\r'] //Multiple PID request in one line - Coolant Temp and Engine Revs
+const monitoringCommandsList = ['AT WS\r', 'AT E0\r', 'AT S0\r', 'AT H0\r', 'AT CAF1\r', '01 05 1\r', '01 0C 1\r', '01 0D 1\r', '01 2F 1\r'] //Multiple PID request in one line - Coolant Temp and Engine Revs
+const canCommandsList = ['AT WS\r']
 const SocketOBD2Connection = require('./modules/socketOBD2Connection')
 const SendingCommands = require('./modules/sendingCommands')
 const play = require('./modules/playPackets')
@@ -18,14 +19,13 @@ const chatAssistant = require('./chatAssistant')
 const { setupSocketIO } = require('./modules/socketIOSetup')
 const { SocketCANSetup } = require('./modules/socketcanSetup')
 const socketOBD2Connection = new SocketOBD2Connection()
-//const socketOBD2Connection2 = new SocketOBD2Connection()
 
 let pid = ''
 let fileName = ''
 let filters= []
 
 // Dummy data to test connection
-//let carInfo = {
+// let carInfo = {
 //     adapterVer: 'ELM328 v2.3', 
 //     protocol: 'Auto', 
 //     vin: '3N1B35754099',
@@ -35,7 +35,8 @@ let filters= []
 // let monitorInfo = {
 //     temp: 100,
 //     revs: 7000,
-//     speed: 180
+//     speed: 180,
+//     fuel: 75
 // }
 
 app.use(express.json())
@@ -88,7 +89,6 @@ socketOBD2Connection.on('error', (err) => {
 app.get('/connectOBD2', (req, res) => {
     let initCommands = new SendingCommands(socketOBD2Connection, initializationCommandsList)
     // Primero, configurar los manejadores de eventos
-
     // Si ocurre un error durante la conexión, envía una respuesta con el estado 500 y el mensaje de error.
     socketOBD2Connection.once('error', (err) => {
         res.status(500).send('Error: ' + err.message);
@@ -100,7 +100,7 @@ app.get('/connectOBD2', (req, res) => {
         // }
     });
 
-    // Si la conexión es exitosa, envía un comando y luego envía una respuesta con el estado 200 y el mensaje 'Successful Connection!'.
+    // Si la conexión es exitosa, envía una respuesta con el estado 200 y el mensaje 'Successful Connection!' e inicia el envio de comandos de inicializacion.
     socketOBD2Connection.once('connected', () => {
         console.log('Conexion exitosa!')
         res.status(200).send('Successful Connection!');
@@ -110,40 +110,32 @@ app.get('/connectOBD2', (req, res) => {
     socketOBD2Connection.on('disconnected', () => {
         console.log("Cerrando conexion...");
         initCommands = null;
-        // socketOBD2Connection.removeAllListeners('error');
-        // socketOBD2Connection.removeAllListeners('connected');
-        // socketOBD2Connection.removeAllListeners('disconnected');
-
     })
 
     // Luego, establecer la conexión
     socketOBD2Connection.connect();
 })
 
-// Capture ELM327 OBD2 WiFi adapter connection errors. 2nd Connection. Si solo realizo una sola conexion no necesito otro
-// socketOBD2Connection.on('error', (err) => {
-//     console.log('Error:', err.message);
-// })
 
 app.get('/monitorVehicle', (req, res) => {
     let monitoringCommands = new SendingCommands(socketOBD2Connection, monitoringCommandsList)
-
+    // Primero, configurar los manejadores de eventos
     // Si ocurre un error durante la conexión, envía una respuesta con el estado 500 y el mensaje de error.
     socketOBD2Connection.once('error', (err) => {
         res.status(500).send('Error: ' + err.message);
-        // Remove after testint dummy data is done
-        //const socket = global.connectedSocket
+        // Remove after testing dummy data is done
+        // const socket = global.connectedSocket
         // if(socket) {
         //     socket.emit('monitorData', monitorInfo);
         //     console.log(monitorInfo)
         // }
     });
 
-    // Si la conexión es exitosa, envía un comando y luego envía una respuesta con el estado 200 y el mensaje 'Successful Connection!'.
+    // Si la conexión es exitosa, envía la respuesta con el estado 200 y el mensaje 'Successful Connection!' e inicia el envio de comandos.
     socketOBD2Connection.once('connected', () => {
         console.log('Segunda Conexion exitosa!')
-        monitoringCommands.sendCommand();
         res.status(200).send('Successful Connection!');
+        monitoringCommands.sendCommand();
     });
 
     socketOBD2Connection.on('disconnected', () => {
@@ -155,6 +147,8 @@ app.get('/monitorVehicle', (req, res) => {
     // Luego, establecer la conexión
     socketOBD2Connection.connect();
 })
+
+
 
 // Connect to MongoDB
 mongoose.connect(MONGODBURI).then(() => console.log("Connected to the MONGODB CAN Bus database")).catch(console.error)

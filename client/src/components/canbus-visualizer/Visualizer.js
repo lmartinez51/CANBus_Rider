@@ -21,10 +21,11 @@ export default function Visualizer () {
     const [adapterVer, setAdapaterVer] = useState('')
     const [protocol, setProtocol] = useState('')
     const [vin, setVin] = useState('')
-
+    // Live data
     const [coolantTemp, setCoolantTemp] = useState (0)
     const [revs, setRevs] = useState(0)
     const [speed, setSpeed] = useState(0)
+    const [fuel, setFuel] = useState (0)
 
     useEffect(() => {
         // Conectar el socket al servidor
@@ -73,6 +74,9 @@ export default function Visualizer () {
             }
             if (data.speed !== undefined) {
             setSpeed(data.speed);
+            }
+            if (data.fuel !== undefined) {
+            setFuel(data.fuel);
             }
         });
 
@@ -161,7 +165,7 @@ export default function Visualizer () {
                             </button>
                             <button className= "refresh" onClick={handleRefreshButton}>Refresh</button>
                             <Sentra/>
-                            <ECUsDiagram coolantTemp={coolantTemp} revs={revs} speed={speed}/>
+                            <ECUsDiagram coolantTemp={coolantTemp} revs={revs} speed={speed} fuel= {fuel}/>
                             <button className={`startButton ${isStarted ? 'started' : ''}`} onClick={handleStartButton} disabled={!isStartButtonActive}>
                                 {isStarted ? 'Stop' : 'Start'}
                             </button>
