@@ -60,6 +60,8 @@
 }
 
 .connectButton.connected {
+    display: inline-block;
+    padding: 10px 5px;
     text-align: center;
     background-color: limegreen;
 }
@@ -79,9 +81,36 @@
     cursor: not-allowed;
 }
 
-.startButton {
+.troubleCodes {
     position: absolute;
     top: 80px;
+    right: 20px;
+    width: 110px;
+    background-color: rgb(105, 105, 105);
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+.troubleCodes.getting {
+    background-color: rgb(251, 255, 0);
+    color: #000;
+}
+
+.troubleCodes:disabled {
+    cursor: not-allowed;
+}
+
+.startButton {
+    position: absolute;
+    top: 140px;
     right: 20px;
     width: 110px;
     background-color: green;
@@ -108,12 +137,12 @@
 
 .refresh {
     position: absolute;
-    top: 140px;
+    top: 200px;
     right: 20px;
     width: 110px;
-    background-color: rgba(192, 192, 192, 1); /* Gris claro */
+    background-color: rgba(192, 192, 192, 1); /* Gris claro rgba(192, 192, 192, 1)*/
     color: #000; /* Color del texto (negro) */
-    padding: 10px 20px; /* Espaciado interno */
+    padding: 10px 10px; /* Espaciado interno */
     text-align: center;
     display: inline-block;
     font-size: 16px;
@@ -149,9 +178,9 @@
     top: 100px;
     left: 9%;
     transform: translateX(-50%);
-    color: black;
+    color: white;
     padding: 10px 20px;
-    text-align: center;
+    text-align: left;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
@@ -160,6 +189,26 @@
     border-radius: 5px;
     min-width: 300px;
     border-radius: 40px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); /* Ajusta el valor de la sombra */
+    background: radial-gradient(circle at center, #336699, #182848);
+}
+
+.troublePanel {
+    position: absolute;
+    bottom: 30px;
+    left: 9%;
+    transform: translateX(-50%);
+    color: white;
+    padding: 10px 20px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    min-width: 300px;
+    border-radius: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); /* Ajusta el valor de la sombra */
+    background: radial-gradient(circle at center, #336699, #182848);
 }

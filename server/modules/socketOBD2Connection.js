@@ -2,66 +2,51 @@ const net = require('net');
 const EventEmitter = require('events');
 
 class SocketOBD2Connection extends EventEmitter{
-    constructor(host = '192.168.0.10', port = 35000) {
-        super();
-        this.OBD_PORT = port;
-        this.OBD_IP = host;
-        this.isConnected = false;
-        this.socket = new net.Socket();
+  constructor(host = '0.0.0.0', port = 35000) {  //192.168.0.10 Real HW
+    super();
+    this.OBD_PORT = port;
+    this.OBD_IP = host;
+    this.socket = new net.Socket();
 
-        // Guardar una referencia a la función con el contexto correcto
-        this.boundListen = this.listen.bind(this);
+    // Guardar una referencia a la función con el contexto correcto
+    this.boundListen = this.listen.bind(this);
 
-        this.socket.on('error', (err) => {
-            this.isConnected = false;
-            this.socket.end();
-            this.emit('error', err);
-        });
-        this.socket.on('connect', () => this.emit('connected'));
-        this.socket.on('close', () => {
-            console.log('Desconectado del adaptador OBDII ELM327 WiFi'); // Mensaje de cierre
-        });
-        this.socket.on('data', this.boundListen);
-    }
+    this.socket.on('error', (err) => {
+      this.socket.end();
+      this.emit('error', err);
+    });
+    this.socket.on('connect', () => this.emit('connected'));
+    this.socket.on('close', () => {
+      console.log('Iniciando desconexion...') // Mensaje de cierre
+      this.emit('disconnected')
+    });
+    this.socket.on('data', this.boundListen);
+    // this.socket.on('timeout', () => {
+    //   console.log('Socket timeout');
+    //   this.disconnect();
+    // });
+  }
 
-    connect() {
-        console.log('Conectando al adaptador OBDII ELM327 WiFi');
-        this.socket.connect(this.OBD_PORT, this.OBD_IP, () => {
-            this.isConnected = true;
-            this.emit('connected');
-        });
-    }
+  connect() {
+    console.log('Conectando al adaptador OBDII ELM327 WiFi');
+    this.socket.connect(this.OBD_PORT, this.OBD_IP, () => {
+      this.emit('connected');
+    })
+  }
 
-    disconnect() {
-        this.isConnected = false;
-        this.socket.off('data', this.boundListen);
-        this.socket.end();
-        this.socket.on('end', () => {
-            this.emit('disconnected');
-        });
-    }
-    
-    // ANTES. ESTO FUNCIONABA CORRECTAMENTE. PROBAR CAMBIOS ANTES DE BORRAR LOS SIGUIENTES COMENTARIOS
-    send(data) {
-        try {
-            this.socket.write(data);
-        } catch (err) {
-            this.emit('error', err);
-        }
-    }
+  disconnect() {
+    this.socket.off('data', this.boundListen);
+    this.socket.end();
+  }
+   
+  send(data) {
+      this.socket.write(data);
+  }
 
-    // send(data) {
-    //     if (this.isConnected) {
-    //         this.socket.write(data);
-    //     } else {
-    //         this.emit('error', new Error('Socket is not connected'));
-    //     }
-    // }
-
-    listen(data) {
-        // Personalized event to listen for data
-        this.emit('dataReceived', data);
-    }
+  listen(data) {
+    // Personalized event to listen for data
+    this.emit('dataReceived', data);
+  }
 
 }
 

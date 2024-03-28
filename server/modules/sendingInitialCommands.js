@@ -1,29 +1,30 @@
 // sendingCommands.js
 const EventEmitter = require('events');
+const { getVehicleDetails } = require('./vinDecoder')
 const MAX_RETRIES = 2;
 
-class SendingCommands extends EventEmitter {
+class SendingInitialCommands extends EventEmitter {
     constructor(socketConnection, commands) {
-        super();
-        this.socketConnection = socketConnection;
-        this.sendingCommands = commands;
-
-        this.commandIndex = 0;
-        this.retryCount = 0; //Command resend attempts
+        super()
+        this.socketConnection = socketConnection
+        this.sendingCommands = commands
+        this.commandIndex = 0
+        this.retryCount = 0 //Command resend attempts
         this.carInfo = {
             adapterVer: '', 
             protocol: '', 
             vin: '',
             processStatus: true
-        };
-        this.monitorInfo = {}
-        this.buffer = '';
-        // Guardar una referencia a la función con el contexto correcto (Importante que esto sea agregado despues de inicializar las variable a cero)
-        this.boundHandleData = this.handleData.bind(this);
+        }
+        this.buffer = ''
+        this.vinInfo = null
+        // Guardar una referencia a la función con el contexto correcto (Importante que esto sea agregado despues de inicializar las variables a cero)
+        this.boundHandleData = this.handleData.bind(this)
 
         // Configura un manejador de eventos para cuando se reciban datos
-        this.socketConnection.on('dataReceived', this.boundHandleData);
+        this.socketConnection.on('dataReceived', this.boundHandleData)
     }
+    
     // Método para enviar comandos
     sendCommand() {
         try {
@@ -37,7 +38,7 @@ class SendingCommands extends EventEmitter {
             } else {
                 // Si todos los comandos se han enviado, registra un mensaje y reinicia los contadores
                 console.log('Secuencia de comandos de inicialización terminada.')
-                this.commandIndex = 0;
+                this.commandIndex = 0; //Quizas estan de mas, para que ponerlas a cero si ya termino de enviar todo y no se volvera a usar
                 this.retryCount = 0;
             }
         } catch (err) {
@@ -62,6 +63,7 @@ class SendingCommands extends EventEmitter {
                 // Si el comando ha fallado MAX_RETRIES veces, desconecta la conexión y registra un mensaje
                 console.log('El comando ha fallado después de ' + MAX_RETRIES + ' intentos: ' + this.sendingCommands[this.commandIndex]);
                 this.socketConnection.disconnect();
+                this.socketConnection.off('dataReceived', this.boundHandleData); 
             }
         } catch (err) {
             // Si ocurre un error al manejar el tiempo de espera, emite un evento de error
@@ -79,13 +81,8 @@ class SendingCommands extends EventEmitter {
         };
     }
 
-    // Método para restablecer los valores de busInfo
-    // resetMonitorInfo() {
-    //     this.monitorInfo = {};
-    // }
-
     //Listen responses to commands
-    handleData(data) {
+    async handleData(data) {
         try {
             clearTimeout(this.commandTimeout);
             //console.log('Recibido del adaptador:\n' + data + '\n');
@@ -113,42 +110,16 @@ class SendingCommands extends EventEmitter {
                     console.log(`VIN Completo: ${this.carInfo.vin}`)
                     this.carInfo.vin = this.carInfo.vin.replace(/[^a-zA-Z0-9]/g, '').substring(1);
                     console.log(`Contenido de VIN: ${this.carInfo.vin}`);
+                    // Espera a que getVehicleDetails se complete antes de emitir los datos
+                    this.vinInfo = await getVehicleDetails(this.carInfo.vin);
                 } else if (this.sendingCommands[this.commandIndex] === 'AT WS\r') {
-                    this.carInfo.adapterVer = completeData.replace(/[^a-zA-Z0-9\s]|[\r\n]+/g, '');
+                    this.carInfo.adapterVer = completeData.replace(/[^a-zA-Z0-9.\s]|[\r\n]+/g, '');
                     this.carInfo.adapterVer = this.carInfo.adapterVer.replace('AT WS', '');
                     console.log(`Contenido de AT WS: ${this.carInfo.adapterVer}`);
                 } else if (this.sendingCommands[this.commandIndex] === 'AT DP\r') {
                     this.carInfo.protocol = completeData.replace(/[^a-zA-Z0-9\s]|[\r\n]+/g, '');
                     this.carInfo.protocol = this.carInfo.protocol.replace('AT DP', '');
                     console.log(`Contenido de DP: ${this.carInfo.protocol}`);
-                } else if (this.sendingCommands[this.commandIndex] === '01 05 1\r') {
-                    // Procesa la respuesta al comando '01 05' Usa solo los dos ultimos pares de datos
-                    let datos = completeData.replace(/[^a-zA-Z0-9\s]|[\r\n]+/g, '');
-                    let lastPair = datos.substring(4, 6);
-                    let par = parseInt(lastPair, 16);
-                    this.monitorInfo.temp = (par - 40);
-                    console.log(`Contenido de Coolant Temperature: ${this.monitorInfo.temp}`);
-                } else if (this.sendingCommands[this.commandIndex] === '01 0C 1\r') {
-                    // Procesa la respuesta al comando '01 0C' Usa solo los dos ultimos pares de datos
-                    let datos = completeData.replace(/[^a-zA-Z0-9\s]|[\r\n]+/g, '');
-                    let lastPair = datos.substring(4, 8);
-                    let par = parseInt(lastPair, 16);
-                    this.monitorInfo.revs = (par/4);
-                    console.log(`Contenido de Revs: ${this.monitorInfo.revs}`);
-                } else if (this.sendingCommands[this.commandIndex] === '01 0D 1\r') {
-                    // Procesa la respuesta al comando '01 0D' Usa solo los dos ultimos pares de datos
-                    let datos = completeData.replace(/[^a-zA-Z0-9\s]|[\r\n]+/g, '');
-                    let lastPair = datos.substring(4, 6);
-                    let par = parseInt(lastPair, 16);
-                    this.monitorInfo.speed = par;
-                    console.log(`Contenido de Speed: ${this.monitorInfo.speed}`);
-                } else if (this.sendingCommands[this.commandIndex] === '01 2F 1\r') {
-                    // Procesa la respuesta al comando '01 2F' Usa solo los dos ultimos pares de datos
-                    let datos = completeData.replace(/[^a-zA-Z0-9\s]|[\r\n]+/g, '');
-                    let lastPair = datos.substring(4, 6);
-                    let par = parseInt(lastPair, 16);
-                    this.monitorInfo.fuel = parseFloat((par * 0.392).toFixed(2));
-                    console.log(`Contenido de Fuel: ${this.monitorInfo.fuel}`);
                 }
                 this.commandIndex++;
                 // Si se han recibido todas las respuestas necesarias de la informacion del vehiculo, emite los datos a través de Socket.IO
@@ -157,18 +128,9 @@ class SendingCommands extends EventEmitter {
                     const socket = global.connectedSocket;
                     if(socket) {
                         socket.emit('obdData', this.carInfo);
-                        // Llama al método para restablecer los valores de busInfo
+                        // Emite los detalles del VIN en un nuevo evento de socket
+                        socket.emit('vinData', this.vinInfo);
                         this.resetCarInfo();
-                    }
-                }
-                // Si se han recibido todos los datos del monitoreo en vivo, emitirlos a través de Socket.IO
-                if (this.monitorInfo.temp !== undefined && this.monitorInfo.revs !== undefined && this.monitorInfo.speed !== undefined && this.monitorInfo.fuel !== undefined) {
-                    console.log(this.monitorInfo)
-                    const socket = global.connectedSocket;
-                    if(socket) {
-                        socket.emit('monitorData', this.monitorInfo);
-                        //this.resetMonitorInfo();
-                        console.log("Monitor data sent")
                     }
                 }
                 if (this.commandIndex < this.sendingCommands.length) {
@@ -177,9 +139,10 @@ class SendingCommands extends EventEmitter {
                 // Verifica si terminaron de enviarse todos los comandos y cierra el socket
                 if (this.commandIndex >= this.sendingCommands.length) {
                     // Cierra la conexión con el socket
-                    console.log('Inicializacion terminada.')
-                    this.socketConnection.off('dataReceived', this.boundHandleData); // Probar
-                    //this.socketConnection.disconnect();  // CUANDO REALMENTE NECESITO DESCONECTARME DEL SOCKET??
+                    console.log('Inicializacion terminada. Desconectando...')
+                    this.socketConnection.disconnect();  // Desconectarse primero asegurarse que no se emitan mas eventos.
+                    this.socketConnection.off('dataReceived', this.boundHandleData); 
+
                 }
             }
         } catch (err) {
@@ -188,4 +151,4 @@ class SendingCommands extends EventEmitter {
     }
 }
 
-module.exports = SendingCommands
+module.exports = SendingInitialCommands

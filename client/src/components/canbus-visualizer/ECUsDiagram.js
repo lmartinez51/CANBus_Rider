@@ -3,15 +3,18 @@ import * as go from 'gojs';
 import { ReactDiagram } from 'gojs-react';
 import "./ECUsDiagram.css"
 import iconCPU from './assets/cpu.png'
+import iconBattery from './assets/battery.png'
 
-export default function ECUsDiagram({ coolantTemp, revs, speed, fuel}) {
+export default function ECUsDiagram({ coolantTemp, revs, speed, fuel, voltage, ctrlDoors}) {
 
   const nodeDataArray = [
-    { key: 'CPU', source: iconCPU, movable: false, isReadOnly: true, loc: "610 280"},
-    { key: 'coolantTemp', text: `Temp: `, value: `${coolantTemp} °C`, movable: false, parent: 'CPU', loc: "380 372"},
-    { key: 'revs', text: `Engine: `, value: `${revs} RPM`, movable: false, parent: 'CPU', loc: "420 290"},
-    { key: 'speed', text: `Speed: `, value: `${speed} Km/h`, movable: false, parent: 'CPU', loc: "504 425"},
-    { key: 'fuel', text: `Fuel: `, value: `${fuel} %`, movable: false, parent: 'CPU', loc: "1265 280"}
+    { key: 'CPU', source: iconCPU, hasImage: true, movable: false, isReadOnly: true, loc: "570 280"},
+    { key: 'coolantTemp', hasImage: false, text: `Temp:`, value: `${coolantTemp} °C`, movable: false, parent: 'CPU', loc: "375 374"},
+    { key: 'revs', hasImage: false, text: `Engine:`, value: `${revs} RPM`, movable: false, parent: 'CPU', loc: "428 280"},
+    { key: 'speed', hasImage: false, text: `Speed:`, value: `${speed} Km/h`, movable: false, parent: 'CPU', loc: "504 425"},
+    { key: 'fuel', hasImage: false, text: `Fuel:`, value: `${fuel} %`, movable: false, parent: 'CPU', loc: "1265 280"},
+    { key: 'voltage', source: iconBattery, hasImage: true, value: `${voltage}`, parent: 'CPU', loc: "610 310"},
+    { key: 'ctrlDoors', hasImage: false, text: `Door:`, value: `${ctrlDoors}`, movable: false, parent: 'CPU', loc: "860 310"}
   ];
 
   function handleModelChange(changes) {
@@ -22,7 +25,7 @@ export default function ECUsDiagram({ coolantTemp, revs, speed, fuel}) {
   function initDiagram() {
     const $ = go.GraphObject.make;
     const diagram = $(go.Diagram, {
-      'initialContentAlignment': new go.Spot(0.53, 0.7), //new go.Spot(0.35, 0.5),
+      'initialContentAlignment': new go.Spot(0.53, 0.78), //new go.Spot(0.35, 0.5),
       'undoManager.isEnabled': true,
       'allowVerticalScroll': false,
       'allowHorizontalScroll': false,
@@ -30,18 +33,30 @@ export default function ECUsDiagram({ coolantTemp, revs, speed, fuel}) {
     });
 
     diagram.nodeTemplate =
-        $(go.Node, 'Auto',
+      $(go.Node, 'Auto',
         new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
         new go.Binding('movable', 'movable'),
         new go.Binding('isReadOnly', 'isReadOnly'), 
-        $(go.Shape, 'RoundedRectangle', { strokeWidth: 1, fill: 'white' }),
-        $(go.Picture, { margin: 3, width: 24, height: 24, background: 'white'}, new go.Binding('source')),
-        //$(go.TextBlock, { margin: 8, stroke: 'red' }, new go.Binding('text')),
+        $(go.Shape, 'RoundedRectangle', { strokeWidth: 1, stroke: 'black', fill: 'white' }),
         $(go.Panel, "Horizontal",
-        $(go.TextBlock, { margin: 8 }, new go.Binding('text')),
-        $(go.TextBlock, { margin: 8, stroke: 'blue', font: 'bold 12px sans-serif' }, new go.Binding('text', 'value'))
-      )
-
+        // Usa una función de enlace para determinar si se debe mostrar la imagen
+        $(go.Picture, 
+            new go.Binding('source'),
+            new go.Binding('visible', 'key', function(k) { return k === 'CPU' || k === 'voltage'; }),
+            { margin: new go.Margin(0, 2, 0, 2), width: 24, height: 24, imageAlignment: go.Spot.Left}
+        ),
+        // Usa una función de enlace para determinar si se deben mostrar los textos
+        $(go.TextBlock, 
+            new go.Binding('text'),
+            new go.Binding('visible', 'key', function(k) { return k !== 'CPU' && k !== 'voltage'; }),
+            { margin: new go.Margin(6, 6, 3, 6), stroke: 'black'}
+        ),
+        $(go.TextBlock, 
+            new go.Binding('text', 'value'),
+            new go.Binding('visible', 'key', function(k) { return k !== 'CPU'; }),
+            { margin: new go.Margin(6, 6, 3, 6), stroke: 'red', font: 'bold 12px sans-serif' }
+        )
+        )
       );
 
     diagram.linkTemplate =

@@ -7,7 +7,9 @@ import React, { useEffect, useState } from 'react'
 import io from 'socket.io-client'
 
 const canUrl = 'http://localhost:8080/connectOBD2'
-const commandsUrl = 'http://localhost:8080/monitorVehicle'
+const startMonitorUrl = 'http://localhost:8080/startMonitorVehicle'
+const endMonitorUrl = 'http://localhost:8080/stopMonitorVehicle'
+const diagnosticsUrl = 'http://localhost:8080/diagnostics'
 const ENDPOINT = 'http://localhost:8080/'
 let socket;
 
@@ -18,14 +20,30 @@ export default function Visualizer () {
     const [status, setStatus] = useState(false)
     const [isStarted, setIsStarted] = useState(false)
     const [isStartButtonActive, setIsStartButtonActive] = useState(false);
+    const [isTCButtonActive, setIsTCButtonActive] = useState(false)
+    // Adapter Information
     const [adapterVer, setAdapaterVer] = useState('')
     const [protocol, setProtocol] = useState('')
     const [vin, setVin] = useState('')
+    // VIN Information
+    const [make, setMake] = useState(null);
+    const [model, setModel] = useState(null);
+    const [modelYear, setModelYear] = useState(null);
+    const [vehicleType, setVehicleType] = useState(null);
+    const [doors, setDoors] = useState(null);
+    const [engineCylinders, setEngineCylinders] = useState(null);
     // Live data
     const [coolantTemp, setCoolantTemp] = useState (0)
     const [revs, setRevs] = useState(0)
     const [speed, setSpeed] = useState(0)
     const [fuel, setFuel] = useState (0)
+    const [voltage, setVoltage] = useState('')
+    // Hack Codes
+    const [ctrlDoors, setCtrlDoors] = useState('Unlocked')
+    // Trouble codes
+    const [troubleCodeNum, setTroubleCodeNum] = useState(0)
+    const [troubleCode, setTroubleCode] = useState('')
+    const [troubleDescription, setTroubleDescription] = useState('')
 
     useEffect(() => {
         // Conectar el socket al servidor
@@ -42,7 +60,7 @@ export default function Visualizer () {
 
         // Asignar un nombre significativo al socket
         socket.on('connect', () => {
-            socket.emit('introduce', 'Visualizer');
+            socket.emit('introduce', 'Diagnostics');
         })
 
         // Manejar errores de conexión del socket
@@ -66,6 +84,9 @@ export default function Visualizer () {
 
         socket.on('monitorData', (data) => {
             console.log(data)
+            if(data.voltage !== undefined){
+            setVoltage(data.voltage)
+            }
             if (data.temp !== undefined) {
             setCoolantTemp(data.temp);
             }
@@ -80,70 +101,114 @@ export default function Visualizer () {
             }
         });
 
-        // Limpiar el evento del socket al desmontar el componente
+        socket.on('vinData', (data) => {
+            console.log(data);
+            setMake(data.Make);
+            setModel(data.Model);
+            setModelYear(data['Model Year']);
+            setVehicleType(data['Vehicle Type']);
+            setDoors(data.Doors);
+            setEngineCylinders(data['Engine Number of Cylinders']);
+        })
+
+        socket.on('codesData', (data) => {
+            console.log(data)
+            setTroubleCodeNum(data.number)
+            setTroubleCode(data.codes)
+            setTroubleDescription(data.description)
+        })
+
+        // Limpiar los eventos del socket al desmontar el componente
         return () => {
-            socket.off('obdData');
-            socket.off('connect');
-            socket.off('connect_error');
-            socket.off('monitorData');
-            socket.disconnect();
-        };
+            socket.off('obdData')
+            socket.off('connect')
+            socket.off('connect_error')
+            socket.off('monitorData')
+            socket.off('vinData')
+            socket.off('codesData')
+            socket.disconnect()
+        }
     }, [])
 
     useEffect(() => {
         if (status) {
             // Cambia status a false después de un retraso
             const timeoutId = setTimeout(() => {
-                //setStatus(false);
-                setIsStartButtonActive(true);  // Habilita el botón 'startButton'
-            }, 1000);  // Puedes ajustar el retraso según tus necesidades
+                setIsTCButtonActive(true) // Habilita el boton 'Get DTCs'
+            }, 1000);  // Ajustar el retraso
     
             // Limpia el temporizador si el componente se desmonta
             return () => clearTimeout(timeoutId);
         }
     }, [status]);
-    
 
-    function handleCanButton() {
+    function handleConnectButton() {
         setIsConnecting(true);
-        axios.get(canUrl)
+        axios.post(canUrl)
             .then(response => {
                 setIsConnecting(false);
                 if (response.status === 200) {
-                    console.log(response.data);
-                    setIsConnected(true);
-                    alert('Conexión exitosa');
+                    console.log(response.data)
+                    setIsConnected(true)
+                    alert('Conexión exitosa')
                 } 
             })
             .catch(error => {
-                setIsConnecting(false);
+                setIsConnecting(false)
+                console.error('There was an error while attempting to make an HTTP request. ', error)
+                setIsConnected(false)
+                alert('There was an error while attempting to make an HTTP request. Please verify your network connection. ' + error.message)
+            })
+    }
+
+    function handleCodesButton() {
+        axios.post(diagnosticsUrl)
+            .then(response => {
+                if (response.status === 200) {
+                    console.log(response.data)
+                    //alert('Succesfull diagnostics')
+                    setIsTCButtonActive(false) //Deshabilita el boton 'Get DTCs'
+                    setIsStartButtonActive(true)  // Habilita el botón 'startButton'
+                } 
+            })
+            .catch(error => {
                 console.error('There was an error while attempting to make an HTTP request. ', error);
-                setIsConnected(false);
-                alert('There was an error while attempting to make an HTTP request. Please verify your network connection. ' + error.message);
-            });
+                alert('There was an error while attempting to make an HTTP request for diagnostics. Please verify your network connection. ' + error.message);
+            })
     }
 
     function handleStartButton() {
         setIsStarted(true);
-        axios.get(commandsUrl)
+        axios.post(startMonitorUrl)
             .then(response => {
                 if (response.status === 200) {
                     console.log(response.data);
+                    //alert('Successful connection')
                 } 
             })
             .catch(error => {
                 console.error('There was an error while attempting to make the request. ', error);
                 alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message);
+                setIsStarted(false)
             })
-            .finally(() => {
-                setIsStarted(false);
-            });
+    }
+    
+    function handleStopButton() {
+        axios.post(endMonitorUrl)
+            .then(response => {
+                if (response.status === 200) {
+                    console.log(response.data)
+                    setIsStarted(false) // Go to green again
+                } 
+            })
+            .catch(error => {
+                alert('There was an error when trying to end the diagnostics. Please verify your network connection and try again. ' + error.message);
+            })
     }
 
     function handleRefreshButton() {
         window.location.reload();
     }
-    
 
     return (
         <>
@@ -155,20 +220,41 @@ export default function Visualizer () {
                                 <p>Adapter Version: {adapterVer}</p>
                                 <p>Protocol: {protocol}</p>
                                 <p>VIN: {vin}</p>
+                                <p>Make: {make}</p>
+                                <p>Model: {model}</p>
+                                <p>Year: {modelYear}</p>
+                                <p>Vehicle Type: {vehicleType}</p>
+                                <p>Engine Cylinders: {engineCylinders}</p>
+                                <p>Doors: {doors}</p>
+                            </div>
+                            <div className="troublePanel">
+                                <p>Number of TCs: <span style={{ color: 'white', fontWeight: 'bold' }}>{troubleCodeNum}</span></p>
+                                <p>Trouble Codes: <span style={{ color: 'red', fontWeight: 'bold' }}>{troubleCode}</span></p>
+                                <p>Description: <span style={{color: 'red', fontWeight: 'bold'}}>{troubleDescription}</span></p>
                             </div>
                             <button
                                 className={`connectButton ${isConnected ? 'connected' : isConnecting ? 'connecting' : status ? 'statusTrue' : ''}`}
-                                onClick={handleCanButton}
+                                onClick={handleConnectButton}
                                 disabled={isConnected || isConnecting || status}
                             >
                                 {isConnected ? 'Connected' : isConnecting ? 'Connecting...' : 'Connect'}
                             </button>
-                            <button className= "refresh" onClick={handleRefreshButton}>Refresh</button>
                             <Sentra/>
-                            <ECUsDiagram coolantTemp={coolantTemp} revs={revs} speed={speed} fuel= {fuel}/>
-                            <button className={`startButton ${isStarted ? 'started' : ''}`} onClick={handleStartButton} disabled={!isStartButtonActive}>
+                            <ECUsDiagram coolantTemp={coolantTemp} revs={revs} speed={speed} fuel={fuel} voltage={voltage} ctrlDoors={ctrlDoors}/>
+                            <button 
+                                className= {`troubleCodes ${isTCButtonActive ? 'getting': ''}`}
+                                onClick={handleCodesButton} 
+                                disabled={!isTCButtonActive}
+                            >Get DTCs
+                            </button>
+                            <button 
+                                className={`startButton ${isStarted ? 'started' : ''}`} 
+                                onClick={isStarted ? handleStopButton : handleStartButton} 
+                                disabled={!isStartButtonActive}
+                            >
                                 {isStarted ? 'Stop' : 'Start'}
                             </button>
+                            <button className= "refresh" onClick={handleRefreshButton}>Refresh</button>
                         </div>
                     </div>
                 </div>

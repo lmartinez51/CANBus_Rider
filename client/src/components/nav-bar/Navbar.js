@@ -32,7 +32,7 @@ const Navbar = () => {
               </li>
               <li className="nav-item p-2 bd-highlight">
                 <Link className="nav-link" to="/Visualizer">
-                  CAN Bus Visualizer
+                  Diagnostics
                 </Link>
               </li>
               <li className="nav-item p-2 bd-highlight">
