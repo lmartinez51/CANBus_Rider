@@ -1,4 +1,4 @@
-import "./Visualizer.css"
+import "./Diagnostics.css"
 import Transitions from "../Transitions"
 import { ReactComponent as Sentra } from "./assets/Sentra2014.svg"
 import axios from 'axios'
@@ -10,22 +10,23 @@ const canUrl = 'http://localhost:8080/connectOBD2'
 const startMonitorUrl = 'http://localhost:8080/startMonitorVehicle'
 const endMonitorUrl = 'http://localhost:8080/stopMonitorVehicle'
 const diagnosticsUrl = 'http://localhost:8080/diagnostics'
+const resetUrl = 'http://localhost:8080/reset'
 const ENDPOINT = 'http://localhost:8080/'
 let socket;
 
-export default function Visualizer () {
+export default function Diagnostics () {
 
+    // Buttons states
     const [isConnected, setIsConnected] = useState(false)
     const [isConnecting, setIsConnecting] = useState(false)
-    const [status, setStatus] = useState(false)
     const [isStarted, setIsStarted] = useState(false)
-    const [isStartButtonActive, setIsStartButtonActive] = useState(false);
-    const [isTCButtonActive, setIsTCButtonActive] = useState(false)
+    const [isStartButtonActive, setIsStartButtonActive] = useState(false)
+    const [buttonStatus, setButtonStatus] = useState([false, false, false])
     // Adapter Information
     const [adapterVer, setAdapaterVer] = useState('')
     const [protocol, setProtocol] = useState('')
-    const [vin, setVin] = useState('')
     // VIN Information
+    const [vin, setVin] = useState('')
     const [make, setMake] = useState(null);
     const [model, setModel] = useState(null);
     const [modelYear, setModelYear] = useState(null);
@@ -38,12 +39,12 @@ export default function Visualizer () {
     const [speed, setSpeed] = useState(0)
     const [fuel, setFuel] = useState (0)
     const [voltage, setVoltage] = useState('')
-    // Hack Codes
-    const [ctrlDoors, setCtrlDoors] = useState('Unlocked')
     // Trouble codes
-    const [troubleCodeNum, setTroubleCodeNum] = useState(0)
-    const [troubleCode, setTroubleCode] = useState('')
-    const [troubleDescription, setTroubleDescription] = useState('')
+    const [troubleCodeNum, setTroubleCodeNum] = useState(null)
+    const [troubleCode, setTroubleCode] = useState('-')
+    const [troubleDescription, setTroubleDescription] = useState('-')
+    // Reset Trouble Codes
+    const [resetTC, setResetTC] = useState('')
 
     useEffect(() => {
         // Conectar el socket al servidor
@@ -74,11 +75,10 @@ export default function Visualizer () {
             setAdapaterVer(data.adapterVer)
             setProtocol(data.protocol)
             setVin(data.vin)
-            setStatus(data.processStatus)
             // Si processStatus es true, restablecer isConnected e isConnecting
             if (data.processStatus) {
-                setIsConnected(false);
-                setIsConnecting(false);
+                setIsConnected(false)
+                setIsConnecting(false)
             }
         });
 
@@ -118,6 +118,11 @@ export default function Visualizer () {
             setTroubleDescription(data.description)
         })
 
+        socket.on('resetData', (data) => {
+            console.log(data)
+            setResetTC(data)
+        })
+
         // Limpiar los eventos del socket al desmontar el componente
         return () => {
             socket.off('obdData')
@@ -126,21 +131,10 @@ export default function Visualizer () {
             socket.off('monitorData')
             socket.off('vinData')
             socket.off('codesData')
+            socket.off('resetData')
             socket.disconnect()
         }
     }, [])
-
-    useEffect(() => {
-        if (status) {
-            // Cambia status a false después de un retraso
-            const timeoutId = setTimeout(() => {
-                setIsTCButtonActive(true) // Habilita el boton 'Get DTCs'
-            }, 1000);  // Ajustar el retraso
-    
-            // Limpia el temporizador si el componente se desmonta
-            return () => clearTimeout(timeoutId);
-        }
-    }, [status]);
 
     function handleConnectButton() {
         setIsConnecting(true);
@@ -150,7 +144,10 @@ export default function Visualizer () {
                 if (response.status === 200) {
                     console.log(response.data)
                     setIsConnected(true)
-                    alert('Conexión exitosa')
+                    alert('Successful connection!')
+                    setTimeout(() => {
+                        setButtonStatus([true, true, false]);
+                    }, 2000)
                 } 
             })
             .catch(error => {
@@ -166,9 +163,17 @@ export default function Visualizer () {
             .then(response => {
                 if (response.status === 200) {
                     console.log(response.data)
-                    //alert('Succesfull diagnostics')
-                    setIsTCButtonActive(false) //Deshabilita el boton 'Get DTCs'
-                    setIsStartButtonActive(true)  // Habilita el botón 'startButton'
+                    if(troubleCodeNum === 0) {
+                        setTimeout(() => {
+                            setButtonStatus([true, false, true]) // No se habilita el boton 'Reset TCs'
+                            setIsStartButtonActive(true)  // Habilita el botón 'startButton'
+                        }, 2000)
+                    } else {
+                        setTimeout(() => {
+                            setButtonStatus([true, false, true]) // Habilita el boton 'Reset TCs'
+                            setIsStartButtonActive(true)  // Habilita el botón 'startButton'
+                        }, 2000)
+                    }
                 } 
             })
             .catch(error => {
@@ -177,13 +182,35 @@ export default function Visualizer () {
             })
     }
 
+    function handleResetButton() {
+        if (window.confirm("Ensuring the vehicle is fully functional before moving forward is paramount. Can you confirm if you have already had the opportunity to fix it?")) {
+            // Si el usuario presiona OK, ejecuta el código para resetear los códigos
+            alert('Please place the ignition key in the ON position, but do not start the vehicle.')
+            axios.post(resetUrl)
+            .then(response => {
+                if (response.status === 200) {
+                    console.log(response.data)
+                    setTimeout(() => {
+                        setButtonStatus([true, true, false]);
+                    }, 2000)
+                    setTroubleCode('-')
+                    setTroubleDescription('-')
+                    setTroubleCodeNum(null)
+                    if(resetTC === '44') alert('Trouble codes have been reset.')
+                } 
+            })
+            .catch(error => {
+                alert('There was an error when trying to reset the codes. Please verify your network connection and try again. ' + error.message);
+            })
+        }
+    }
+
     function handleStartButton() {
         setIsStarted(true);
         axios.post(startMonitorUrl)
             .then(response => {
                 if (response.status === 200) {
                     console.log(response.data);
-                    //alert('Successful connection')
                 } 
             })
             .catch(error => {
@@ -207,13 +234,13 @@ export default function Visualizer () {
     }
 
     function handleRefreshButton() {
-        window.location.reload();
+        window.location.reload()
     }
 
     return (
         <>
             <Transitions>
-                <div className='Visualizer'>
+                <div className='Diagnostics'>
                     <div className="map">
                         <div className="carMap">
                             <div className="infoPanel">
@@ -228,24 +255,30 @@ export default function Visualizer () {
                                 <p>Doors: {doors}</p>
                             </div>
                             <div className="troublePanel">
-                                <p>Number of TCs: <span style={{ color: 'white', fontWeight: 'bold' }}>{troubleCodeNum}</span></p>
+                                <p>Number of TCs: <span style={{ color: 'white', fontWeight: 'bold' }}>{troubleCodeNum !== null ? troubleCodeNum : ''}</span></p>
                                 <p>Trouble Codes: <span style={{ color: 'red', fontWeight: 'bold' }}>{troubleCode}</span></p>
                                 <p>Description: <span style={{color: 'red', fontWeight: 'bold'}}>{troubleDescription}</span></p>
                             </div>
                             <button
-                                className={`connectButton ${isConnected ? 'connected' : isConnecting ? 'connecting' : status ? 'statusTrue' : ''}`}
+                                className={`connectionButton ${isConnected ? 'connected' : isConnecting ? 'connecting' : buttonStatus[0] ? 'statusTrue' : ''}`}
                                 onClick={handleConnectButton}
-                                disabled={isConnected || isConnecting || status}
+                                disabled={isConnected || isConnecting || buttonStatus[0]}
                             >
                                 {isConnected ? 'Connected' : isConnecting ? 'Connecting...' : 'Connect'}
                             </button>
                             <Sentra/>
-                            <ECUsDiagram coolantTemp={coolantTemp} revs={revs} speed={speed} fuel={fuel} voltage={voltage} ctrlDoors={ctrlDoors}/>
+                            <ECUsDiagram coolantTemp={coolantTemp} revs={revs} speed={speed} fuel={fuel} voltage={voltage}/>
                             <button 
-                                className= {`troubleCodes ${isTCButtonActive ? 'getting': ''}`}
+                                className= {`troubleCodes ${buttonStatus[1] ? 'getting': ''}`}  
                                 onClick={handleCodesButton} 
-                                disabled={!isTCButtonActive}
+                                disabled={!buttonStatus[1]}
                             >Get DTCs
+                            </button>
+                            <button
+                                className={`resetButton ${buttonStatus[2] ? 'resetting': ''}`}
+                                onClick={handleResetButton}
+                                disabled={!buttonStatus[2]}
+                            >Reset TCs
                             </button>
                             <button 
                                 className={`startButton ${isStarted ? 'started' : ''}`} 
@@ -254,7 +287,7 @@ export default function Visualizer () {
                             >
                                 {isStarted ? 'Stop' : 'Start'}
                             </button>
-                            <button className= "refresh" onClick={handleRefreshButton}>Refresh</button>
+                            <button className= "refresh" onClick={handleRefreshButton}>Reset All</button>
                         </div>
                     </div>
                 </div>

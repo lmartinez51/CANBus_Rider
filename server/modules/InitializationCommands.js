@@ -83,7 +83,7 @@ class SendingInitialCommands extends CommandProcessor {
                     // Cierra la conexión con el socket
                     console.log('Inicializacion terminada.')
                     this.socketConnection.disconnect();  // Desconectarse primero asegurarse que no se emitan mas eventos.
-                    this.socketConnection.off('dataReceived', this.boundHandleData)
+                    this.socketConnection.off('dataReceived', this.boundHandleData)  //Dato anterior: dataReceived
                     this.commandIndex = 0
                 }
             }

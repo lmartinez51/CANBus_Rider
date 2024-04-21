@@ -29,9 +29,9 @@ class SendingMonitorCommands extends CommandProcessor {
 
     //Listen responses to commands
     handleData(data) {
-        //const socket = global.connectedScoket;
         try {
             clearTimeout(this.commandTimeout);
+            console.log('Recibido del adaptador:\n' + data + '\n');
             this.buffer += data.toString();
             if (this.buffer.includes('>')) {
                 // Procesa los datos completos
@@ -42,6 +42,7 @@ class SendingMonitorCommands extends CommandProcessor {
                     this.monitorInfo.voltage = this.monitorInfo.voltage.replace('AT RV', '')
                     console.log(`Contenido de AT RV: ${this.monitorInfo.voltage}`);
                 } else if (this.sendingCommands[this.commandIndex] === '01 05 1\r') {
+                    console.log(`Contenido raw para temperatura: ${completeData}`)
                     // Procesa la respuesta al comando '01 05' Usa solo los dos ultimos pares de datos
                     let datos = completeData.replace(/[^a-zA-Z0-9\s]|[\r\n]+/g, '');
                     let lastPair = datos.substring(4, 6);

@@ -1,21 +1,20 @@
 import React from 'react';
 import * as go from 'gojs';
-import { ReactDiagram } from 'gojs-react';
+import { ReactDiagram } from 'gojs-react'
 import "./ECUsDiagram.css"
 import iconCPU from './assets/cpu.png'
 import iconBattery from './assets/battery.png'
 
-export default function ECUsDiagram({ coolantTemp, revs, speed, fuel, voltage, ctrlDoors}) {
+export default function ECUsDiagram({ coolantTemp, revs, speed, fuel, voltage}) {
 
   const nodeDataArray = [
-    { key: 'CPU', source: iconCPU, hasImage: true, movable: false, isReadOnly: true, loc: "570 280"},
-    { key: 'coolantTemp', hasImage: false, text: `Temp:`, value: `${coolantTemp} °C`, movable: false, parent: 'CPU', loc: "375 374"},
-    { key: 'revs', hasImage: false, text: `Engine:`, value: `${revs} RPM`, movable: false, parent: 'CPU', loc: "428 280"},
-    { key: 'speed', hasImage: false, text: `Speed:`, value: `${speed} Km/h`, movable: false, parent: 'CPU', loc: "504 425"},
-    { key: 'fuel', hasImage: false, text: `Fuel:`, value: `${fuel} %`, movable: false, parent: 'CPU', loc: "1265 280"},
-    { key: 'voltage', source: iconBattery, hasImage: true, value: `${voltage}`, parent: 'CPU', loc: "610 310"},
-    { key: 'ctrlDoors', hasImage: false, text: `Door:`, value: `${ctrlDoors}`, movable: false, parent: 'CPU', loc: "860 310"}
-  ];
+    { key: 'CPU', source: iconCPU, hasImage: true, movable: false, isReadOnly: true, loc: "570 325"},
+    { key: 'coolantTemp', hasImage: false, text: `Temp:`, value: `${coolantTemp} °C`, movable: false, parent: 'CPU', loc: "370 420"},
+    { key: 'revs', hasImage: false, text: `Engine:`, value: `${revs} RPM`, movable: false, parent: 'CPU', loc: "428 325"},
+    { key: 'speed', hasImage: false, text: `Speed:`, value: `${speed} Km/h`, movable: false, parent: 'CPU', loc: "510 475"},
+    { key: 'fuel', hasImage: false, text: `Fuel:`, value: `${fuel} %`, movable: false, parent: 'CPU', loc: "1265 325"},
+    { key: 'voltage', source: iconBattery, hasImage: true, value: `${voltage}`, parent: 'CPU', loc: "610 360"},
+  ]
 
   function handleModelChange(changes) {
     // Aquí podrías manejar los cambios en el modelo del diagrama
@@ -25,12 +24,12 @@ export default function ECUsDiagram({ coolantTemp, revs, speed, fuel, voltage, c
   function initDiagram() {
     const $ = go.GraphObject.make;
     const diagram = $(go.Diagram, {
-      'initialContentAlignment': new go.Spot(0.53, 0.78), //new go.Spot(0.35, 0.5),
+      'initialContentAlignment': new go.Spot(0.53, 0.82), //new go.Spot(0.35, 0.5),
       'undoManager.isEnabled': true,
       'allowVerticalScroll': false,
       'allowHorizontalScroll': false,
       model: $(go.TreeModel)
-    });
+    })
 
     diagram.nodeTemplate =
       $(go.Node, 'Auto',

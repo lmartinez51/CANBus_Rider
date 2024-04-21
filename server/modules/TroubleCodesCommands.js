@@ -7,7 +7,7 @@ class SendingTroubleCodesCommands extends CommandProcessor {
         this.codesInfo = {
             number: 0,
             codes: '',
-            description: ''
+            description: '',
         }
         this.isRunning = false
     }
@@ -17,7 +17,7 @@ class SendingTroubleCodesCommands extends CommandProcessor {
         this.codesInfo = {
             number: 0,
             codes: 'No TCs',
-            description: 'N/A'
+            description: 'N/A',
         }
     }
 
@@ -34,14 +34,18 @@ class SendingTroubleCodesCommands extends CommandProcessor {
                 // Inicializa un array vacío para almacenar los resultados
                 //let results = []; // Es posible que haya varias lineas de errores
                 if (this.sendingCommands[this.commandIndex] === '01 01\r') {
-                    let stringTCNumber = completeData.replace(/[^a-zA-Z0-9.\s]|[\r\n]+/g, '');
-                    console.log(`Esto tiene: ${stringTCNumber}`)
-                    let pairs = stringTCNumber.split(' ');
-                    let thirdPair = pairs[2]; // e.g. '81'
-                    
+                    // Divide la respuesta en líneas
+                    let lines = completeData.split('\r');
+                    // Se eliminan lineas vacias
+                    lines = lines.filter(line => line.trim() !== '');
+                    // Por ahora tomar solo la primera linea
+                    let stringTCNumber = lines[0].replace(/[^a-zA-Z0-9.\s]|[\r\n]+/g, '');
+                    console.log(`La primera linea contiene: ${stringTCNumber}`)
+                    let thirdPair = stringTCNumber.substring(4,6);
+                    //let thirdPair = pairs[2]; // e.g. '81'
+                    console.log(`El tercer par de numeros es: ${thirdPair}`)
                     // Convertir de hexadecimal a decimal
-                    let decimalNumber = parseInt(thirdPair, 16); // 129
-                    
+                    let decimalNumber = parseInt(thirdPair, 16);
                     // Restar 129
                     let result = decimalNumber - 129;
                     // Guardar el resultado en 'this.codeInfo.number'
@@ -49,8 +53,9 @@ class SendingTroubleCodesCommands extends CommandProcessor {
                     console.log(`Contenido del numero de errores: ${this.codesInfo.number}`);
                 } else if (this.sendingCommands[this.commandIndex] === '03\r') {
                     let troubleString = completeData.replace(/[^a-zA-Z0-9.\s]|[\r\n]+/g, '');
-                    let pairs = troubleString.split(' ');
-                    let secondAndThirdPair = pairs[1] + pairs[2]; // '0133'
+                    console.log(`String de TC: ${troubleString}`)
+                    let secondPair = troubleString.substring(2,4); // Esto debe modificarse de acuerdo a lo que responda el adapter real
+                    //let secondAndThirdPair = pairs[2] + pairs[3]; // '0133'
                     
                     // Crear un objeto para mapear los reemplazos
                     let replacements = {
@@ -73,10 +78,10 @@ class SendingTroubleCodesCommands extends CommandProcessor {
                     };
                     
                     // Obtener el primer caracter
-                    let firstChar = secondAndThirdPair[0];
+                    let firstChar = secondPair[0];
                     
                     // Reemplazar el primer caracter
-                    let finalString = replacements[firstChar] + secondAndThirdPair.slice(1);
+                    let finalString = replacements[firstChar] + secondPair.slice(1);
                     
                     // Guardar el resultado en 'this.codesInfo.codes'
                     this.codesInfo.codes = finalString
@@ -97,7 +102,7 @@ class SendingTroubleCodesCommands extends CommandProcessor {
                         if(socket) {
                             socket.emit('codesData', this.codesInfo);
                             this.socketConnection.disconnect();
-                            this.socketConnection.off('dataReceived', this.boundHandleData);
+                            this.socketConnection.off('data', this.boundHandleData);
                         }
                     } else if (this.codesInfo.number !== undefined && this.codesInfo.codes !== undefined && this.codesInfo.description !== undefined) {
                         console.log(this.codesInfo);

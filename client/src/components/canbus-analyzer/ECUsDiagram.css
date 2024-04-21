@@ -1,0 +1,21 @@
+.diagram-ECU-component {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    height: 100%;
+    width: 100%;
+    border: none;
+    border-radius: 40px;
+}
+
+#contextMenu {
+    z-index: 1;  /* Ajusta este valor según sea necesario */
+    /* el resto de tus estilos */
+}
+  
+#contextMenu button {
+    width: 150px;  /* Ajusta este valor según sea necesario */
+    /* el resto de tus estilos */
+  }
+  

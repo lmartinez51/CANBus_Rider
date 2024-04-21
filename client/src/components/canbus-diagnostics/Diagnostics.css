@@ -1,5 +1,5 @@
 /* Entire available screen */
-.Visualizer{
+.Diagnostics{
     width: 1920px;
     max-width: 1920px; /* Ancho total */
     display: flex;
@@ -21,7 +21,7 @@
     align-items: center;
     height: 700px;
     width: 1900px;
-    margin: 10px 10px 10px 10px; 
+    margin: 10px 10px 10px 5px; 
     border-radius: 40px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
     background: radial-gradient(circle at center, #336699, #182848);
@@ -41,7 +41,7 @@
     opacity: 0.2;
 }
 
-.connectButton {
+.connectionButton {
     position: absolute;
     top: 20px;
     right: 20px;
@@ -59,25 +59,25 @@
     border-color: rgba(102, 102, 102, 1);
 }
 
-.connectButton.connected {
+.connectionButton.connected {
     display: inline-block;
     padding: 10px 5px;
     text-align: center;
     background-color: limegreen;
 }
 
-.connectButton.connecting {
+.connectionButton.connecting {
     display: inline-block;
     padding: 10px 5px;
     text-align: center;
     background-color: darkred;
 }
 
-.connectButton.statusTrue {
+.connectionButton.statusTrue {
     background-color: rgb(105, 105, 105);
 }
 
-.connectButton:disabled {
+.connectionButton:disabled {
     cursor: not-allowed;
 }
 
@@ -108,9 +108,36 @@
     cursor: not-allowed;
 }
 
-.startButton {
+.resetButton {
     position: absolute;
     top: 140px;
+    right: 20px;
+    width: 110px;
+    background-color: rgb(105, 105, 105);
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+.resetButton.resetting {
+    background-color: rgb(204, 51, 0);
+    color: #ececf1;
+}
+
+.resetButton:disabled {
+    cursor: not-allowed;
+}
+
+.startButton {
+    position: absolute;
+    top: 200px;
     right: 20px;
     width: 110px;
     background-color: green;
@@ -137,10 +164,10 @@
 
 .refresh {
     position: absolute;
-    top: 200px;
+    top: 260px;
     right: 20px;
     width: 110px;
-    background-color: rgba(192, 192, 192, 1); /* Gris claro rgba(192, 192, 192, 1)*/
+    background-color: rgba(192, 192, 192, 0.6); /* Gris claro rgba(192, 192, 192, 1)*/
     color: #000; /* Color del texto (negro) */
     padding: 10px 10px; /* Espaciado interno */
     text-align: center;
@@ -156,14 +183,14 @@
 
     /* Estilos de sombra y cambio de tamaño al hacer clic */
     &:active {
-        background-color: rgba(192, 192, 192, 0.8); /* Cambia el tono del gris al hacer clic */
+        background-color: rgba(192, 192, 192, 0.1); /* Cambia el tono del gris al hacer clic */
         transform: scale(0.95); /* Reduce ligeramente el tamaño */
         box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
     }
 
     /* Estilos al pasar el cursor por encima */
     &:hover {
-        background-color: rgba(192, 192, 192, 0.9); /* Cambia el tono del gris al pasar el cursor */
+        background-color: rgba(192, 192, 192, 1); /* Cambia el tono del gris al pasar el cursor */
     }
 
     /* Estilos cuando está deshabilitado */
@@ -195,7 +222,7 @@
 
 .troublePanel {
     position: absolute;
-    bottom: 30px;
+    bottom: 10px;
     left: 9%;
     transform: translateX(-50%);
     color: white;

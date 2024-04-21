@@ -31,13 +31,18 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="nav-item p-2 bd-highlight">
-                <Link className="nav-link" to="/Visualizer">
-                  Diagnostics
+                <Link className="nav-link" to="/Diagnostics">
+                  Diagnostics (OBD2)
+                </Link>
+              </li>
+              <li className="nav-item p-2 bd-highlight">
+                <Link className="nav-link" to="/Analyzer">
+                  Analyzer (OBD2)
                 </Link>
               </li>
               <li className="nav-item p-2 bd-highlight">
                 <Link className="nav-link" to="/Playground">
-                  Playground
+                  Playground (SAE J1939)
                 </Link>
               </li>
               <li className="nav-item p-2 bd-highlight">

@@ -7,11 +7,14 @@ class CommandProcessor extends EventEmitter {
         this.socketConnection = socketConnection
         this.sendingCommands = commands
         this.commandIndex = 0
-        this.retryCount = 0 //Command resend attempts
-        //this.info = info
+        //this.retryCount = 0 //Command resend attempts
         this.buffer = ''
         this.boundHandleData = this.handleData.bind(this)
         this.socketConnection.on('dataReceived', this.boundHandleData)
+        // Añade un manejador de eventos para 'disconnected'
+        this.socketConnection.on('disconnected', () => {
+            console.log('Comprobacion. El socket se ha desconectado.')
+        })
     }
 
     shouldSendCommand() {
@@ -27,7 +30,7 @@ class CommandProcessor extends EventEmitter {
             } else {
                 console.log('Emision de comandos detenida.')
                 this.commandIndex = 0
-                this.retryCount = 0
+                //this.retryCount = 0
             }
         } catch (err) {
             this.emit('error', err)
@@ -38,19 +41,34 @@ class CommandProcessor extends EventEmitter {
         try {
             clearTimeout(this.commandTimeout)
             console.log('Tiempo de espera agotado para el comando: ' + this.sendingCommands[this.commandIndex])
-            if (this.retryCount < MAX_RETRIES) {
-                console.log('Reintentando el comando: ' + this.sendingCommands[this.commandIndex])
-                this.retryCount++
-                this.sendCommand()
-            } else {
-                console.log('El comando ha fallado después de ' + MAX_RETRIES + ' intentos: ' + this.sendingCommands[this.commandIndex])
-                this.socketConnection.disconnect()
-                this.socketConnection.off('dataReceived', this.boundHandleData)
-            }
+            console.log('El comando ha fallado: ' + this.sendingCommands[this.commandIndex])
+            this.socketConnection.disconnect()
+            console.log('Desconectando despues de fallar el comando.')
+            this.socketConnection.off('dataReceived', this.boundHandleData) // dataReceived
+            this.socketConnection = null
         } catch (err) {
             this.emit('error', err)
         }
     }
+    // handleCommandTimeout() {
+    //     try {
+    //         clearTimeout(this.commandTimeout)
+    //         console.log('Tiempo de espera agotado para el comando: ' + this.sendingCommands[this.commandIndex])
+    //         if (this.retryCount < MAX_RETRIES) {
+    //             console.log('Reintentando el comando: ' + this.sendingCommands[this.commandIndex])
+    //             this.retryCount++
+    //             this.sendCommand()
+    //         } else {
+    //             console.log('El comando ha fallado después de ' + MAX_RETRIES + ' intentos: ' + this.sendingCommands[this.commandIndex])
+    //             this.socketConnection.disconnect()
+    //             console.log('Desconectando despues de varios intentos.')
+    //             this.socketConnection.off('dataReceived', this.boundHandleData) // dataReceived
+    //             this.socketConnection = null
+    //         }
+    //     } catch (err) {
+    //         this.emit('error', err)
+    //     }
+    // }
 }
 
 module.exports = CommandProcessor

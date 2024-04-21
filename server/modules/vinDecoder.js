@@ -6,12 +6,12 @@ async function getVehicleDetails(VIN) {
     if (VIN.length !== 17) {
         console.log("VIN Inválido");
         return {
-            "Make": "NA",
-            "Model": "NA",
-            "Model Year": "NA",
-            "Vehicle Type": "NA",
-            "Doors": "NA",
-            "Engine Number of Cylinders": "NA"
+            "Make": "N/A",
+            "Model": "N/A",
+            "Model Year": "N/A",
+            "Vehicle Type": "N/A",
+            "Doors": "N/A",
+            "Engine Number of Cylinders": "N/A"
         };
     }
 
@@ -48,17 +48,16 @@ async function getVehicleDetails(VIN) {
                     break;
             }
         }
-
         return details;
     } catch (error) {
         console.error(error);
         return {
-            "Make": "NA",
-            "Model": "NA",
-            "Model Year": "NA",
-            "Vehicle Type": "NA",
-            "Doors": "NA",
-            "Engine Number of Cylinders": "NA"
+            "Make": "N/A",
+            "Model": "N/A",
+            "Model Year": "N/A",
+            "Vehicle Type": "N/A",
+            "Doors": "N/A",
+            "Engine Number of Cylinders": "N/A"
         };
     }
 }

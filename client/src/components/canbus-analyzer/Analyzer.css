@@ -1,0 +1,361 @@
+/* Entire available screen */
+.Analyzer{
+    width: 1920px;
+    max-width: 1920px; /* Ancho total */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 720px;
+    background: radial-gradient(circle at center, #336699, #182848);
+}
+
+/* .map {
+    width: 1920px; 
+    max-height: 720px;
+} */
+
+.carBackground {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 700px;
+    width: 1900px;
+    margin: 10px 10px 10px 0px; /*Top, Right, Bottom, Left */
+    border-radius: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    background: radial-gradient(circle at center, #336699, #182848);
+}
+
+/* Car container */
+.carSvg{
+    width: 1120px;
+    height: 683px;
+}
+
+.vehicleData {
+    position: absolute;
+    top: 100px;
+    left: 9%;
+    transform: translateX(-50%);
+    color: white;
+    padding: 10px 20px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 5px;
+    min-width: 300px;
+    border-radius: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); /* Ajusta el valor de la sombra */
+    background: radial-gradient(circle at center, #336699, #182848);
+    /* z-index: 10; */
+}
+
+.connectButton {
+    position: absolute;
+    top: 20px;
+    right: 150px;
+    width: 110px;
+    background-color: rgba(0,128,0,0.6);
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgba(0,128,0, 1); /* Cambia el tono del gris al pasar el cursor */
+    }
+}
+
+.connectButton.connected {
+    display: inline-block;
+    padding: 10px 5px;
+    text-align: center;
+    background-color: limegreen;
+}
+
+.connectButton.connecting {
+    display: inline-block;
+    padding: 10px 5px;
+    text-align: center;
+    background-color: darkred;
+}
+
+.connectButton.statusTrue {
+    background-color: rgb(105, 105, 105);
+}
+
+.connectButton:disabled {
+    cursor: not-allowed;
+}
+
+.range1Button {
+    position: absolute;
+    top: 80px;
+    right: 150px;
+    width: 110px;
+    background-color: rgb(40, 77, 241);
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+.range1Button.started {
+    background-color: darkred;
+    height: 66px;
+}
+
+.range1Button:disabled {
+    background-color: rgb(105, 105, 105);
+    cursor: not-allowed;
+}
+
+.range2Button {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    width: 110px;
+    background-color: rgb(40, 77, 241);
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+.range2Button.started {
+    background-color: darkred;
+    height: 66px;
+}
+
+.range2Button:disabled {
+    background-color: rgb(105, 105, 105);
+    cursor: not-allowed;
+}
+
+.range3Button {
+    position: absolute;
+    top: 160px;
+    right: 150px;
+    width: 110px;
+    background-color: rgb(40, 77, 241);
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+.range3Button.started {
+    background-color: darkred;
+    height: 66px;
+}
+
+.range3Button:disabled {
+    background-color: rgb(105, 105, 105);
+    cursor: not-allowed;
+}
+
+.range4Button {
+    position: absolute;
+    top: 160px;
+    right: 20px;
+    width: 110px;
+    background-color: rgb(40, 77, 241);
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+.range4Button.started {
+    background-color: darkred;
+    height: 66px;
+}
+
+.range4Button:disabled {
+    background-color: rgb(105, 105, 105);
+    cursor: not-allowed;
+}
+
+.range5Button {
+    position: absolute;
+    top: 240px;
+    right: 150px;
+    width: 110px;
+    background-color: rgb(40, 77, 241);
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+.range5Button.started {
+    background-color: darkred;
+    height: 66px;
+}
+
+.range5Button:disabled {
+    background-color: rgb(105, 105, 105);
+    cursor: not-allowed;
+}
+
+.range6Button {
+    position: absolute;
+    top: 240px;
+    right: 20px;
+    width: 110px;
+    background-color: rgb(40, 77, 241);
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+.range6Button.started {
+    background-color: darkred;
+    height: 66px;
+}
+
+.range6Button:disabled {
+    background-color: rgb(105, 105, 105);
+    cursor: not-allowed;
+}
+
+.range7Button {
+    position: absolute;
+    top: 320px;
+    right: 150px;
+    width: 110px;
+    background-color: rgb(40, 77, 241);
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+.range7Button.started {
+    background-color: darkred;
+    height: 66px;
+}
+
+.range7Button:disabled {
+    background-color: rgb(105, 105, 105);
+    cursor: not-allowed;
+}
+
+.range8Button {
+    position: absolute;
+    top: 320px;
+    right: 20px;
+    width: 110px;
+    background-color: rgb(40, 77, 241);
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    color: #ececf1;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+}
+
+.range8Button.started {
+    background-color: darkred;
+    height: 66px;
+}
+
+.range8Button:disabled {
+    background-color: rgb(105, 105, 105);
+    cursor: not-allowed;
+}
+
+.resetAll{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 110px;
+    background-color: rgba(192, 192, 192, 0.6); /* Gris claro rgba(192, 192, 192, 1)*/
+    color: #000; /* Color del texto (negro) */
+    padding: 10px 10px; /* Espaciado interno */
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    border-radius: 0.4rem; /* Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgba(192, 192, 192, 1); /* Cambia el tono del gris al pasar el cursor */
+    }
+}

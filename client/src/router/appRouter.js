@@ -3,9 +3,10 @@ import React from "react"
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom"
 import Home from "../components/home-screen/Home"
 import Navbar from "../components/nav-bar/Navbar"
-import CANBusManager from "../components/can-bus-manager/CANBusManager"
+import CANBusManager from "../components/canbus-manager/CANBusManager"
+import Diagnostics from "../components/canbus-diagnostics/Diagnostics"
+import Analyzer from "../components/canbus-analyzer/Analyzer"
 import Playground from "../components/playground/Playground"
-import Visualizer from "../components/canbus-visualizer/Visualizer"
 import AboutUs  from "../components/about/AboutUs"
 
  
@@ -19,10 +20,12 @@ function Animated() {
                     element={<Home />}></Route>
                 <Route exact path="/CANBusManager"
                     element={<CANBusManager />}></Route>
+                <Route exact path="/Diagnostics"
+                    element={<Diagnostics />}></Route>
+                <Route exact path="/Analyzer"
+                    element={<Analyzer />}></Route>
                 <Route exact path="/Playground"
                     element={<Playground />}></Route>
-                <Route exact path="/Visualizer"
-                    element={<Visualizer />}></Route>
                 <Route exact path="/AboutUs"
                     element={<AboutUs />}></Route>
             </Routes>
