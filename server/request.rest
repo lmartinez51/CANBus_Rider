@@ -1,0 +1,52 @@
+GET http://localhost:8080/projects HTTP/1.1
+
+###
+GET http://localhost:3001/project/session HTTP/1.1
+
+###
+GET http://localhost:3001/project/file HTTP/1.1
+
+###
+GET http://localhost:8080/project/new HTTP/1.1
+
+###
+POST http://localhost:8080/project/new
+Content-Type: application/json
+
+{
+"projectName": "Sentra2015",
+"deviceHost": "192.168.0.10",
+"devicePort": "35000",
+"vin": "3YP2015NBG003616",
+"make": "Nissan",
+"model": "Sentra",
+"modelYear": "2015",
+"vehicleType": "Passenger Car",
+"doors": "4",
+"engineCylinders": "4",
+"diagramData": "Diagrama"
+}
+
+###
+POST http://localhost:8080/project/new
+Content-Type: application/json
+
+{
+"eventName": "Inspeccion",
+"eventDate": "10/06/2022",
+"analystInitials": "GO",
+"canConnectorID": "123",
+"vehicleID": "12345",
+"baudRate": "5000",
+"dbcFileName": "honda.dbc",
+"blacklistFileName": "bl01.dbc",
+"session": "63886c7f365d84655f52c8ff"
+}
+
+###
+DELETE http://localhost:3001/project/delete-file
+
+###
+DELETE http://localhost:3001/project/delete-project/634c731b938045b0bf01b3f0
+###
+DELETE http://localhost:3001/project/delete-session/634bd2b3859dae316bcf05d0

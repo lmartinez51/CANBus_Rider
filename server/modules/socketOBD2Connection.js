@@ -2,7 +2,7 @@ const net = require('net')
 const EventEmitter = require('events')
 
 class SocketOBD2Connection extends EventEmitter{
-  constructor(host = '0.0.0.0', port = 35000) {  //192.168.0.10 Real HW
+  constructor(host = '192.168.0.10', port = 35000) {  // Default HW Device IP/Port
     super()
     this.OBD_PORT = port
     this.OBD_IP = host

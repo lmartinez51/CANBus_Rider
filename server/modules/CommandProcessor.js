@@ -42,6 +42,7 @@ class CommandProcessor extends EventEmitter {
             clearTimeout(this.commandTimeout)
             console.log('Tiempo de espera agotado para el comando: ' + this.sendingCommands[this.commandIndex])
             console.log('El comando ha fallado: ' + this.sendingCommands[this.commandIndex])
+            this.commandIndex = 0
             this.socketConnection.disconnect()
             console.log('Desconectando despues de fallar el comando.')
             this.socketConnection.off('dataReceived', this.boundHandleData) // dataReceived
@@ -50,25 +51,6 @@ class CommandProcessor extends EventEmitter {
             this.emit('error', err)
         }
     }
-    // handleCommandTimeout() {
-    //     try {
-    //         clearTimeout(this.commandTimeout)
-    //         console.log('Tiempo de espera agotado para el comando: ' + this.sendingCommands[this.commandIndex])
-    //         if (this.retryCount < MAX_RETRIES) {
-    //             console.log('Reintentando el comando: ' + this.sendingCommands[this.commandIndex])
-    //             this.retryCount++
-    //             this.sendCommand()
-    //         } else {
-    //             console.log('El comando ha fallado después de ' + MAX_RETRIES + ' intentos: ' + this.sendingCommands[this.commandIndex])
-    //             this.socketConnection.disconnect()
-    //             console.log('Desconectando despues de varios intentos.')
-    //             this.socketConnection.off('dataReceived', this.boundHandleData) // dataReceived
-    //             this.socketConnection = null
-    //         }
-    //     } catch (err) {
-    //         this.emit('error', err)
-    //     }
-    // }
 }
 
 module.exports = CommandProcessor

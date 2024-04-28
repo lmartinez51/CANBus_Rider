@@ -1,15 +1,16 @@
 import "./Diagnostics.css"
 import Transitions from "../Transitions"
+import ConnectModal from '../modals/ConnectModal'
 import { ReactComponent as Sentra } from "./assets/Sentra2014.svg"
 import axios from 'axios'
 import ECUsDiagram from './ECUsDiagram'
 import React, { useEffect, useState } from 'react'
 import io from 'socket.io-client'
 
-const canUrl = 'http://localhost:8080/connectOBD2'
+const connectUrl = 'http://localhost:8080/connectOBD2'
 const startMonitorUrl = 'http://localhost:8080/startMonitorVehicle'
 const endMonitorUrl = 'http://localhost:8080/stopMonitorVehicle'
-const diagnosticsUrl = 'http://localhost:8080/diagnostics'
+const troubleCodesUrl = 'http://localhost:8080/troubleCodes'
 const resetUrl = 'http://localhost:8080/reset'
 const ENDPOINT = 'http://localhost:8080/'
 let socket;
@@ -45,6 +46,9 @@ export default function Diagnostics () {
     const [troubleDescription, setTroubleDescription] = useState('-')
     // Reset Trouble Codes
     const [resetTC, setResetTC] = useState('')
+    //Modal
+    const [modalShow, setModalShow] = useState(false)
+    const [connectOption, setConnectOption] = useState('')
 
     useEffect(() => {
         // Conectar el socket al servidor
@@ -137,8 +141,14 @@ export default function Diagnostics () {
     }, [])
 
     function handleConnectButton() {
-        setIsConnecting(true);
-        axios.post(canUrl)
+        setModalShow(true)
+    }
+
+    function handleOptionSelected(option) {
+        setModalShow(false)
+        setIsConnecting(true)
+        setConnectOption(option)
+        axios.post(connectUrl, { option: option, component: 'diagnostics'})
             .then(response => {
                 setIsConnecting(false);
                 if (response.status === 200) {
@@ -159,7 +169,7 @@ export default function Diagnostics () {
     }
 
     function handleCodesButton() {
-        axios.post(diagnosticsUrl)
+        axios.post(connectUrl, { option: connectOption, component: 'troubleCodes'})
             .then(response => {
                 if (response.status === 200) {
                     console.log(response.data)
@@ -186,7 +196,7 @@ export default function Diagnostics () {
         if (window.confirm("Ensuring the vehicle is fully functional before moving forward is paramount. Can you confirm if you have already had the opportunity to fix it?")) {
             // Si el usuario presiona OK, ejecuta el código para resetear los códigos
             alert('Please place the ignition key in the ON position, but do not start the vehicle.')
-            axios.post(resetUrl)
+            axios.post(connectUrl, { option: connectOption, component: 'resetCodes'})
             .then(response => {
                 if (response.status === 200) {
                     console.log(response.data)
@@ -207,7 +217,7 @@ export default function Diagnostics () {
 
     function handleStartButton() {
         setIsStarted(true);
-        axios.post(startMonitorUrl)
+        axios.post(startMonitorUrl, { option: connectOption })
             .then(response => {
                 if (response.status === 200) {
                     console.log(response.data);
@@ -240,6 +250,11 @@ export default function Diagnostics () {
     return (
         <>
             <Transitions>
+                <ConnectModal 
+                    show={modalShow} 
+                    handleClose={() => setModalShow(false)} 
+                    handleOptionSelected={handleOptionSelected} 
+                />
                 <div className='Diagnostics'>
                     <div className="map">
                         <div className="carMap">

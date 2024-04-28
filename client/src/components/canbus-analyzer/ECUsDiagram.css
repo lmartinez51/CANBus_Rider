@@ -10,12 +10,25 @@
 }
 
 #contextMenu {
-    z-index: 1;  /* Ajusta este valor según sea necesario */
-    /* el resto de tus estilos */
+    z-index: 1;  /* Ajuste este valor según sea necesario */
 }
   
 #contextMenu button {
-    width: 150px;  /* Ajusta este valor según sea necesario */
-    /* el resto de tus estilos */
-  }
-  
+    width: 100px;  /* Ajuste este valor según sea necesario */
+    border-radius: 0.4rem; /* Borde redondeado */
+    background-color: rgba(192, 192, 192, 0.7);
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+    }
+}
+
+#contextMenu button:disabled {
+    cursor: not-allowed;
+}

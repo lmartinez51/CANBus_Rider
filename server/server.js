@@ -21,8 +21,8 @@ const sixthFilterList = ['AT WS\r', 'AT E0\r', 'AT L1\r', 'AT H1\r', 'AT S0\r', 
 const seventhFilterList = ['AT WS\r', 'AT E0\r', 'AT L1\r', 'AT H1\r', 'AT S0\r', 'AT CSM0\r', 'AT CF 400\r', 'AT CM 600\r', 'AT MA\r']
 const eighthFilterList = ['AT WS\r', 'AT E0\r', 'AT L1\r', 'AT H1\r', 'AT S0\r', 'AT CSM0\r', 'AT CF 600\r', 'AT CM 600\r', 'AT MA\r']
 const SocketOBD2Connection = require('./modules/socketOBD2Connection')
-const SendingInitialCommands = require('./modules/InitializationCommands')
-const SendingVehicleInfoCommands = require('./modules/VehicleInfoCommands')
+const SendingDiagnosticsCommands = require('./modules/DiagnosticsCommands')
+const SendingAnalyzerCommands = require('./modules/AnalyzerCommands')
 const SendingSnifferCommands = require('./modules/SnifferCommands')
 const SendingMonitorCommands = require('./modules/MonitorCommands')
 const SendingTroubleCodesCommands = require('./modules/TroubleCodesCommands')
@@ -82,10 +82,29 @@ app.get('/vcan', (req,res) => {
 	res.send("Virtual CAN Bus 29-bits initialized")
 })
 
-// Connect to OBD2 ELM327 WiFi Adapter and run initial commands
+// Connect to OBD2 ELM327 WiFi Adapter and run commands
 app.post('/connectOBD2', (req, res) => {
-    socketOBD2Connection = new SocketOBD2Connection()
-    sendingCommands = new SendingInitialCommands(socketOBD2Connection, initializationCommandsList)
+    const host = req.body.option.host
+    const port = req.body.option.port
+    const component = req.body.component
+    socketOBD2Connection = new SocketOBD2Connection(host, port)
+    switch(component) {
+        case 'analyzer':
+            sendingCommands = new SendingAnalyzerCommands(socketOBD2Connection, initializationCommandsList)
+            break
+        case 'diagnostics':
+            // Connect Diagnostics
+            sendingCommands = new SendingDiagnosticsCommands(socketOBD2Connection, initializationCommandsList)
+            break
+        case 'troubleCodes':
+            //Run OBD2 Trouble Codes Diagnostics
+            sendingCommands = new SendingTroubleCodesCommands(socketOBD2Connection, troubleCodeList)
+            break
+        case 'resetCodes':
+            // Clear Vehicle Diagnostic Trouble Codes
+            sendingCommands = new SendingResetCodesCommands(socketOBD2Connection, resetTroubleCodeCommand)
+            break
+    }
     // Define los manejadores de eventos
     const errorHandler = async (err) => {
         console.log('Error:', err.message)
@@ -115,81 +134,14 @@ app.post('/connectOBD2', (req, res) => {
 
     // Luego, establecer la conexión
     socketOBD2Connection.connect()
-})
-
-// Connect to OBD2 ELM327 WiFi Adapter and run vehicle info commands
-app.post('/vehicleInfo', (req, res) => {
-    socketOBD2Connection = new SocketOBD2Connection()
-    sendingCommands = new SendingVehicleInfoCommands(socketOBD2Connection, initializationCommandsList)
-    // Define los manejadores de eventos
-    const errorHandler = async (err) => {
-        console.log('Error:', err.message)
-        res.status(500).send('Error: ' + err.message)
-    }
-
-    const connectedHandler = () => {
-        console.log('Conexion exitosa!')
-        res.status(200).send('Successful Connection!')
-        sendingCommands.sendCommand()
-    }
-
-    // Elimina los manejadores de eventos existentes
-    socketOBD2Connection.off('error', errorHandler)
-    socketOBD2Connection.off('connected', connectedHandler)
-    socketOBD2Connection.removeAllListeners('disconnected')
-
-    // Agrega los manejadores de eventos
-    socketOBD2Connection.once('error', errorHandler)
-    socketOBD2Connection.once('connected', connectedHandler)
-
-    socketOBD2Connection.on('disconnected', () => {
-        console.log("Desconectado del adaptador OBDII ELM327 WiFi.")
-        sendingCommands = null
-        socketOBD2Connection = null
-    });
-
-    // Luego, establecer la conexión
-    socketOBD2Connection.connect()
-})
-
-// Run OBD2 Diagnostics
-app.post('/diagnostics', (req, res) => {
-    socketOBD2Connection = new SocketOBD2Connection()
-    sendingCommands = new SendingTroubleCodesCommands(socketOBD2Connection, troubleCodeList)
-    // Define los manejadores de eventos
-    const errorHandler = async (err) => {
-        console.log('Error:', err.message);
-        res.status(500).send('Error: ' + err.message);
-    }
-    const connectedHandler = () => {
-        console.log('Iniciando Diagnosticos')
-        res.status(200).send('Getting Diagnostics!')
-        sendingCommands.sendCommand()
-    }
-
-    // Elimina los manejadores de eventos existentes
-    socketOBD2Connection.off('error', errorHandler)
-    socketOBD2Connection.off('connected', connectedHandler)
-    socketOBD2Connection.removeAllListeners('disconnected')
-
-    // Agrega los manejadores de eventos
-    socketOBD2Connection.once('error', errorHandler)
-    socketOBD2Connection.once('connected', connectedHandler)
-    socketOBD2Connection.on('disconnected', () => {
-        console.log("Desconectado del adaptador OBDII ELM327 WiFi.")
-        sendingCommands = null
-        socketOBD2Connection = null
-    })
-
-    // Conectarse al socket
-    socketOBD2Connection.connect()
-
 })
 
 // Start Vehicule Live Data (RPM, Speed, Engine Temp, Fuel, Battery Voltage)
 app.post('/startMonitorVehicle', (req, res) => {
+    const host = req.body.option.host
+    const port = req.body.option.port
     if (!socketOBD2Connection) {
-        socketOBD2Connection = new SocketOBD2Connection()
+        socketOBD2Connection = new SocketOBD2Connection(host, port)
     }
     sendingCommands = new SendingMonitorCommands(socketOBD2Connection, monitoringCommandsList)
     // Elimina los manejadores de eventos existentes
@@ -238,44 +190,11 @@ app.post('/stopMonitorVehicle', (req, res) => {
     sendingCommands.stopCommandCycle()
 })
 
-// Clear Vehicle Diagnostic Trouble Codes
-app.post('/reset', (req, res) => {
-    socketOBD2Connection = new SocketOBD2Connection()
-    sendingCommands = new SendingResetCodesCommands(socketOBD2Connection, resetTroubleCodeCommand)
-    // Define los manejadores de eventos
-    const errorHandler = async (err) => {
-        console.log("Error al restablecer los TCs.")
-        console.log('Error:', err.message);
-        res.status(500).send('Error: ' + err.message);
-    }
-    const connectedHandler = () => {
-        console.log('Restableciendo codigos de error...')
-        res.status(200).send('Resetting trouble codes.')
-        sendingCommands.sendCommand()
-    }
-
-    // Elimina los manejadores de eventos existentes
-    socketOBD2Connection.off('error', errorHandler)
-    socketOBD2Connection.off('connected', connectedHandler)
-    socketOBD2Connection.removeAllListeners('disconnected')
-
-    // Agrega los manejadores de eventos
-    socketOBD2Connection.once('error', errorHandler)
-    socketOBD2Connection.once('connected', connectedHandler)
-    socketOBD2Connection.on('disconnected', () => {
-        console.log("Codigos de problema restablecidos.")
-        console.log("Desconectado del adaptador OBDII ELM327 WiFi.")
-        sendingCommands = null
-        socketOBD2Connection = null
-    })
-
-    // Conectar al socket
-    socketOBD2Connection.connect()
-})
-
 // Start CAN Bus sniffing
 app.post('/startSniffer', (req, res) => {
-    const range = req.body.range  // Añade esta línea
+    const range = req.body.range
+    const host = req.body.option.host
+    const port = req.body.option.port
     console.log(`Rango: ${range}`)
     let snifferCommandsList
     switch(range) {
@@ -309,7 +228,7 @@ app.post('/startSniffer', (req, res) => {
     }
 
     if (!socketOBD2Connection) {
-        socketOBD2Connection = new SocketOBD2Connection()
+        socketOBD2Connection = new SocketOBD2Connection(host, port)
     }
     sendingCommands = new SendingSnifferCommands(socketOBD2Connection, snifferCommandsList)
     // Elimina los manejadores de eventos existentes
@@ -367,9 +286,11 @@ app.post('/stopSniffer', (req, res) => {
 
 app.post('/sniffECU', (req, res) => {
     const ecu = req.body.ecu
+    const host = req.body.option.host
+    const port = req.body.option.port
     let sniffSingleECUCommands = ['AT WS\r', 'AT E0\r', 'AT L1\r', 'AT H1\r', 'AT S0\r', 'AT CSM0\r', `AT CRA ${ecu}\r`, 'AT MA\r'] 
     if (!socketOBD2Connection) {
-        socketOBD2Connection = new SocketOBD2Connection()
+        socketOBD2Connection = new SocketOBD2Connection(host, port)
     }
     sendingCommands = new SendingSnifferCommands(socketOBD2Connection, sniffSingleECUCommands)
     // Elimina los manejadores de eventos existentes
@@ -400,6 +321,76 @@ app.post('/sniffECU', (req, res) => {
     socketOBD2Connection.connect()
 })
 
+// Database Models
+const Project = require('./models/vehicle_model')
+
+/* Vehicle Database Endpoints */
+
+// Saving Project to MongoDB database
+app.post('/project/new', async (req, res) => {
+    const project = new Project({ 
+        _id: new mongoose.Types.ObjectId(),
+        projectName: req.body.projectName,
+        deviceHost: req.body.deviceHost,
+        devicePort: req.body.devicePort,
+        vin: req.body.vin,
+        make: req.body.make,
+        model: req.body.model,
+        modelYear: req.body.modelYear,
+        vehicleType: req.body.vehicleType,
+        doors: req.body.doors,
+        engineCylinders: req.body.engineCylinders,
+        diagramData: req.body.diagramData
+    })
+    try {
+        await project.save()
+        res.status(200).send('Vehicle Information Saved!')
+    } catch (error) {
+        res.status(500).send('Error saving the project: ' + error.message)
+        console.log("Error saving vechicle information:" + error.message)
+    }
+})
+
+// Get all the projects from database
+app.get('/projects', async (req, res) => {
+    try {
+        const projects = await Project.find()
+        res.json(projects)
+    } catch (error) {
+        res.status(500).send('Error fetching projects: ' + error.message)
+        console.log("Error fectching vechicle information:" + error.message)
+    }
+})  
+
+// Get specific project from the database by project name
+app.get('/project/new', async (req, res) => {
+    const projectName = req.query.projectName
+    try {
+        const project = await Project.find({projectName})
+        res.json(project)
+    } catch (error) {
+        res.status(500).send('Error fetching the project: ' + error.message)
+        console.log("Error fectching vechicle information:" + error.message)
+    }
+})
+
+// Get specific project from the database by project id
+app.get('/project/:id', async (req, res) => {
+    const projectId = req.params.id
+    console.log(`Project ID: ${projectId}`)
+    try {
+        const project = await Project.findById(projectId)
+        if (project) {
+            res.json(project)
+        } else {
+            res.status(404).send('Project not found')
+        }
+    } catch (error) {
+        res.status(500).send('Error fetching the project: ' + error.message)
+        console.log("Error fectching vechicle information:" + error.message)
+    }
+})
+  
 // Connect to MongoDB
 mongoose.connect(MONGODBURI).then(() => console.log("Connected to the MONGODB CAN Bus database")).catch(console.error)
 

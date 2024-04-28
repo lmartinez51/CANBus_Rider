@@ -9,13 +9,8 @@
     background: radial-gradient(circle at center, #336699, #182848);
 }
 
-/* .map {
-    width: 1920px; 
-    max-height: 720px;
-} */
-
 .carBackground {
-    position: relative;
+    position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -33,25 +28,28 @@
     height: 683px;
 }
 
-.vehicleData {
+.vehicleInfo {
     position: absolute;
-    top: 100px;
-    left: 9%;
-    transform: translateX(-50%);
-    color: white;
-    padding: 10px 20px;
+    bottom: 20px;
+    left: 20px;
+    color: rgb(211,211, 211);
+    padding: 0px 5px;
     text-align: left;
-    text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 4px 2px;
-    border-radius: 5px;
-    min-width: 300px;
-    border-radius: 40px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); /* Ajusta el valor de la sombra */
-    background: radial-gradient(circle at center, #336699, #182848);
-    /* z-index: 10; */
+    min-width: 340px;
+    height: 150px;
+    border:  1px solid rgb(211,211, 211);
+    box-shadow: 0 0 0 1px #000, 0 0 0 3px rgb(211,211, 211), 0 0 0 5px #000;
+    /* background-color: transparent; */
+    background-color: radial-gradient(circle at center, #336699, #182848); 
+    z-index: 2;
 }
+
+/* .vehicleInfo p {
+    /*border: 1px solid rgb(211,211, 211); /* Crea una línea después de cada párrafo */
+    /*padding-top: 10px; Añade un poco de espacio antes de cada línea */
+    /* text-indent: 5px; }*/
 
 .connectButton {
     position: absolute;
@@ -70,17 +68,6 @@
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     z-index: 2;
-
-    /* Estilos de sombra y cambio de tamaño al hacer clic */
-    &:active {
-        transform: scale(0.95); /* Reduce ligeramente el tamaño */
-        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
-    }
-
-    /* Estilos al pasar el cursor por encima */
-    &:hover {
-        background-color: rgba(0,128,0, 1); /* Cambia el tono del gris al pasar el cursor */
-    }
 }
 
 .connectButton.connected {
@@ -121,6 +108,7 @@
     color: #ececf1;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
+    z-index: 2;
 }
 
 .range1Button.started {
@@ -149,6 +137,7 @@
     color: #ececf1;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
+    z-index: 2;
 }
 
 .range2Button.started {
@@ -177,6 +166,7 @@
     color: #ececf1;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
+    z-index: 2;
 }
 
 .range3Button.started {
@@ -205,6 +195,7 @@
     color: #ececf1;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
+    z-index: 2;
 }
 
 .range4Button.started {
@@ -233,6 +224,7 @@
     color: #ececf1;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
+    z-index: 2;
 }
 
 .range5Button.started {
@@ -261,6 +253,7 @@
     color: #ececf1;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
+    z-index: 2;
 }
 
 .range6Button.started {
@@ -289,6 +282,7 @@
     color: #ececf1;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
+    z-index: 2;
 }
 
 .range7Button.started {
@@ -317,6 +311,7 @@
     color: #ececf1;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
+    z-index: 2;
 }
 
 .range8Button.started {
@@ -347,6 +342,7 @@
     cursor: pointer; /* Cambia el cursor al pasar por encima */
     outline: none; /* Quita el contorno al hacer clic */
     transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    z-index: 2;
 
     /* Estilos de sombra y cambio de tamaño al hacer clic */
     &:active {
@@ -356,6 +352,72 @@
 
     /* Estilos al pasar el cursor por encima */
     &:hover {
-        background-color: rgba(192, 192, 192, 1); /* Cambia el tono del gris al pasar el cursor */
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+    }
+}
+
+.openButton{
+    position: absolute;
+    top: 400px;
+    right: 150px;
+    width: 110px;
+    background-color: rgb(40, 77, 241);
+    color: #ececf1;
+    padding: 10px 10px; /* Espaciado interno */
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    border-radius: 0.4rem; /* Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+        color: #000;
+    }
+}
+
+.saveButton{
+    position: absolute;
+    top: 400px;
+    right: 20px;
+    width: 110px;
+    background-color: rgb(40, 77, 241);
+    color: #ececf1;
+    padding: 10px 10px; /* Espaciado interno */
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    border-radius: 0.4rem; /* Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+        color: #000;
     }
 }

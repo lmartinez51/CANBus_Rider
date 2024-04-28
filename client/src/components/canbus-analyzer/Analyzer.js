@@ -1,5 +1,7 @@
 import "./Analyzer.css"
 import Transitions from "../Transitions"
+import ConnectModal from '../modals/ConnectModal'
+import VehiclesListModal from '../modals/VehiclesListModal'
 import ECUsDiagram from './ECUsDiagram'
 import React, { useEffect, useState, useRef } from 'react'
 import { ReactComponent as Car } from "./assets/carSvg.svg"
@@ -8,8 +10,11 @@ import io from 'socket.io-client'
 
 const snifferUrl = 'http://localhost:8080/startSniffer'
 const endSnifferUrl = 'http://localhost:8080/stopSniffer'
-const vehicleInfoUrl = 'http://localhost:8080/vehicleInfo'
+const connectUrl = 'http://localhost:8080/connectOBD2'
 const singleECUUrl = 'http://localhost:8080/sniffECU'
+const getAllVehiclesUrl = 'http://localhost:8080/projects'
+const addVehicleUrl = 'http://localhost:8080/project/new'
+const getVehicleUrl = 'http://localhost:8080/project/'
 const ENDPOINT = 'http://localhost:8080/'
 let socket
 
@@ -32,10 +37,14 @@ export default function Analyzer () {
     const [vehicleType, setVehicleType] = useState(null)
     const [doors, setDoors] = useState(null);
     const [engineCylinders, setEngineCylinders] = useState(null)
-
-    // useEffect(() => {
-    //     console.log(`La variable isStarted tiene valor ${isStarted}`);
-    //   }, [isStarted])
+    // Modals
+    const [connectModalShow, setConnectModalShow] = useState(false)
+    const [connectOption, setConnectOption] = useState({host:'', port:''})
+    const [vehicleModalShow, setVehicleModalShow] = useState(false)
+    // Diagram
+    const diagramRef = useRef(null)
+    // Database related
+    const [projects, setProjects] = useState([])
 
     useEffect(() => {
         // Conectar el socket al servidor
@@ -90,9 +99,15 @@ export default function Analyzer () {
         }
     }, [])
 
-    function handleVehicleButton(range) {
+    function handleConnectButton() {
+        setConnectModalShow(true)
+    }
+
+    function handleOptionSelected(option) {
+        setConnectModalShow(false)
         setIsConnecting(true)
-        axios.post(vehicleInfoUrl, { range: range })
+        setConnectOption({ host: option.host, port: option.port })
+        axios.post(connectUrl, { option: option, component: 'analyzer'})
             .then(response => {
                 if (response.status === 200) {
                     console.log(response.data)
@@ -115,7 +130,7 @@ export default function Analyzer () {
         setActiveRange(range)
         setIsStarted(true)
         isStartedRef.current = true
-        axios.post(snifferUrl, { range: range })
+        axios.post(snifferUrl, { range: range, option: connectOption})
             .then(response => {
                 if (response.status === 200) {
                     console.log(response.data)
@@ -146,79 +161,163 @@ export default function Analyzer () {
               } else {
                 alert('There was an error when trying to end data monitoring. Please verify your network connection and try again. ' + error.message)
               }
-              //reject(error)
             })
         })
     }
 
     function handleNodeSniff(ecu) {
-        // Verifica si el proceso está corriendo antes de intentar detenerlo
-        if (isStartedRef.current) {
-            handleStopButton().then(() => {
+        //Funcion de actualizacion 'currentConnectOption', necesaria para acceder al valor actualizado 'connectOption' debido al 'closure' 
+        setConnectOption(currentConnectOption => {
+            // Verifica si el proceso está corriendo antes de intentar detenerlo
+            if (isStartedRef.current) {
+                handleStopButton().then(() => {
+                    setActiveRange(null)
+                    setIsStarted(true) // Deactivate range buttons
+                    // Luego, envía el ECU al backend
+                    axios.post(singleECUUrl, { ecu: ecu, option: currentConnectOption })
+                    .then(response => {
+                        if (response.status === 200) {
+                            console.log(response.data)
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error sending the ECU name to the server:', error)
+                        alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
+                    })
+                    .finally(() => {
+                        // Restablece isStartedRef a false en todos los casos
+                        isStartedRef.current = false
+                    })
+                }).catch(error => {
+                    console.error('Error stopping the process:', error)
+                    alert('There was an error when trying to stop the process. Please verify your network connection and try again. ' + error.message)
+                })
+            } else {
                 setActiveRange(null)
                 setIsStarted(true) // Deactivate range buttons
-                // Luego, envía el ECU al backend
-                axios.post(singleECUUrl, { ecu: ecu }).then(response => {
-                    if (response.status === 200) {
-                        console.log(response.data)
-                    }
-                })
-                .catch(error => {
-                    console.error('Error sending the ECU name to the server:', error)
-                    alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
-                })
-                .finally(() => {
-                    // Restablece isStartedRef a false en todos los casos
-                    isStartedRef.current = false
-                })
-            }).catch(error => {
-                console.error('Error stopping the process:', error)
-                alert('There was an error when trying to stop the process. Please verify your network connection and try again. ' + error.message)
-            })
-        } else {
-            setActiveRange(null)
-            setIsStarted(true) // Deactivate range buttons
-            // Si el proceso no está corriendo, simplemente envía el ECU al backend
-            axios.post(singleECUUrl, { ecu: ecu }).then(response => {
-                if (response.status === 200) {
-                    console.log(response.data)
-                }
-            })
-            .catch(error => {
-                console.error('Error sending the ECU name to the server:', error)
-                alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
-            })
-            .finally(() => {
-                // Restablece isStartedRef a false en todos los casos
-                isStartedRef.current = false
-            })
-        }
-    }
+                // Si el proceso no está corriendo, simplemente envía el ECU al backend
+                axios.post(singleECUUrl, { ecu: ecu, option: currentConnectOption })
+                    .then(response => {
+                        if (response.status === 200) {
+                            console.log(response.data)
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error sending the ECU name to the server:', error)
+                        alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
+                    })
+                    .finally(() => {
+                        // Restablece isStartedRef a false en todos los casos
+                        isStartedRef.current = false
+                    })
+            }
+    
+            return currentConnectOption; // Devuelve el mismo valor para no cambiar el estado
+        });
+    }    
 
     function handleResetAllButton() {
         window.location.reload()
     }
 
+    const handleSaveButton = (event) => {
+        // Prevents the 'Save' button from refreshing the page
+        event.preventDefault()
+        let diagramData = diagramRef.current.saveDiagram()
+        const data = { 
+            projectName: model+modelYear, 
+            deviceHost: connectOption.host,
+            devicePort: connectOption.port,
+            vin: vin,
+            make: make,
+            model: model,
+            modelYear: modelYear,
+            vehicleType: vehicleType,
+            doors: doors,
+            engineCylinders: engineCylinders,
+            diagramData: diagramData
+        }
+        axios.post(addVehicleUrl, data).then((response) => {
+            if (response.status === 200) {
+                console.log(response.data)
+            }
+        })
+        .catch(error => {
+            console.error('Error saving vehicle info into the database:', error)
+            alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
+        })
+      }
+
+    async function handleOpenButton() {
+        await handleVehicleList() // Carga la lista de proyectos cuando se abre el modal
+        setVehicleModalShow(true)
+    }
+
+    async function handleVehicleList(){
+        await axios.get(getAllVehiclesUrl)
+        .then(response => {
+            setProjects(response.data)
+        })
+        .catch(error => {
+            console.error('Error loading projects from the database: ' , error)
+            alert('There was an error when trying to make a request. Please verify your network and database connection. ' + error.message)
+        })
+    }
+
+    async function handleVehicleSelected(option) {
+        const projectId = option
+        await axios.get(`${getVehicleUrl}${projectId}`)
+          .then(response => {
+            const project = response.data
+            diagramRef.current.loadDiagram(project.diagramData)
+            setVin(project.vin)
+            setMake(project.make)
+            setModel(project.model)
+            setModelYear(project.modelYear)
+            setVehicleType(project.vehicleType)
+            setDoors(project.doors)
+            setEngineCylinders(project.engineCylinders)
+          })
+          .catch(error => {
+            console.error('Error loading project from the database:', error)
+            alert('There was an error when trying to make a request. Please verify your network and database connection. ' + error.message)
+        })
+    }
+
     return (
         <>
             <Transitions>
+                <ConnectModal 
+                    show={connectModalShow} 
+                    handleClose={() => setConnectModalShow(false)} 
+                    handleOptionSelected={handleOptionSelected} 
+                />
+                <VehiclesListModal 
+                    show={vehicleModalShow} 
+                    handleClose={() => setVehicleModalShow(false)} 
+                    projects={projects} // Pasa la lista de proyectos al modal
+                    handleVehicleSelected={handleVehicleSelected} // Pasa la función al modal
+                />
                 <div className='Analyzer'>
-
                     <div className="carBackground">
-                        <div className="vehicleData">
+                        <div className="vehicleInfo">
+                            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                                <p>Make: {make}</p>
+                                <p>Model: {model}</p>
+                                <p>Year: {modelYear}</p>
+                            </div>
                             <p>VIN: {vin}</p>
-                            <p>Make: {make}</p>
-                            <p>Model: {model}</p>
-                            <p>Year: {modelYear}</p>
                             <p>Vehicle Type: {vehicleType}</p>
-                            <p>Engine Cylinders: {engineCylinders}</p>
-                            <p>Doors: {doors}</p>
+                            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                                <p>Engine Cylinders: {engineCylinders}</p>
+                                <p>Doors: {doors}</p>
+                            </div>
                         </div>
                         <Car className='carSvg'/>
-                        <ECUsDiagram data={data} onNodeSniff={handleNodeSniff} onStopSniff={handleStopButton}/>
+                        <ECUsDiagram ref={diagramRef} data={data} onNodeSniff={handleNodeSniff} connectOption={connectOption} onStopSniff={handleStopButton}/>
                         <button
                             className={`connectButton ${isConnected ? 'connected' : isConnecting ? 'connecting' : connectButtonStatus ? 'statusTrue' : ''}`}
-                            onClick={() => handleVehicleButton('getData')} 
+                            onClick={() => handleConnectButton('getData')} 
                             disabled={isConnected || isConnecting || connectButtonStatus}
                             >
                             {isConnected ? 'Connected' : isConnecting ? 'Connecting...' : 'Connect'}
@@ -287,7 +386,9 @@ export default function Analyzer () {
                             {activeRange === 'eighth' ? 'Stop' : 'Range 8'}
                             {activeRange !== 'eighth' && <span style={{fontSize: '12px', display: 'block'}}>(600 - 7FF)</span>}
                         </button>
-                        <button className= "resetAll" onClick={handleResetAllButton}>Reset All</button>
+                        <button className="resetAll" onClick={handleResetAllButton}>Reset All</button>
+                        <button className="openButton" onClick={handleOpenButton}>Load Diag</button>
+                        <button className="saveButton" onClick={handleSaveButton}>Save Diag</button>
                     </div>
                 </div>
             </Transitions>

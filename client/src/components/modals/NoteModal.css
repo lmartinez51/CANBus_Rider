@@ -1,0 +1,83 @@
+.modal-content.noteModal {
+    width: 300px;
+    height: 175px;
+}
+
+.modal-header {
+    height: 40px;
+}
+
+/* Ajusta el alto del cuerpo del modal */
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: normal;
+    height: 100px;
+}
+
+.noteForm {
+    width: 200px;
+    height: 40px;
+}
+
+.modalInput {
+    background-color: white;
+    color: black;
+    border-color: black;
+    height: 40px;
+    font-size: large;
+}
+
+/* Alinea los botones a la derecha */
+.buttonContainer {
+    display: flex;
+    justify-content: left;
+    padding-top: 15px;
+}
+
+.noteCancelButton{
+    width: 60px;
+    margin-right: 10px;
+    height: 36px;
+    color: #fff;
+    background-color: #6c757d;
+    border-radius: 0.4rem;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+        color: black;
+    }
+}
+
+.noteSaveButton{
+    width: 60px;
+    height: 36px;
+    color: #fff;
+    background-color: rgb(40, 77, 241);
+    border-radius: 0.4rem;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+        color: black;
+    }
+}
+

@@ -1,8 +1,9 @@
-import React, { useRef, useEffect} from 'react';
-import * as go from 'gojs';
-import { ReactDiagram } from 'gojs-react';
-import iconCPU from './assets/cpu.png';
-import './ECUsDiagram.css';
+import React, { useRef, useEffect, useState, forwardRef} from 'react'
+import * as go from 'gojs'
+import { ReactDiagram } from 'gojs-react'
+import iconCPU from './assets/cpu.png'
+import NoteModal from '../modals/NoteModal'
+import './ECUsDiagram.css'
 
 // Function to determine the range from the given ECU value in decimal
 function getRangeFromECU(ecuValueInDecimal) {
@@ -40,46 +41,56 @@ function calculatePosition(ecu) {
   }
 }
 
-export default function ECUsDiagram({ data, onNodeSniff, onStopSniff}) {
+const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
   const diagramRef = useRef(null)
+  const [isSniffing, setIsSniffing] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const originalColors = useRef({}) // Almacena los colores originales de los nodos
+
+  const handleOpenModal = () => {
+    setShowModal(true)
+  }
+
+  const handleCloseModal = () => {
+    setShowModal(false)
+  }
 
   // Function to handle changes in node data and update node color accordingly
-  function handleNodeChange(ecu) {
-    const diagram = diagramRef.current
-    const model = diagram.model
+  function handleNodeChange(ecu, diagram) {
+    const diagramN = diagram
+    const model = diagramN.model
     const nodeData = model.findNodeDataForKey(ecu)
     model.setDataProperty(nodeData, 'changeCount', nodeData.changeCount + 1)
-    console.log(`El conteo actual de ${ecu} es: ${nodeData.changeCount}`)
-    const node = diagram.findNodeForKey(ecu)
+    //console.log(`El conteo actual de ${ecu} es: ${nodeData.changeCount}`)
+    const node = diagramN.findNodeForKey(ecu)
     if (node) {
-        changeNodeColor(node, nodeData.changeCount)
+        changeNodeColor(node, nodeData.changeCount, diagramN)
     }
   }
 
   // Function to change the color of a node based on the change count
-  function changeNodeColor(node, changeCount) {
-      const shape = node.findObject("SHAPE")
-      if (shape) {
-          if (changeCount > 1 && changeCount < 200) {
-              shape.fill = "limegreen"
-          } else if (changeCount > 1000) {
-              shape.fill = "red"
-          }
-      }
+  function changeNodeColor(node, changeCount, diagram) {
+    let color;
+    if (changeCount > 1 && changeCount < 200) {
+      color = "limegreen";
+    } else if (changeCount > 1000) {
+      color = "red";
+    }
+    if (color) {
+      // Actualiza los datos del modelo para reflejar el cambio de color
+      diagram.model.startTransaction('update color')
+      diagram.model.setDataProperty(node.data, 'color', color)
+      diagram.model.commitTransaction('update color')
+    }
   }
+
 
   function initDiagram() {
 
     const $ = go.GraphObject.make
     const model = $(go.TreeModel)
 
-    // listen for change in the payload
-    model.addChangedListener(function(e) {
-      if (e.change === go.ChangedEvent.Property && e.propertyName === 'value') {
-        handleNodeChange(e.object.key)
-      }
-    })
-    
     const diagram = $(go.Diagram, {
       'initialContentAlignment': new go.Spot(.5, .5),
       'undoManager.isEnabled': true,
@@ -88,6 +99,13 @@ export default function ECUsDiagram({ data, onNodeSniff, onStopSniff}) {
       model: model,
     })
         
+    // listen for change in the payload
+    model.addChangedListener(function(e) {
+      if (e.change === go.ChangedEvent.Property && e.propertyName === 'value') {
+        handleNodeChange(e.object.key, diagram)
+      }
+    })
+    
     // This is the actual HTML context menu:
     var cxElement = document.getElementById("contextMenu");
 
@@ -122,7 +140,15 @@ export default function ECUsDiagram({ data, onNodeSniff, onStopSniff}) {
           new go.Binding('visible', 'key', function(k) { return k !== 'ECU'; }),
           { margin: new go.Margin(6, 6, 3, 6), stroke: 'blue', font: 'bold 12px sans-serif' }
         )
-      ), 
+      ),
+      {
+        toolTip:  // define a tooltip for each node that displays the color as text
+          $(go.Adornment, 'Auto',
+            $(go.Shape, { fill: '#FFFFCC' }),
+            $(go.TextBlock, { margin: 4 },
+              new go.Binding('text', 'signal', function(v) { return "Signals: " + v; }))
+          )  // end of Adornment
+      },
     )
 
     diagram.contextMenu = myContextMenu;
@@ -147,6 +173,7 @@ export default function ECUsDiagram({ data, onNodeSniff, onStopSniff}) {
       maybeShowItem(document.getElementById("delete"), cmd.canDeleteSelection())
       maybeShowItem(document.getElementById("sniff"), obj != null)
       maybeShowItem(document.getElementById("stop"), obj != null)
+      maybeShowItem(document.getElementById("addNote"), obj != null && obj instanceof go.Node)
       
       // Now show the whole context menu element
       if (hasMenuItem) {
@@ -165,11 +192,12 @@ export default function ECUsDiagram({ data, onNodeSniff, onStopSniff}) {
     // // This is the general menu command handler, parameterized by the name of the command.
     function cxcommand(event, val) {
       if (val === undefined) val = event.currentTarget.id;
-      var diagramM = diagram;
+      var diagramM = diagram
       switch (val) {
         case "selectAll": diagramM.commandHandler.selectAll(); break;
         case "delete": diagramM.commandHandler.deleteSelection(); break;
-        case "sniff": {handleNodeSniffContextMenu(diagram); break;}
+        case "sniff": {handleNodeSniffContextMenu(diagramM); break;}
+        case "addNote": {handleOpenModal(); break;}
         default: break;
       }
       diagramM.currentTool.stopTool();
@@ -182,9 +210,15 @@ export default function ECUsDiagram({ data, onNodeSniff, onStopSniff}) {
       cxcommand(null, 'delete');
     });
     document.getElementById('sniff').addEventListener('click', function() {
-      cxcommand(null, 'sniff');
+      if (!isSniffing) {
+        cxcommand(null, 'sniff')
+        setIsSniffing(true)
+      }
     });
-
+    document.getElementById('addNote').addEventListener('click', function() {
+      cxcommand(null, 'addNote');
+    });
+    
     diagram.linkTemplate =
       $(go.Link,
         $(go.Shape, { strokeWidth: 1, stroke: 'black' })
@@ -221,7 +255,8 @@ export default function ECUsDiagram({ data, onNodeSniff, onStopSniff}) {
             parent: 'ECU',
             loc: go.Point.stringify(calculatePosition(ecu)),
             color: "white",
-            changeCount: 1, // Inicializamos el contador de cambios en 0
+            changeCount: 1, // Inicializamos el contador de cambios en 1
+            signal: []
           }
           model.addNodeData(nodeData)
         } else  if (payload && existingNodeData.value !== payload) {
@@ -242,10 +277,13 @@ export default function ECUsDiagram({ data, onNodeSniff, onStopSniff}) {
         // Call setDataProperty to support undo/redo as well as
         // automatically evaluating any relevant bindings.
         diagram.model.setDataProperty(data, 'color', "limegreen");
-  
         // Change the color of all other nodes to '#666666'
         diagram.nodes.each((node) => {
           if (node !== selectedNode) {
+            // const shape = node.findObject("SHAPE");
+            // shape.fill = '#666666'
+            originalColors.current[node.key] = node.data.color // Guarda el color original
+            console.log(`Colores actuales: ${originalColors.current[node.key]}`)
             diagram.model.setDataProperty(node.data, 'color', '#666666');
             node.pickable = false; 
           }
@@ -254,37 +292,90 @@ export default function ECUsDiagram({ data, onNodeSniff, onStopSniff}) {
     });
     diagram.commitTransaction('change color');
   }
+
+  function handleAddNote(note) {
+    const diagram = diagramRef.current
+    diagram.model.startTransaction('add note')
+    let selectedNode = diagram.selection.first()
+    if (selectedNode) {
+      let newNote = note
+      if (newNote) {
+          let nodeData = selectedNode.data;
+          let newSignal = [...nodeData.signal, newNote]; // Crea una nueva lista con la nota añadida
+          diagram.model.setDataProperty(nodeData, 'signal', newSignal); // Actualiza la propiedad 'signal' del nodo
+      }
+    }
+    diagram.model.commitTransaction('add note')
+    setShowModal(false)
+  }
+
+  // Función para guardar el estado del diagrama
+  function saveDiagram() {
+      let diagramData = diagramRef.current.model.toJson(); // Serializa el modelo del diagrama a JSON
+      return diagramData;
+  }
+
+  // Función para cargar el estado del diagrama
+  function loadDiagram(diagramData) {
+      if (diagramData) {
+      diagramRef.current.model = go.Model.fromJson(diagramData); // Deserializa el JSON para crear un nuevo modelo
+      }
+  }
+
+  // Guarda las funciones en la ref. Guardar/Cargar diagrama en/desde la base de datos.
+  useEffect(() => {
+      ref.current = {
+      saveDiagram,
+      loadDiagram
+      };
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   
   return (
-    <div id="myDiagram" style={{ position: 'absolute', height: '680px', width: '1600px', margin: '10px', zIndex: 2}}>
+    <div id="myDiagram" style={{ position: 'absolute', height: '680px', width: '1880px', margin: '10px', zIndex: 2}}>
+        <div>
+          <NoteModal show={showModal} handleClose={handleCloseModal} handleSaveNote={handleAddNote} />
+        </div>
       <ReactDiagram
         initDiagram={initDiagram}
         divClassName='diagram-ECU-component'
         style={{ border: 'none' }}
-        //onContextMenu={(node) => handleNodeSniffContextMenu(node)}
+        ref={diagramRef}
       />
       <div id="contextMenu" style={{ display: 'none', position: 'absolute' }}>
-        <button id="sniff">Sniff</button>
-        <button id="stop" onClick={() => {
+        <button id="sniff" disabled={isSniffing}>Sniff</button>
+        <button id="stop" style={{ backgroundColor: isSniffing ? 'red' : (isHovered ? 'rgb(214, 214, 214)' : 'rgba(192, 192, 192, 0.7)') }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)} onClick={() => {
           onStopSniff()
             .then(() => {
               const model = diagramRef.current.model
               model.startTransaction("change color")
               // Cambia el color de todos los nodos a blanco
               diagramRef.current.nodes.each(function(node) {
-                model.setDataProperty(node.data, 'color', 'white')
-                node.pickable = true;
-              });
+                const originalColor = originalColors.current[node.key] // Obtener el color original
+                console.log(`Color actual: ${originalColor}`)
+                model.setDataProperty(node.data, 'color', originalColor)
+                node.pickable = true
+              })
               model.commitTransaction("change color")
+              originalColors.current = {}
             })
             .catch(error => {
               console.error('There was an error while trying to stop the sniffer.', error)
             })
+            .finally(() => {
+              // Restablece setIsSniffing a false en todos los casos
+              setIsSniffing(false)
+            })
           }}>Stop
         </button>
-        <button id="selectAll">Select All</button>
-        <button id="delete">Delete</button>
+        <button id="selectAll" disabled={isSniffing}>Select All</button>
+        <button id="delete" disabled={isSniffing}>Delete</button>
+        <button id="addNote" disabled={isSniffing}>Add Note</button>
       </div>
     </div>
-  );  
-}
+  )
+})
+
+export default ECUsDiagram
+

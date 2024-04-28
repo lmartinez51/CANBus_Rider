@@ -25,7 +25,6 @@ class SendingSnifferCommands extends CommandProcessor {
             this.ecuInfo.ecu = ecu
             this.ecuInfo.payload = payload
             console.log(this.ecuInfo)
-            //console.log(`Payload es: ${this.ecuInfo.payload}`)
             const socket = global.connectedSocket
             if(socket) {
                 socket.emit('snifferData', this.ecuInfo)

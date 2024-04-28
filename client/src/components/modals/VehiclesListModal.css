@@ -1,0 +1,35 @@
+.modal-content {
+    color: #dee2e6;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    background: radial-gradient(circle at center, #336699, #182848);
+}
+
+.select-container {
+    max-height: 147px;
+    overflow-y: auto;
+    color: #dee2e6;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    background: radial-gradient(circle at center, #336699, #182848);
+}
+
+.vehicleSelect {
+    border-radius: 0.25rem;
+    border: 1px;
+    border-color: #495057;
+    font-size: 1rem;
+    font-weight: 400;
+    text-align: center;
+    /* padding: .375rem 2.25rem .375rem 2.25rem; */
+    word-wrap: normal;
+    color: white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    background: radial-gradient(circle at center, #336699, #182848);
+    height: 33px;
+    width: 206px;
+}
+
+.vehicleOption {
+    color: black;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    background: radial-gradient(circle at center, #336699, #182848);
+}
