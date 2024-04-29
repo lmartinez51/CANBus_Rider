@@ -267,30 +267,28 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
   }, [data])
 
   function handleNodeSniffContextMenu(diagram) {
-    diagram.startTransaction('change color');
-    diagram.selection.each((selectedNode) => {
-      if (selectedNode instanceof go.Node) {
-        // ignore any selected Links and simple Parts
-        // Examine and modify the data, not the Node directly.
-        const data = selectedNode.data;
-        onNodeSniff(data.key);
-        // Call setDataProperty to support undo/redo as well as
-        // automatically evaluating any relevant bindings.
-        diagram.model.setDataProperty(data, 'color', "limegreen");
-        // Change the color of all other nodes to '#666666'
-        diagram.nodes.each((node) => {
-          if (node !== selectedNode) {
-            // const shape = node.findObject("SHAPE");
-            // shape.fill = '#666666'
-            originalColors.current[node.key] = node.data.color // Guarda el color original
-            console.log(`Colores actuales: ${originalColors.current[node.key]}`)
-            diagram.model.setDataProperty(node.data, 'color', '#666666');
-            node.pickable = false; 
-          }
-        });
-      }
-    });
-    diagram.commitTransaction('change color');
+      diagram.startTransaction('change color')
+      diagram.selection.each((selectedNode) => {
+        if (selectedNode instanceof go.Node) {
+          // ignore any selected Links and simple Parts
+          // Examine and modify the data, not the Node directly.
+          const data = selectedNode.data
+          onNodeSniff(data.key)
+          // Call setDataProperty to support undo/redo as well as
+          // automatically evaluating any relevant bindings.
+          //diagram.model.setDataProperty(data, 'color', "limegreen")
+          // Change the color of all other nodes to '#666666'
+          diagram.nodes.each((node) => {
+            if (node !== selectedNode) {
+              originalColors.current[node.key] = node.data.color // Guarda el color original
+              console.log(`Colores actuales: ${originalColors.current[node.key]}`)
+              diagram.model.setDataProperty(node.data, 'color', '#666666')
+              node.pickable = false
+            }
+          })
+        }
+      })
+      diagram.commitTransaction('change color')
   }
 
   function handleAddNote(note) {

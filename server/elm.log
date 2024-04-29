@@ -5363,3 +5363,690 @@ ELM327 OBD-II adapter emulator v3.0.0 started at TCP/IP network port 35000.
 2024-04-28 06:37:10,602  root       terminate  DEBUG    Start termination procedure.
 2024-04-28 06:37:11,704  root       set_defaults DEBUG    Stopping ECU task "Default ECU Task module", ECU="7E0", method=stop()
 2024-04-28 06:37:11,704  root       terminate  DEBUG    Terminated.
+2024-04-29 00:01:28,852  root       run        INFO     
+
+ELM327 OBD-II adapter emulator v3.0.0 started at TCP/IP network port 35000.
+
+2024-04-29 00:01:28,866  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 00:01:42,863  root       accept_connection DEBUG    Connected by ('127.0.0.1', 45800)
+2024-04-29 00:01:42,864  root       run        DEBUG    Received 'AT WS'
+2024-04-29 00:01:42,864  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 00:01:42,864  root       handle_request DEBUG    Instantiating ECU task "Default ECU Task module" for ECU "7E0"
+2024-04-29 00:01:42,868  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 00:01:42,869  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 00:01:42,870  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 00:01:42,878  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 00:01:43,381  root       run        DEBUG    Received 'AT SP 0'
+2024-04-29 00:01:43,381  root       handle_request DEBUG    Handling: 'ATSP0', header '7E0', ECU '7E0'
+2024-04-29 00:01:43,382  root       handle_request DEBUG    Description: AT PROTO, PID AT_PROTO (ATSP0)
+2024-04-29 00:01:43,382  root       <module>   DEBUG    set PROTO 0
+2024-04-29 00:01:43,382  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 00:01:43,383  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 00:01:43,884  root       run        DEBUG    Received 'AT DP'
+2024-04-29 00:01:43,885  root       handle_request DEBUG    Handling: 'ATDP', header '7E0', ECU '7E0'
+2024-04-29 00:01:43,885  root       handle_request DEBUG    Description: AT set DESCRIBE PROTO, PID AT_DESCRIBE_PROTO (ATDP)
+2024-04-29 00:01:44,385  root       handle_response DEBUG    Processing: '<writeln>ISO 15765-4 (CAN 11/500)</writeln>'
+2024-04-29 00:01:44,385  root       handle_response DEBUG    Write: 'ISO 15765-4 (CAN 11/500)\r\r>'
+2024-04-29 00:01:44,888  root       run        DEBUG    Received 'AT E0'
+2024-04-29 00:01:44,889  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 00:01:44,890  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 00:01:44,890  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 00:01:44,890  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 00:01:44,890  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 00:01:45,393  root       run        DEBUG    Received 'AT S0'
+2024-04-29 00:01:45,393  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 00:01:45,394  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 00:01:45,394  root       <module>   DEBUG    set SPACES False
+2024-04-29 00:01:45,394  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 00:01:45,394  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 00:01:45,895  root       run        DEBUG    Received 'AT H0'
+2024-04-29 00:01:45,895  root       handle_request DEBUG    Handling: 'ATH0', header '7E0', ECU '7E0'
+2024-04-29 00:01:45,896  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH0)
+2024-04-29 00:01:45,896  root       <module>   DEBUG    set HEADERS ON/OFF : False
+2024-04-29 00:01:45,896  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 00:01:45,896  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 00:01:46,397  root       run        DEBUG    Received 'AT CAF1'
+2024-04-29 00:01:46,398  root       handle_request DEBUG    Handling: 'ATCAF1', header '7E0', ECU '7E0'
+2024-04-29 00:01:46,398  root       handle_request DEBUG    Description: AT CAN Automatic Formatting, PID AT_CAF (ATCAF1)
+2024-04-29 00:01:46,398  root       <module>   DEBUG    Set CAN Automatic Formatting ON/OFF : True
+2024-04-29 00:01:46,398  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 00:01:46,398  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 00:01:46,900  root       run        DEBUG    Received '09 02'
+2024-04-29 00:01:46,900  root       handle_request DEBUG    Handling: '0902', header '7E0', ECU '7E0'
+2024-04-29 00:01:46,900  root       handle_request DEBUG    Description: Vehicle Identification Number, PID VIN (0902)
+2024-04-29 00:01:46,900  root       handle_response DEBUG    Processing: '<pos_answer>01 4D 41 54 34 30 33 30 39 36 42 4E 4C 30 30 30 30 30</pos_answer>'
+2024-04-29 00:01:46,900  root       handle_response DEBUG    Write: '014\r0: 4902014D4154\r1: 34303330393642\r2: 4E4C3030303030\r\r>'
+2024-04-29 00:01:46,907  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 00:01:46,907  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 00:01:46,908  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 02:45:05,895  root       accept_connection DEBUG    Connected by ('127.0.0.1', 44874)
+2024-04-29 02:45:05,946  root       run        DEBUG    Received 'AT WS'
+2024-04-29 02:45:05,955  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 02:45:05,966  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 02:45:05,978  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 02:45:05,980  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 02:45:05,991  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 02:45:06,500  root       run        DEBUG    Received 'AT SP 0'
+2024-04-29 02:45:06,500  root       handle_request DEBUG    Handling: 'ATSP0', header '7E0', ECU '7E0'
+2024-04-29 02:45:06,500  root       handle_request DEBUG    Description: AT PROTO, PID AT_PROTO (ATSP0)
+2024-04-29 02:45:06,506  root       <module>   DEBUG    set PROTO 0
+2024-04-29 02:45:06,508  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:45:06,508  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:45:07,011  root       run        DEBUG    Received 'AT DP'
+2024-04-29 02:45:07,014  root       handle_request DEBUG    Handling: 'ATDP', header '7E0', ECU '7E0'
+2024-04-29 02:45:07,015  root       handle_request DEBUG    Description: AT set DESCRIBE PROTO, PID AT_DESCRIBE_PROTO (ATDP)
+2024-04-29 02:45:07,516  root       handle_response DEBUG    Processing: '<writeln>ISO 15765-4 (CAN 11/500)</writeln>'
+2024-04-29 02:45:07,516  root       handle_response DEBUG    Write: 'ISO 15765-4 (CAN 11/500)\r\r>'
+2024-04-29 02:45:08,018  root       run        DEBUG    Received 'AT E0'
+2024-04-29 02:45:08,021  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 02:45:08,022  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 02:45:08,022  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 02:45:08,022  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:45:08,022  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:45:08,525  root       run        DEBUG    Received 'AT S0'
+2024-04-29 02:45:08,525  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 02:45:08,526  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 02:45:08,526  root       <module>   DEBUG    set SPACES False
+2024-04-29 02:45:08,526  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:45:08,527  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:45:09,030  root       run        DEBUG    Received 'AT H0'
+2024-04-29 02:45:09,031  root       handle_request DEBUG    Handling: 'ATH0', header '7E0', ECU '7E0'
+2024-04-29 02:45:09,031  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH0)
+2024-04-29 02:45:09,032  root       <module>   DEBUG    set HEADERS ON/OFF : False
+2024-04-29 02:45:09,032  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:45:09,032  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:45:09,536  root       run        DEBUG    Received 'AT CAF1'
+2024-04-29 02:45:09,536  root       handle_request DEBUG    Handling: 'ATCAF1', header '7E0', ECU '7E0'
+2024-04-29 02:45:09,536  root       handle_request DEBUG    Description: AT CAN Automatic Formatting, PID AT_CAF (ATCAF1)
+2024-04-29 02:45:09,537  root       <module>   DEBUG    Set CAN Automatic Formatting ON/OFF : True
+2024-04-29 02:45:09,537  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:45:09,537  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:45:10,040  root       run        DEBUG    Received '09 02'
+2024-04-29 02:45:10,041  root       handle_request DEBUG    Handling: '0902', header '7E0', ECU '7E0'
+2024-04-29 02:45:10,041  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-04-29 02:45:10,041  root       handle_request DEBUG    Description: Vehicle Identification Number, PID VIN (0902)
+2024-04-29 02:45:10,046  root       handle_response DEBUG    Processing: '<pos_answer>01 53 42 31 5A 53 33 4A 45 36 30 45 32 38 32 31 30 32</pos_answer>'
+2024-04-29 02:45:10,052  root       handle_response DEBUG    Write: '014\r0: 490201534231\r1: 5A53334A453630\r2: 45323832313032\r\r>'
+2024-04-29 02:45:10,065  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 02:45:10,067  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 02:45:10,073  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 02:46:23,635  root       accept_connection DEBUG    Connected by ('127.0.0.1', 46644)
+2024-04-29 02:46:23,640  root       run        DEBUG    Received 'AT WS'
+2024-04-29 02:46:23,640  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 02:46:23,641  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 02:46:23,641  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 02:46:23,641  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 02:46:23,641  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 02:46:24,152  root       run        DEBUG    Received 'AT SP 0'
+2024-04-29 02:46:24,156  root       handle_request DEBUG    Handling: 'ATSP0', header '7E0', ECU '7E0'
+2024-04-29 02:46:24,156  root       handle_request DEBUG    Description: AT PROTO, PID AT_PROTO (ATSP0)
+2024-04-29 02:46:24,157  root       <module>   DEBUG    set PROTO 0
+2024-04-29 02:46:24,157  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:46:24,157  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:46:24,660  root       run        DEBUG    Received 'AT DP'
+2024-04-29 02:46:24,661  root       handle_request DEBUG    Handling: 'ATDP', header '7E0', ECU '7E0'
+2024-04-29 02:46:24,661  root       handle_request DEBUG    Description: AT set DESCRIBE PROTO, PID AT_DESCRIBE_PROTO (ATDP)
+2024-04-29 02:46:25,162  root       handle_response DEBUG    Processing: '<writeln>ISO 15765-4 (CAN 11/500)</writeln>'
+2024-04-29 02:46:25,164  root       handle_response DEBUG    Write: 'ISO 15765-4 (CAN 11/500)\r\r>'
+2024-04-29 02:46:25,667  root       run        DEBUG    Received 'AT E0'
+2024-04-29 02:46:25,672  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 02:46:25,672  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 02:46:25,672  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 02:46:25,673  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:46:25,673  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:46:26,175  root       run        DEBUG    Received 'AT S0'
+2024-04-29 02:46:26,175  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 02:46:26,177  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 02:46:26,177  root       <module>   DEBUG    set SPACES False
+2024-04-29 02:46:26,177  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:46:26,184  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:46:26,697  root       run        DEBUG    Received 'AT H0'
+2024-04-29 02:46:26,697  root       handle_request DEBUG    Handling: 'ATH0', header '7E0', ECU '7E0'
+2024-04-29 02:46:26,698  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH0)
+2024-04-29 02:46:26,698  root       <module>   DEBUG    set HEADERS ON/OFF : False
+2024-04-29 02:46:26,698  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:46:26,698  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:46:27,201  root       run        DEBUG    Received 'AT CAF1'
+2024-04-29 02:46:27,204  root       handle_request DEBUG    Handling: 'ATCAF1', header '7E0', ECU '7E0'
+2024-04-29 02:46:27,205  root       handle_request DEBUG    Description: AT CAN Automatic Formatting, PID AT_CAF (ATCAF1)
+2024-04-29 02:46:27,205  root       <module>   DEBUG    Set CAN Automatic Formatting ON/OFF : True
+2024-04-29 02:46:27,205  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:46:27,205  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:46:27,706  root       run        DEBUG    Received '09 02'
+2024-04-29 02:46:27,707  root       handle_request DEBUG    Handling: '0902', header '7E0', ECU '7E0'
+2024-04-29 02:46:27,707  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-04-29 02:46:27,707  root       handle_request DEBUG    Description: Vehicle Identification Number, PID VIN (0902)
+2024-04-29 02:46:27,707  root       handle_response DEBUG    Processing: '<pos_answer>01 57 50 30 5A 5A 5A 39 39 5A 54 53 33 39 30 30 30 30</pos_answer>'
+2024-04-29 02:46:27,707  root       handle_response DEBUG    Write: '014\r0: 490201575030\r1: 5A5A5A39395A54\r2: 53333930303030\r\r>'
+2024-04-29 02:46:27,723  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 02:46:27,724  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 02:46:27,725  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 02:51:26,493  root       accept_connection DEBUG    Connected by ('127.0.0.1', 54250)
+2024-04-29 02:51:26,496  root       run        DEBUG    Received 'AT WS'
+2024-04-29 02:51:26,496  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 02:51:26,497  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 02:51:26,497  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 02:51:26,497  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 02:51:26,497  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 02:51:27,010  root       run        DEBUG    Received 'AT SP 0'
+2024-04-29 02:51:27,010  root       handle_request DEBUG    Handling: 'ATSP0', header '7E0', ECU '7E0'
+2024-04-29 02:51:27,011  root       handle_request DEBUG    Description: AT PROTO, PID AT_PROTO (ATSP0)
+2024-04-29 02:51:27,011  root       <module>   DEBUG    set PROTO 0
+2024-04-29 02:51:27,011  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:51:27,011  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:51:27,518  root       run        DEBUG    Received 'AT DP'
+2024-04-29 02:51:27,518  root       handle_request DEBUG    Handling: 'ATDP', header '7E0', ECU '7E0'
+2024-04-29 02:51:27,518  root       handle_request DEBUG    Description: AT set DESCRIBE PROTO, PID AT_DESCRIBE_PROTO (ATDP)
+2024-04-29 02:51:28,022  root       handle_response DEBUG    Processing: '<writeln>ISO 15765-4 (CAN 11/500)</writeln>'
+2024-04-29 02:51:28,023  root       handle_response DEBUG    Write: 'ISO 15765-4 (CAN 11/500)\r\r>'
+2024-04-29 02:51:28,524  root       run        DEBUG    Received 'AT E0'
+2024-04-29 02:51:28,527  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 02:51:28,527  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 02:51:28,527  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 02:51:28,527  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:51:28,528  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:51:29,033  root       run        DEBUG    Received 'AT S0'
+2024-04-29 02:51:29,033  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 02:51:29,033  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 02:51:29,034  root       <module>   DEBUG    set SPACES False
+2024-04-29 02:51:29,034  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:51:29,034  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:51:29,535  root       run        DEBUG    Received 'AT H0'
+2024-04-29 02:51:29,535  root       handle_request DEBUG    Handling: 'ATH0', header '7E0', ECU '7E0'
+2024-04-29 02:51:29,536  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH0)
+2024-04-29 02:51:29,536  root       <module>   DEBUG    set HEADERS ON/OFF : False
+2024-04-29 02:51:29,536  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:51:29,536  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:51:30,042  root       run        DEBUG    Received 'AT CAF1'
+2024-04-29 02:51:30,042  root       handle_request DEBUG    Handling: 'ATCAF1', header '7E0', ECU '7E0'
+2024-04-29 02:51:30,042  root       handle_request DEBUG    Description: AT CAN Automatic Formatting, PID AT_CAF (ATCAF1)
+2024-04-29 02:51:30,042  root       <module>   DEBUG    Set CAN Automatic Formatting ON/OFF : True
+2024-04-29 02:51:30,052  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 02:51:30,052  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 02:51:30,553  root       run        DEBUG    Received '09 02'
+2024-04-29 02:51:30,553  root       handle_request DEBUG    Handling: '0902', header '7E0', ECU '7E0'
+2024-04-29 02:51:30,554  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-04-29 02:51:30,554  root       handle_request DEBUG    Description: Vehicle Identification Number, PID VIN (0902)
+2024-04-29 02:51:30,554  root       handle_response DEBUG    Processing: '<pos_answer>01 4D 41 54 34 30 33 30 39 36 42 4E 4C 30 30 30 30 30</pos_answer>'
+2024-04-29 02:51:30,554  root       handle_response DEBUG    Write: '014\r0: 4902014D4154\r1: 34303330393642\r2: 4E4C3030303030\r\r>'
+2024-04-29 02:51:30,572  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 02:51:30,573  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 02:51:30,573  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 03:08:39,416  root       accept_connection DEBUG    Connected by ('127.0.0.1', 53842)
+2024-04-29 03:08:39,419  root       run        DEBUG    Received 'AT WS'
+2024-04-29 03:08:39,420  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 03:08:39,420  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 03:08:39,421  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 03:08:39,421  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 03:08:39,421  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 03:08:39,924  root       run        DEBUG    Received 'AT SP 0'
+2024-04-29 03:08:39,925  root       handle_request DEBUG    Handling: 'ATSP0', header '7E0', ECU '7E0'
+2024-04-29 03:08:39,925  root       handle_request DEBUG    Description: AT PROTO, PID AT_PROTO (ATSP0)
+2024-04-29 03:08:39,925  root       <module>   DEBUG    set PROTO 0
+2024-04-29 03:08:39,925  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:08:39,926  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:08:40,428  root       run        DEBUG    Received 'AT DP'
+2024-04-29 03:08:40,428  root       handle_request DEBUG    Handling: 'ATDP', header '7E0', ECU '7E0'
+2024-04-29 03:08:40,429  root       handle_request DEBUG    Description: AT set DESCRIBE PROTO, PID AT_DESCRIBE_PROTO (ATDP)
+2024-04-29 03:08:40,940  root       handle_response DEBUG    Processing: '<writeln>ISO 15765-4 (CAN 11/500)</writeln>'
+2024-04-29 03:08:40,940  root       handle_response DEBUG    Write: 'ISO 15765-4 (CAN 11/500)\r\r>'
+2024-04-29 03:08:41,446  root       run        DEBUG    Received 'AT E0'
+2024-04-29 03:08:41,446  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 03:08:41,447  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 03:08:41,448  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 03:08:41,451  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:08:41,451  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:08:41,956  root       run        DEBUG    Received 'AT S0'
+2024-04-29 03:08:41,956  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 03:08:41,957  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 03:08:41,957  root       <module>   DEBUG    set SPACES False
+2024-04-29 03:08:41,957  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:08:41,957  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:08:42,460  root       run        DEBUG    Received 'AT H0'
+2024-04-29 03:08:42,463  root       handle_request DEBUG    Handling: 'ATH0', header '7E0', ECU '7E0'
+2024-04-29 03:08:42,463  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH0)
+2024-04-29 03:08:42,463  root       <module>   DEBUG    set HEADERS ON/OFF : False
+2024-04-29 03:08:42,464  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:08:42,464  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:08:42,966  root       run        DEBUG    Received 'AT CAF1'
+2024-04-29 03:08:42,966  root       handle_request DEBUG    Handling: 'ATCAF1', header '7E0', ECU '7E0'
+2024-04-29 03:08:42,966  root       handle_request DEBUG    Description: AT CAN Automatic Formatting, PID AT_CAF (ATCAF1)
+2024-04-29 03:08:42,966  root       <module>   DEBUG    Set CAN Automatic Formatting ON/OFF : True
+2024-04-29 03:08:42,967  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:08:42,967  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:08:43,469  root       run        DEBUG    Received '09 02'
+2024-04-29 03:08:43,471  root       handle_request DEBUG    Handling: '0902', header '7E0', ECU '7E0'
+2024-04-29 03:08:43,471  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-04-29 03:08:43,471  root       handle_request DEBUG    Description: Vehicle Identification Number, PID VIN (0902)
+2024-04-29 03:08:43,472  root       handle_response DEBUG    Processing: '<pos_answer>01 57 50 30 5A 5A 5A 39 39 5A 54 53 33 39 30 30 30 30</pos_answer>'
+2024-04-29 03:08:43,472  root       handle_response DEBUG    Write: '014\r0: 490201575030\r1: 5A5A5A39395A54\r2: 53333930303030\r\r>'
+2024-04-29 03:08:43,483  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 03:08:43,486  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 03:08:43,488  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 03:27:00,234  root       accept_connection DEBUG    Connected by ('127.0.0.1', 35326)
+2024-04-29 03:27:00,239  root       run        DEBUG    Received 'AT WS'
+2024-04-29 03:27:00,240  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 03:27:00,240  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 03:27:00,241  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 03:27:00,241  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 03:27:00,241  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 03:27:00,744  root       run        DEBUG    Received 'AT SP 0'
+2024-04-29 03:27:00,745  root       handle_request DEBUG    Handling: 'ATSP0', header '7E0', ECU '7E0'
+2024-04-29 03:27:00,746  root       handle_request DEBUG    Description: AT PROTO, PID AT_PROTO (ATSP0)
+2024-04-29 03:27:00,746  root       <module>   DEBUG    set PROTO 0
+2024-04-29 03:27:00,746  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:27:00,746  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:27:01,256  root       run        DEBUG    Received 'AT DP'
+2024-04-29 03:27:01,256  root       handle_request DEBUG    Handling: 'ATDP', header '7E0', ECU '7E0'
+2024-04-29 03:27:01,257  root       handle_request DEBUG    Description: AT set DESCRIBE PROTO, PID AT_DESCRIBE_PROTO (ATDP)
+2024-04-29 03:27:01,757  root       handle_response DEBUG    Processing: '<writeln>ISO 15765-4 (CAN 11/500)</writeln>'
+2024-04-29 03:27:01,758  root       handle_response DEBUG    Write: 'ISO 15765-4 (CAN 11/500)\r\r>'
+2024-04-29 03:27:02,261  root       run        DEBUG    Received 'AT E0'
+2024-04-29 03:27:02,261  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 03:27:02,261  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 03:27:02,262  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 03:27:02,262  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:27:02,262  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:27:02,764  root       run        DEBUG    Received 'AT S0'
+2024-04-29 03:27:02,764  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 03:27:02,764  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 03:27:02,769  root       <module>   DEBUG    set SPACES False
+2024-04-29 03:27:02,769  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:27:02,769  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:27:03,271  root       run        DEBUG    Received 'AT H0'
+2024-04-29 03:27:03,272  root       handle_request DEBUG    Handling: 'ATH0', header '7E0', ECU '7E0'
+2024-04-29 03:27:03,272  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH0)
+2024-04-29 03:27:03,274  root       <module>   DEBUG    set HEADERS ON/OFF : False
+2024-04-29 03:27:03,274  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:27:03,275  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:27:03,778  root       run        DEBUG    Received 'AT CAF1'
+2024-04-29 03:27:03,778  root       handle_request DEBUG    Handling: 'ATCAF1', header '7E0', ECU '7E0'
+2024-04-29 03:27:03,779  root       handle_request DEBUG    Description: AT CAN Automatic Formatting, PID AT_CAF (ATCAF1)
+2024-04-29 03:27:03,779  root       <module>   DEBUG    Set CAN Automatic Formatting ON/OFF : True
+2024-04-29 03:27:03,779  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:27:03,779  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:27:04,282  root       run        DEBUG    Received '09 02'
+2024-04-29 03:27:04,282  root       handle_request DEBUG    Handling: '0902', header '7E0', ECU '7E0'
+2024-04-29 03:27:04,282  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-04-29 03:27:04,283  root       handle_request DEBUG    Description: Vehicle Identification Number, PID VIN (0902)
+2024-04-29 03:27:04,283  root       handle_response DEBUG    Processing: '<pos_answer>01 53 42 31 5A 53 33 4A 45 36 30 45 32 38 32 31 30 32</pos_answer>'
+2024-04-29 03:27:04,283  root       handle_response DEBUG    Write: '014\r0: 490201534231\r1: 5A53334A453630\r2: 45323832313032\r\r>'
+2024-04-29 03:27:04,289  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 03:27:04,289  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 03:27:04,290  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 03:30:14,106  root       accept_connection DEBUG    Connected by ('127.0.0.1', 41168)
+2024-04-29 03:30:14,107  root       run        DEBUG    Received 'AT WS'
+2024-04-29 03:30:14,107  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 03:30:14,108  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 03:30:14,108  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 03:30:14,108  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 03:30:14,112  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 03:30:14,615  root       run        DEBUG    Received 'AT SP 0'
+2024-04-29 03:30:14,615  root       handle_request DEBUG    Handling: 'ATSP0', header '7E0', ECU '7E0'
+2024-04-29 03:30:14,616  root       handle_request DEBUG    Description: AT PROTO, PID AT_PROTO (ATSP0)
+2024-04-29 03:30:14,616  root       <module>   DEBUG    set PROTO 0
+2024-04-29 03:30:14,616  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:30:14,616  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:30:15,124  root       run        DEBUG    Received 'AT DP'
+2024-04-29 03:30:15,125  root       handle_request DEBUG    Handling: 'ATDP', header '7E0', ECU '7E0'
+2024-04-29 03:30:15,128  root       handle_request DEBUG    Description: AT set DESCRIBE PROTO, PID AT_DESCRIBE_PROTO (ATDP)
+2024-04-29 03:30:15,628  root       handle_response DEBUG    Processing: '<writeln>ISO 15765-4 (CAN 11/500)</writeln>'
+2024-04-29 03:30:15,629  root       handle_response DEBUG    Write: 'ISO 15765-4 (CAN 11/500)\r\r>'
+2024-04-29 03:30:16,134  root       run        DEBUG    Received 'AT E0'
+2024-04-29 03:30:16,134  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 03:30:16,136  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 03:30:16,140  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 03:30:16,140  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:30:16,140  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:30:16,642  root       run        DEBUG    Received 'AT S0'
+2024-04-29 03:30:16,643  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 03:30:16,643  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 03:30:16,645  root       <module>   DEBUG    set SPACES False
+2024-04-29 03:30:16,645  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:30:16,645  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:30:17,154  root       run        DEBUG    Received 'AT H0'
+2024-04-29 03:30:17,155  root       handle_request DEBUG    Handling: 'ATH0', header '7E0', ECU '7E0'
+2024-04-29 03:30:17,155  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH0)
+2024-04-29 03:30:17,156  root       <module>   DEBUG    set HEADERS ON/OFF : False
+2024-04-29 03:30:17,156  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:30:17,156  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:30:17,656  root       run        DEBUG    Received 'AT CAF1'
+2024-04-29 03:30:17,656  root       handle_request DEBUG    Handling: 'ATCAF1', header '7E0', ECU '7E0'
+2024-04-29 03:30:17,657  root       handle_request DEBUG    Description: AT CAN Automatic Formatting, PID AT_CAF (ATCAF1)
+2024-04-29 03:30:17,657  root       <module>   DEBUG    Set CAN Automatic Formatting ON/OFF : True
+2024-04-29 03:30:17,657  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:30:17,657  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:30:18,159  root       run        DEBUG    Received '09 02'
+2024-04-29 03:30:18,159  root       handle_request DEBUG    Handling: '0902', header '7E0', ECU '7E0'
+2024-04-29 03:30:18,159  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-04-29 03:30:18,160  root       handle_request DEBUG    Description: Vehicle Identification Number, PID VIN (0902)
+2024-04-29 03:30:18,160  root       handle_response DEBUG    Processing: '<pos_answer>01 57 50 30 5A 5A 5A 39 39 5A 54 53 33 39 30 30 30 30</pos_answer>'
+2024-04-29 03:30:18,160  root       handle_response DEBUG    Write: '014\r0: 490201575030\r1: 5A5A5A39395A54\r2: 53333930303030\r\r>'
+2024-04-29 03:30:18,164  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 03:30:18,173  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 03:30:18,175  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 03:34:02,721  root       accept_connection DEBUG    Connected by ('127.0.0.1', 40796)
+2024-04-29 03:34:02,726  root       run        DEBUG    Received 'AT WS'
+2024-04-29 03:34:02,726  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 03:34:02,726  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 03:34:02,726  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 03:34:02,727  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 03:34:02,727  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 03:34:03,228  root       run        DEBUG    Received 'AT E0'
+2024-04-29 03:34:03,228  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 03:34:03,229  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 03:34:03,229  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 03:34:03,229  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:34:03,229  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:34:03,733  root       run        DEBUG    Received 'AT L1'
+2024-04-29 03:34:03,733  root       handle_request DEBUG    Handling: 'ATL1', header '7E0', ECU '7E0'
+2024-04-29 03:34:03,733  root       handle_request DEBUG    Description: AT LINEFEEDS, PID AT_LINEFEEDS (ATL1)
+2024-04-29 03:34:03,733  root       <module>   DEBUG    set LINEFEEDS ON/OFF : True
+2024-04-29 03:34:03,733  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:34:03,741  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 03:34:04,243  root       run        DEBUG    Received 'AT H1'
+2024-04-29 03:34:04,244  root       handle_request DEBUG    Handling: 'ATH1', header '7E0', ECU '7E0'
+2024-04-29 03:34:04,244  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH1)
+2024-04-29 03:34:04,244  root       <module>   DEBUG    set HEADERS ON/OFF : True
+2024-04-29 03:34:04,244  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:34:04,245  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 03:34:04,748  root       run        DEBUG    Received 'AT S0'
+2024-04-29 03:34:04,749  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 03:34:04,749  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 03:34:04,752  root       <module>   DEBUG    set SPACES False
+2024-04-29 03:34:04,752  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:34:04,752  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 03:34:05,254  root       run        DEBUG    Received 'AT CSM0'
+2024-04-29 03:34:05,254  root       handle_request DEBUG    Handling: 'ATCSM0', header '7E0', ECU '7E0'
+2024-04-29 03:34:05,286  root       handle_request INFO     Unknown ELM command: 'ATCSM0', header=7E0
+2024-04-29 03:34:05,301  root       handle_response DEBUG    Processing: '<writeln>?</writeln>'
+2024-04-29 03:34:05,301  root       handle_response DEBUG    Write: '?\r\n\r\n>'
+2024-04-29 03:34:05,803  root       run        DEBUG    Received 'AT CRA 139'
+2024-04-29 03:34:05,803  root       handle_request DEBUG    Handling: 'ATCRA139', header '7E0', ECU '7E0'
+2024-04-29 03:34:05,804  root       handle_request DEBUG    Description: AT SET CAN RX Addr, PID AT_SET_CAN_RX_ADDR (ATCRA139)
+2024-04-29 03:34:05,805  root       <module>   DEBUG    set CAN RX Addr 139
+2024-04-29 03:34:05,805  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:34:05,810  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 03:34:06,313  root       run        DEBUG    Received 'AT MA'
+2024-04-29 03:34:06,313  root       handle_request DEBUG    Handling: 'ATMA', header '7E0', ECU '7E0'
+2024-04-29 03:34:06,314  root       handle_request DEBUG    Description: AT Monitor all messages, PID AT_MA (ATMA)
+2024-04-29 03:34:06,314  root       handle_response DEBUG    Processing: '<writeln>C4 </writeln><writeln>245 00 </writeln><writeln>247 06 00200283 00 3127 00 </writeln><writeln>260 0262 01 00 </writeln><writeln>020 00 </writeln><writeln>0B4 002344 000AA 1A 6F 1A 6212127 00 </writeln><writeln>2247 06 020200260 411 0040AA 1A 6F 283 00 </writeln><writeln>020 00 </writeln><writeln>0B4 00 001273F9 58 5C 560AA 1 22245 00 3A026247020 02006262 0139B 0127 00 </writeln><writeln>1394 0020 00 </writeln><writeln>0B4 00 </writeln><writeln>0250344 00 260 08 FF F1STOPPED</writeln><writeln></writeln><writeln>>TMA</writeln><writeln>?</writeln><writeln></writeln><writeln>>ATMA</writeln><writeln>0AA 1A 6F 1A 6F 1A 6F 1A 6F </writeln><writeln>224 00 </writeln><writeln>127 00 </writeln><writeln>344 00 </writeln><writeln>260 08 FF F2 00 00 FF F2 54 A3 </writeln><writeln>020 00 </writeln><writeln>230 00 </writeln><writeln>025 00 </writeln><writeln>024 01 FD </writeln><writeln>1C4 06 7D 00 00 00 00 00 </writeln><writeln>48B 80 05 05 05 00 00 00 00 </writeln><writeln>245 00 </writeln><writeln>0AA 1A 6F 1A 6F 1A 6F 1A 6F </writeln><writeln>2A4 00 </writeln><writeln>361 80 00 00 00 01 FD 01 FB </writeln><writeln>38B 00 </writeln><writeln>247 06 00 FF 00 00 00 00 </writeln><writeln>413 01 01 </writeln><writeln>127 00 </writeln><writeln>020 00 </writeln><writeln>0B4 00 </writeln><writeln>025 00 </writeln><writeln>02266 10 342F 283 23</writeln>'
+2024-04-29 03:34:06,322  root       handle_response DEBUG    Write: 'C4 \r\n245 00 \r\n247 06 00200283 00 3127 00 \r\n260 0262 01 00 \r\n020 00 \r\n0B4 002344 000AA 1A 6F 1A 6212127 00 \r\n2247 06 020200260 411 0040AA 1A 6F 283 00 \r\n020 00 \r\n0B4 00 001273F9 58 5C 560AA 1 22245 00 3A026247020 02006262 0139B 0127 00 \r\n1394 0020 00 \r\n0B4 00 \r\n0250344 00 260 08 FF F1STOPPED\r\n\r\n>TMA\r\n?\r\n\r\n>ATMA\r\n0AA 1A 6F 1A 6F 1A 6F 1A 6F \r\n224 00 \r\n127 00 \r\n344 00 \r\n260 08 FF F2 00 00 FF F2 54 A3 \r\n020 00 \r\n230 00 \r\n025 00 \r\n024 01 FD \r\n1C4 06 7D 00 00 00 00 00 \r\n48B 80 05 05 05 00 00 00 00 \r\n245 00 \r\n0AA 1A 6F 1A 6F 1A 6F 1A 6F \r\n2A4 00 \r\n361 80 00 00 00 01 FD 01 FB \r\n38B 00 \r\n247 06 00 FF 00 00 00 00 \r\n413 01 01 \r\n127 00 \r\n020 00 \r\n0B4 00 \r\n025 00 \r\n02266 10 342F 283 23\r\n\r\n>'
+2024-04-29 03:34:18,334  root       run        DEBUG    Received '$'
+2024-04-29 03:34:18,334  root       run        WARNING  Invalid request: '$'
+2024-04-29 03:34:19,836  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 03:34:19,836  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 03:34:19,837  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 03:38:08,158  root       accept_connection DEBUG    Connected by ('127.0.0.1', 47828)
+2024-04-29 03:38:08,162  root       run        DEBUG    Received 'AT WS'
+2024-04-29 03:38:08,163  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 03:38:08,163  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 03:38:08,163  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 03:38:08,165  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 03:38:08,165  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 03:38:08,667  root       run        DEBUG    Received 'AT SP 0'
+2024-04-29 03:38:08,667  root       handle_request DEBUG    Handling: 'ATSP0', header '7E0', ECU '7E0'
+2024-04-29 03:38:08,667  root       handle_request DEBUG    Description: AT PROTO, PID AT_PROTO (ATSP0)
+2024-04-29 03:38:08,668  root       <module>   DEBUG    set PROTO 0
+2024-04-29 03:38:08,668  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:38:08,668  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:38:09,169  root       run        DEBUG    Received 'AT DP'
+2024-04-29 03:38:09,169  root       handle_request DEBUG    Handling: 'ATDP', header '7E0', ECU '7E0'
+2024-04-29 03:38:09,169  root       handle_request DEBUG    Description: AT set DESCRIBE PROTO, PID AT_DESCRIBE_PROTO (ATDP)
+2024-04-29 03:38:09,670  root       handle_response DEBUG    Processing: '<writeln>ISO 15765-4 (CAN 11/500)</writeln>'
+2024-04-29 03:38:09,670  root       handle_response DEBUG    Write: 'ISO 15765-4 (CAN 11/500)\r\r>'
+2024-04-29 03:38:10,172  root       run        DEBUG    Received 'AT E0'
+2024-04-29 03:38:10,172  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 03:38:10,173  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 03:38:10,174  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 03:38:10,174  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:38:10,174  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:38:10,678  root       run        DEBUG    Received 'AT S0'
+2024-04-29 03:38:10,678  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 03:38:10,678  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 03:38:10,679  root       <module>   DEBUG    set SPACES False
+2024-04-29 03:38:10,679  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:38:10,679  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:38:11,184  root       run        DEBUG    Received 'AT H0'
+2024-04-29 03:38:11,184  root       handle_request DEBUG    Handling: 'ATH0', header '7E0', ECU '7E0'
+2024-04-29 03:38:11,184  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH0)
+2024-04-29 03:38:11,185  root       <module>   DEBUG    set HEADERS ON/OFF : False
+2024-04-29 03:38:11,185  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:38:11,185  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:38:11,689  root       run        DEBUG    Received 'AT CAF1'
+2024-04-29 03:38:11,689  root       handle_request DEBUG    Handling: 'ATCAF1', header '7E0', ECU '7E0'
+2024-04-29 03:38:11,689  root       handle_request DEBUG    Description: AT CAN Automatic Formatting, PID AT_CAF (ATCAF1)
+2024-04-29 03:38:11,689  root       <module>   DEBUG    Set CAN Automatic Formatting ON/OFF : True
+2024-04-29 03:38:11,689  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:38:11,690  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:38:12,196  root       run        DEBUG    Received '09 02'
+2024-04-29 03:38:12,196  root       handle_request DEBUG    Handling: '0902', header '7E0', ECU '7E0'
+2024-04-29 03:38:12,196  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-04-29 03:38:12,197  root       handle_request DEBUG    Description: Vehicle Identification Number, PID VIN (0902)
+2024-04-29 03:38:12,197  root       handle_response DEBUG    Processing: '<pos_answer>01 53 42 31 5A 53 33 4A 45 36 30 45 32 38 32 31 30 32</pos_answer>'
+2024-04-29 03:38:12,197  root       handle_response DEBUG    Write: '014\r0: 490201534231\r1: 5A53334A453630\r2: 45323832313032\r\r>'
+2024-04-29 03:38:12,202  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 03:38:12,202  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 03:38:12,202  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 03:39:34,707  root       accept_connection DEBUG    Connected by ('127.0.0.1', 35648)
+2024-04-29 03:39:34,709  root       run        DEBUG    Received 'AT WS'
+2024-04-29 03:39:34,710  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 03:39:34,710  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 03:39:34,710  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 03:39:34,710  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 03:39:34,710  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 03:39:35,222  root       run        DEBUG    Received 'AT E0'
+2024-04-29 03:39:35,222  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 03:39:35,223  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 03:39:35,223  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 03:39:35,223  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:39:35,223  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 03:39:35,729  root       run        DEBUG    Received 'AT L1'
+2024-04-29 03:39:35,729  root       handle_request DEBUG    Handling: 'ATL1', header '7E0', ECU '7E0'
+2024-04-29 03:39:35,729  root       handle_request DEBUG    Description: AT LINEFEEDS, PID AT_LINEFEEDS (ATL1)
+2024-04-29 03:39:35,729  root       <module>   DEBUG    set LINEFEEDS ON/OFF : True
+2024-04-29 03:39:35,729  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:39:35,730  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 03:39:36,231  root       run        DEBUG    Received 'AT H1'
+2024-04-29 03:39:36,231  root       handle_request DEBUG    Handling: 'ATH1', header '7E0', ECU '7E0'
+2024-04-29 03:39:36,232  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH1)
+2024-04-29 03:39:36,232  root       <module>   DEBUG    set HEADERS ON/OFF : True
+2024-04-29 03:39:36,232  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:39:36,232  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 03:39:36,740  root       run        DEBUG    Received 'AT S0'
+2024-04-29 03:39:36,740  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 03:39:36,740  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 03:39:36,741  root       <module>   DEBUG    set SPACES False
+2024-04-29 03:39:36,741  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:39:36,741  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 03:39:37,242  root       run        DEBUG    Received 'AT CSM0'
+2024-04-29 03:39:37,242  root       handle_request DEBUG    Handling: 'ATCSM0', header '7E0', ECU '7E0'
+2024-04-29 03:39:37,249  root       handle_request INFO     Unknown ELM command: 'ATCSM0', header=7E0
+2024-04-29 03:39:37,250  root       handle_response DEBUG    Processing: '<writeln>?</writeln>'
+2024-04-29 03:39:37,250  root       handle_response DEBUG    Write: '?\r\n\r\n>'
+2024-04-29 03:39:37,757  root       run        DEBUG    Received 'AT CF 100'
+2024-04-29 03:39:37,758  root       handle_request DEBUG    Handling: 'ATCF100', header '7E0', ECU '7E0'
+2024-04-29 03:39:37,758  root       handle_request DEBUG    Description: AT Set the CAN hardware filter pattern, PID AT_CAN_FP (ATCF100)
+2024-04-29 03:39:37,765  root       <module>   DEBUG    Set CAN hardware filter pattern to <100>
+2024-04-29 03:39:37,766  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:39:37,766  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 03:39:38,268  root       run        DEBUG    Received 'AT CM 780'
+2024-04-29 03:39:38,269  root       handle_request DEBUG    Handling: 'ATCM780', header '7E0', ECU '7E0'
+2024-04-29 03:39:38,269  root       handle_request DEBUG    Description: AT Set the CAN hardware filter mask, PID AT_CAN_HFM (ATCM780)
+2024-04-29 03:39:38,269  root       <module>   DEBUG    Set CAN hardware filter mask to <780>
+2024-04-29 03:39:38,269  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 03:39:38,269  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 03:39:38,771  root       run        DEBUG    Received 'AT MA'
+2024-04-29 03:39:38,771  root       handle_request DEBUG    Handling: 'ATMA', header '7E0', ECU '7E0'
+2024-04-29 03:39:38,772  root       handle_request DEBUG    Description: AT Monitor all messages, PID AT_MA (ATMA)
+2024-04-29 03:39:38,772  root       handle_response DEBUG    Processing: '<writeln>C4 </writeln><writeln>245 00 </writeln><writeln>247 06 00200283 00 3127 00 </writeln><writeln>260 0262 01 00 </writeln><writeln>020 00 </writeln><writeln>0B4 002344 000AA 1A 6F 1A 6212127 00 </writeln><writeln>2247 06 020200260 411 0040AA 1A 6F 283 00 </writeln><writeln>020 00 </writeln><writeln>0B4 00 001273F9 58 5C 560AA 1 22245 00 3A026247020 02006262 0139B 0127 00 </writeln><writeln>1394 0020 00 </writeln><writeln>0B4 00 </writeln><writeln>0250344 00 260 08 FF F1STOPPED</writeln><writeln></writeln><writeln>>TMA</writeln><writeln>?</writeln><writeln></writeln><writeln>>ATMA</writeln><writeln>0AA 1A 6F 1A 6F 1A 6F 1A 6F </writeln><writeln>224 00 </writeln><writeln>127 00 </writeln><writeln>344 00 </writeln><writeln>260 08 FF F2 00 00 FF F2 54 A3 </writeln><writeln>020 00 </writeln><writeln>230 00 </writeln><writeln>025 00 </writeln><writeln>024 01 FD </writeln><writeln>1C4 06 7D 00 00 00 00 00 </writeln><writeln>48B 80 05 05 05 00 00 00 00 </writeln><writeln>245 00 </writeln><writeln>0AA 1A 6F 1A 6F 1A 6F 1A 6F </writeln><writeln>2A4 00 </writeln><writeln>361 80 00 00 00 01 FD 01 FB </writeln><writeln>38B 00 </writeln><writeln>247 06 00 FF 00 00 00 00 </writeln><writeln>413 01 01 </writeln><writeln>127 00 </writeln><writeln>020 00 </writeln><writeln>0B4 00 </writeln><writeln>025 00 </writeln><writeln>02266 10 342F 283 23</writeln>'
+2024-04-29 03:39:38,773  root       handle_response DEBUG    Write: 'C4 \r\n245 00 \r\n247 06 00200283 00 3127 00 \r\n260 0262 01 00 \r\n020 00 \r\n0B4 002344 000AA 1A 6F 1A 6212127 00 \r\n2247 06 020200260 411 0040AA 1A 6F 283 00 \r\n020 00 \r\n0B4 00 001273F9 58 5C 560AA 1 22245 00 3A026247020 02006262 0139B 0127 00 \r\n1394 0020 00 \r\n0B4 00 \r\n0250344 00 260 08 FF F1STOPPED\r\n\r\n>TMA\r\n?\r\n\r\n>ATMA\r\n0AA 1A 6F 1A 6F 1A 6F 1A 6F \r\n224 00 \r\n127 00 \r\n344 00 \r\n260 08 FF F2 00 00 FF F2 54 A3 \r\n020 00 \r\n230 00 \r\n025 00 \r\n024 01 FD \r\n1C4 06 7D 00 00 00 00 00 \r\n48B 80 05 05 05 00 00 00 00 \r\n245 00 \r\n0AA 1A 6F 1A 6F 1A 6F 1A 6F \r\n2A4 00 \r\n361 80 00 00 00 01 FD 01 FB \r\n38B 00 \r\n247 06 00 FF 00 00 00 00 \r\n413 01 01 \r\n127 00 \r\n020 00 \r\n0B4 00 \r\n025 00 \r\n02266 10 342F 283 23\r\n\r\n>'
+2024-04-29 03:39:42,211  root       run        DEBUG    Received '$'
+2024-04-29 03:39:42,211  root       run        WARNING  Invalid request: '$'
+2024-04-29 03:39:43,712  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 03:39:43,713  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 03:39:43,713  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 04:01:24,232  root       accept_connection DEBUG    Connected by ('127.0.0.1', 44880)
+2024-04-29 04:01:24,232  root       run        DEBUG    Received 'AT WS'
+2024-04-29 04:01:24,232  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 04:01:24,233  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 04:01:24,233  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 04:01:24,233  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 04:01:24,233  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 04:01:24,737  root       run        DEBUG    Received 'AT SP 0'
+2024-04-29 04:01:24,737  root       handle_request DEBUG    Handling: 'ATSP0', header '7E0', ECU '7E0'
+2024-04-29 04:01:24,737  root       handle_request DEBUG    Description: AT PROTO, PID AT_PROTO (ATSP0)
+2024-04-29 04:01:24,738  root       <module>   DEBUG    set PROTO 0
+2024-04-29 04:01:24,738  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:01:24,738  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 04:01:25,245  root       run        DEBUG    Received 'AT DP'
+2024-04-29 04:01:25,246  root       handle_request DEBUG    Handling: 'ATDP', header '7E0', ECU '7E0'
+2024-04-29 04:01:25,247  root       handle_request DEBUG    Description: AT set DESCRIBE PROTO, PID AT_DESCRIBE_PROTO (ATDP)
+2024-04-29 04:01:25,748  root       handle_response DEBUG    Processing: '<writeln>ISO 15765-4 (CAN 11/500)</writeln>'
+2024-04-29 04:01:25,748  root       handle_response DEBUG    Write: 'ISO 15765-4 (CAN 11/500)\r\r>'
+2024-04-29 04:01:26,251  root       run        DEBUG    Received 'AT E0'
+2024-04-29 04:01:26,251  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 04:01:26,252  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 04:01:26,252  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 04:01:26,252  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:01:26,252  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 04:01:26,757  root       run        DEBUG    Received 'AT S0'
+2024-04-29 04:01:26,757  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 04:01:26,758  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 04:01:26,758  root       <module>   DEBUG    set SPACES False
+2024-04-29 04:01:26,758  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:01:26,758  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 04:01:27,261  root       run        DEBUG    Received 'AT H0'
+2024-04-29 04:01:27,261  root       handle_request DEBUG    Handling: 'ATH0', header '7E0', ECU '7E0'
+2024-04-29 04:01:27,261  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH0)
+2024-04-29 04:01:27,262  root       <module>   DEBUG    set HEADERS ON/OFF : False
+2024-04-29 04:01:27,262  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:01:27,262  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 04:01:27,767  root       run        DEBUG    Received 'AT CAF1'
+2024-04-29 04:01:27,767  root       handle_request DEBUG    Handling: 'ATCAF1', header '7E0', ECU '7E0'
+2024-04-29 04:01:27,768  root       handle_request DEBUG    Description: AT CAN Automatic Formatting, PID AT_CAF (ATCAF1)
+2024-04-29 04:01:27,768  root       <module>   DEBUG    Set CAN Automatic Formatting ON/OFF : True
+2024-04-29 04:01:27,768  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:01:27,769  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 04:01:28,271  root       run        DEBUG    Received '09 02'
+2024-04-29 04:01:28,271  root       handle_request DEBUG    Handling: '0902', header '7E0', ECU '7E0'
+2024-04-29 04:01:28,272  root       handle_request DEBUG    UDS P3 timer expired: running stop() method for ECU task "Default ECU Task module", ECU="7E0".
+2024-04-29 04:01:28,272  root       handle_request DEBUG    Description: Vehicle Identification Number, PID VIN (0902)
+2024-04-29 04:01:28,272  root       handle_response DEBUG    Processing: '<pos_answer>01 53 42 31 5A 53 33 4A 45 36 30 45 32 38 32 31 30 32</pos_answer>'
+2024-04-29 04:01:28,272  root       handle_response DEBUG    Write: '014\r0: 490201534231\r1: 5A53334A453630\r2: 45323832313032\r\r>'
+2024-04-29 04:01:28,277  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 04:01:28,277  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 04:01:28,277  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 04:01:33,344  root       accept_connection DEBUG    Connected by ('127.0.0.1', 44896)
+2024-04-29 04:01:33,345  root       run        DEBUG    Received 'AT WS'
+2024-04-29 04:01:33,346  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 04:01:33,346  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 04:01:33,346  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 04:01:33,346  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 04:01:33,347  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 04:01:33,858  root       run        DEBUG    Received 'AT E0'
+2024-04-29 04:01:33,858  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 04:01:33,859  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 04:01:33,859  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 04:01:33,859  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:01:33,859  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 04:01:34,360  root       run        DEBUG    Received 'AT L1'
+2024-04-29 04:01:34,361  root       handle_request DEBUG    Handling: 'ATL1', header '7E0', ECU '7E0'
+2024-04-29 04:01:34,364  root       handle_request DEBUG    Description: AT LINEFEEDS, PID AT_LINEFEEDS (ATL1)
+2024-04-29 04:01:34,364  root       <module>   DEBUG    set LINEFEEDS ON/OFF : True
+2024-04-29 04:01:34,364  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:01:34,365  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 04:01:34,870  root       run        DEBUG    Received 'AT H1'
+2024-04-29 04:01:34,870  root       handle_request DEBUG    Handling: 'ATH1', header '7E0', ECU '7E0'
+2024-04-29 04:01:34,871  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH1)
+2024-04-29 04:01:34,871  root       <module>   DEBUG    set HEADERS ON/OFF : True
+2024-04-29 04:01:34,871  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:01:34,871  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 04:01:35,373  root       run        DEBUG    Received 'AT S0'
+2024-04-29 04:01:35,373  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 04:01:35,374  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 04:01:35,374  root       <module>   DEBUG    set SPACES False
+2024-04-29 04:01:35,374  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:01:35,374  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 04:01:35,876  root       run        DEBUG    Received 'AT CSM0'
+2024-04-29 04:01:35,876  root       handle_request DEBUG    Handling: 'ATCSM0', header '7E0', ECU '7E0'
+2024-04-29 04:01:35,877  root       handle_request INFO     Unknown ELM command: 'ATCSM0', header=7E0
+2024-04-29 04:01:35,880  root       handle_response DEBUG    Processing: '<writeln>?</writeln>'
+2024-04-29 04:01:35,880  root       handle_response DEBUG    Write: '?\r\n\r\n>'
+2024-04-29 04:01:36,383  root       run        DEBUG    Received 'AT CF 600'
+2024-04-29 04:01:36,383  root       handle_request DEBUG    Handling: 'ATCF600', header '7E0', ECU '7E0'
+2024-04-29 04:01:36,383  root       handle_request DEBUG    Description: AT Set the CAN hardware filter pattern, PID AT_CAN_FP (ATCF600)
+2024-04-29 04:01:36,384  root       <module>   DEBUG    Set CAN hardware filter pattern to <600>
+2024-04-29 04:01:36,384  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:01:36,384  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 04:01:36,886  root       run        DEBUG    Received 'AT CM 600'
+2024-04-29 04:01:36,886  root       handle_request DEBUG    Handling: 'ATCM600', header '7E0', ECU '7E0'
+2024-04-29 04:01:36,886  root       handle_request DEBUG    Description: AT Set the CAN hardware filter mask, PID AT_CAN_HFM (ATCM600)
+2024-04-29 04:01:36,893  root       <module>   DEBUG    Set CAN hardware filter mask to <600>
+2024-04-29 04:01:36,894  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:01:36,894  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 04:01:37,396  root       run        DEBUG    Received 'AT MA'
+2024-04-29 04:01:37,396  root       handle_request DEBUG    Handling: 'ATMA', header '7E0', ECU '7E0'
+2024-04-29 04:01:37,397  root       handle_request DEBUG    Description: AT Monitor all messages, PID AT_MA (ATMA)
+2024-04-29 04:01:37,397  root       handle_response DEBUG    Processing: '<writeln>C4 </writeln><writeln>245 00 </writeln><writeln>247 06 00200283 00 3127 00 </writeln><writeln>260 0262 01 00 </writeln><writeln>020 00 </writeln><writeln>0B4 002344 000AA 1A 6F 1A 6212127 00 </writeln><writeln>2247 06 020200260 411 0040AA 1A 6F 283 00 </writeln><writeln>020 00 </writeln><writeln>0B4 00 001273F9 58 5C 560AA 1 22245 00 3A026247020 02006262 0139B 0127 00 </writeln><writeln>1394 0020 00 </writeln><writeln>0B4 00 </writeln><writeln>0250344 00 260 08 FF F1STOPPED</writeln><writeln></writeln><writeln>>TMA</writeln><writeln>?</writeln><writeln></writeln><writeln>>ATMA</writeln><writeln>0AA 1A 6F 1A 6F 1A 6F 1A 6F </writeln><writeln>224 00 </writeln><writeln>127 00 </writeln><writeln>344 00 </writeln><writeln>260 08 FF F2 00 00 FF F2 54 A3 </writeln><writeln>020 00 </writeln><writeln>230 00 </writeln><writeln>025 00 </writeln><writeln>024 01 FD </writeln><writeln>1C4 06 7D 00 00 00 00 00 </writeln><writeln>48B 80 05 05 05 00 00 00 00 </writeln><writeln>245 00 </writeln><writeln>0AA 1A 6F 1A 6F 1A 6F 1A 6F </writeln><writeln>2A4 00 </writeln><writeln>361 80 00 00 00 01 FD 01 FB </writeln><writeln>38B 00 </writeln><writeln>247 06 00 FF 00 00 00 00 </writeln><writeln>413 01 01 </writeln><writeln>127 00 </writeln><writeln>020 00 </writeln><writeln>0B4 00 </writeln><writeln>025 00 </writeln><writeln>02266 10 342F 283 23</writeln>'
+2024-04-29 04:01:37,397  root       handle_response DEBUG    Write: 'C4 \r\n245 00 \r\n247 06 00200283 00 3127 00 \r\n260 0262 01 00 \r\n020 00 \r\n0B4 002344 000AA 1A 6F 1A 6212127 00 \r\n2247 06 020200260 411 0040AA 1A 6F 283 00 \r\n020 00 \r\n0B4 00 001273F9 58 5C 560AA 1 22245 00 3A026247020 02006262 0139B 0127 00 \r\n1394 0020 00 \r\n0B4 00 \r\n0250344 00 260 08 FF F1STOPPED\r\n\r\n>TMA\r\n?\r\n\r\n>ATMA\r\n0AA 1A 6F 1A 6F 1A 6F 1A 6F \r\n224 00 \r\n127 00 \r\n344 00 \r\n260 08 FF F2 00 00 FF F2 54 A3 \r\n020 00 \r\n230 00 \r\n025 00 \r\n024 01 FD \r\n1C4 06 7D 00 00 00 00 00 \r\n48B 80 05 05 05 00 00 00 00 \r\n245 00 \r\n0AA 1A 6F 1A 6F 1A 6F 1A 6F \r\n2A4 00 \r\n361 80 00 00 00 01 FD 01 FB \r\n38B 00 \r\n247 06 00 FF 00 00 00 00 \r\n413 01 01 \r\n127 00 \r\n020 00 \r\n0B4 00 \r\n025 00 \r\n02266 10 342F 283 23\r\n\r\n>'
+2024-04-29 04:01:41,128  root       run        DEBUG    Received '$'
+2024-04-29 04:01:41,128  root       run        WARNING  Invalid request: '$'
+2024-04-29 04:01:42,628  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 04:01:42,629  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 04:01:42,629  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 04:02:50,095  root       accept_connection DEBUG    Connected by ('127.0.0.1', 52734)
+2024-04-29 04:02:50,098  root       run        DEBUG    Received 'AT WS'
+2024-04-29 04:02:50,099  root       handle_request DEBUG    Handling: 'ATWS', header '7E0', ECU '7E0'
+2024-04-29 04:02:50,099  root       handle_request DEBUG    Description: AT WARM START, PID AT_WARM_START (ATWS)
+2024-04-29 04:02:50,099  root       <module>   DEBUG    Warm start and sleep 0.1 seconds
+2024-04-29 04:02:50,099  root       handle_response DEBUG    Processing: '<writeln></writeln><writeln>ELM327 v1.5</writeln>'
+2024-04-29 04:02:50,100  root       handle_response DEBUG    Write: '\rELM327 v1.5\r\r>'
+2024-04-29 04:02:50,606  root       run        DEBUG    Received 'AT E0'
+2024-04-29 04:02:50,606  root       handle_request DEBUG    Handling: 'ATE0', header '7E0', ECU '7E0'
+2024-04-29 04:02:50,607  root       handle_request DEBUG    Description: AT ECHO, PID AT_ECHO (ATE0)
+2024-04-29 04:02:50,607  root       <module>   DEBUG    set ECHO ON/OFF : False
+2024-04-29 04:02:50,607  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:02:50,607  root       handle_response DEBUG    Write: 'OK\r\r>'
+2024-04-29 04:02:51,109  root       run        DEBUG    Received 'AT L1'
+2024-04-29 04:02:51,109  root       handle_request DEBUG    Handling: 'ATL1', header '7E0', ECU '7E0'
+2024-04-29 04:02:51,110  root       handle_request DEBUG    Description: AT LINEFEEDS, PID AT_LINEFEEDS (ATL1)
+2024-04-29 04:02:51,113  root       <module>   DEBUG    set LINEFEEDS ON/OFF : True
+2024-04-29 04:02:51,114  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:02:51,114  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 04:02:51,615  root       run        DEBUG    Received 'AT H1'
+2024-04-29 04:02:51,616  root       handle_request DEBUG    Handling: 'ATH1', header '7E0', ECU '7E0'
+2024-04-29 04:02:51,618  root       handle_request DEBUG    Description: AT HEADERS, PID AT_USE_HEADERS (ATH1)
+2024-04-29 04:02:51,618  root       <module>   DEBUG    set HEADERS ON/OFF : True
+2024-04-29 04:02:51,618  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:02:51,618  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 04:02:52,121  root       run        DEBUG    Received 'AT S0'
+2024-04-29 04:02:52,122  root       handle_request DEBUG    Handling: 'ATS0', header '7E0', ECU '7E0'
+2024-04-29 04:02:52,122  root       handle_request DEBUG    Description: AT Spaces off or on, PID AT_SPACES (ATS0)
+2024-04-29 04:02:52,126  root       <module>   DEBUG    set SPACES False
+2024-04-29 04:02:52,127  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:02:52,127  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 04:02:52,628  root       run        DEBUG    Received 'AT CSM0'
+2024-04-29 04:02:52,629  root       handle_request DEBUG    Handling: 'ATCSM0', header '7E0', ECU '7E0'
+2024-04-29 04:02:52,632  root       handle_request INFO     Unknown ELM command: 'ATCSM0', header=7E0
+2024-04-29 04:02:52,637  root       handle_response DEBUG    Processing: '<writeln>?</writeln>'
+2024-04-29 04:02:52,637  root       handle_response DEBUG    Write: '?\r\n\r\n>'
+2024-04-29 04:02:53,144  root       run        DEBUG    Received 'AT CRA 413'
+2024-04-29 04:02:53,144  root       handle_request DEBUG    Handling: 'ATCRA413', header '7E0', ECU '7E0'
+2024-04-29 04:02:53,145  root       handle_request DEBUG    Description: AT SET CAN RX Addr, PID AT_SET_CAN_RX_ADDR (ATCRA413)
+2024-04-29 04:02:53,145  root       <module>   DEBUG    set CAN RX Addr 413
+2024-04-29 04:02:53,145  root       handle_response DEBUG    Processing: '<writeln>OK</writeln>'
+2024-04-29 04:02:53,145  root       handle_response DEBUG    Write: 'OK\r\n\r\n>'
+2024-04-29 04:02:53,649  root       run        DEBUG    Received 'AT MA'
+2024-04-29 04:02:53,649  root       handle_request DEBUG    Handling: 'ATMA', header '7E0', ECU '7E0'
+2024-04-29 04:02:53,649  root       handle_request DEBUG    Description: AT Monitor all messages, PID AT_MA (ATMA)
+2024-04-29 04:02:53,649  root       handle_response DEBUG    Processing: '<writeln>C4 </writeln><writeln>245 00 </writeln><writeln>247 06 00200283 00 3127 00 </writeln><writeln>260 0262 01 00 </writeln><writeln>020 00 </writeln><writeln>0B4 002344 000AA 1A 6F 1A 6212127 00 </writeln><writeln>2247 06 020200260 411 0040AA 1A 6F 283 00 </writeln><writeln>020 00 </writeln><writeln>0B4 00 001273F9 58 5C 560AA 1 22245 00 3A026247020 02006262 0139B 0127 00 </writeln><writeln>1394 0020 00 </writeln><writeln>0B4 00 </writeln><writeln>0250344 00 260 08 FF F1STOPPED</writeln><writeln></writeln><writeln>>TMA</writeln><writeln>?</writeln><writeln></writeln><writeln>>ATMA</writeln><writeln>0AA 1A 6F 1A 6F 1A 6F 1A 6F </writeln><writeln>224 00 </writeln><writeln>127 00 </writeln><writeln>344 00 </writeln><writeln>260 08 FF F2 00 00 FF F2 54 A3 </writeln><writeln>020 00 </writeln><writeln>230 00 </writeln><writeln>025 00 </writeln><writeln>024 01 FD </writeln><writeln>1C4 06 7D 00 00 00 00 00 </writeln><writeln>48B 80 05 05 05 00 00 00 00 </writeln><writeln>245 00 </writeln><writeln>0AA 1A 6F 1A 6F 1A 6F 1A 6F </writeln><writeln>2A4 00 </writeln><writeln>361 80 00 00 00 01 FD 01 FB </writeln><writeln>38B 00 </writeln><writeln>247 06 00 FF 00 00 00 00 </writeln><writeln>413 01 01 </writeln><writeln>127 00 </writeln><writeln>020 00 </writeln><writeln>0B4 00 </writeln><writeln>025 00 </writeln><writeln>02266 10 342F 283 23</writeln>'
+2024-04-29 04:02:53,650  root       handle_response DEBUG    Write: 'C4 \r\n245 00 \r\n247 06 00200283 00 3127 00 \r\n260 0262 01 00 \r\n020 00 \r\n0B4 002344 000AA 1A 6F 1A 6212127 00 \r\n2247 06 020200260 411 0040AA 1A 6F 283 00 \r\n020 00 \r\n0B4 00 001273F9 58 5C 560AA 1 22245 00 3A026247020 02006262 0139B 0127 00 \r\n1394 0020 00 \r\n0B4 00 \r\n0250344 00 260 08 FF F1STOPPED\r\n\r\n>TMA\r\n?\r\n\r\n>ATMA\r\n0AA 1A 6F 1A 6F 1A 6F 1A 6F \r\n224 00 \r\n127 00 \r\n344 00 \r\n260 08 FF F2 00 00 FF F2 54 A3 \r\n020 00 \r\n230 00 \r\n025 00 \r\n024 01 FD \r\n1C4 06 7D 00 00 00 00 00 \r\n48B 80 05 05 05 00 00 00 00 \r\n245 00 \r\n0AA 1A 6F 1A 6F 1A 6F 1A 6F \r\n2A4 00 \r\n361 80 00 00 00 01 FD 01 FB \r\n38B 00 \r\n247 06 00 FF 00 00 00 00 \r\n413 01 01 \r\n127 00 \r\n020 00 \r\n0B4 00 \r\n025 00 \r\n02266 10 342F 283 23\r\n\r\n>'
+2024-04-29 04:03:03,796  root       run        DEBUG    Received '$'
+2024-04-29 04:03:03,796  root       run        WARNING  Invalid request: '$'
+2024-04-29 04:03:05,298  root       read_from_device DEBUG    TCP/IP communication terminated by the client.
+2024-04-29 04:03:05,299  root       reset      DEBUG    Resetting counters and sleeping for 0 seconds
+2024-04-29 04:03:05,301  root       accept_connection DEBUG    Waiting for connection at TCP/IP network port 35000.
+2024-04-29 04:26:01,258  root       terminate  DEBUG    Start termination procedure.
+2024-04-29 04:26:02,370  root       set_defaults DEBUG    Stopping ECU task "Default ECU Task module", ECU="7E0", method=stop()
+2024-04-29 04:26:02,370  root       terminate  DEBUG    Terminated.

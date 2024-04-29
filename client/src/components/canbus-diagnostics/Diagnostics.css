@@ -46,7 +46,7 @@
     top: 20px;
     right: 20px;
     width: 110px;
-    background-color: green;
+    background-color: rgba(0,128,0,0.6);
     padding: 10px 20px;
     text-align: center;
     display: inline-block;
@@ -57,6 +57,18 @@
     color: #ececf1;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: limegreen; /* Cambia el tono del gris al pasar el cursor */
+        color: #000;
+    }
 }
 
 .connectionButton.connected {

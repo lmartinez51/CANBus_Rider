@@ -345,6 +345,7 @@ app.post('/project/new', async (req, res) => {
     try {
         await project.save()
         res.status(200).send('Vehicle Information Saved!')
+        console.log('New Vehicle Information Saved!')
     } catch (error) {
         res.status(500).send('Error saving the project: ' + error.message)
         console.log("Error saving vechicle information:" + error.message)
@@ -387,6 +388,26 @@ app.get('/project/:id', async (req, res) => {
         }
     } catch (error) {
         res.status(500).send('Error fetching the project: ' + error.message)
+        console.log("Error fectching vechicle information:" + error.message)
+    }
+})
+
+// Update project
+app.post('/project/update/:id', async (req, res) => {
+    const projectId = req.params.id
+    const newData = req.body
+
+    try {
+        const project = await Project.findOneAndUpdate({ _id: projectId }, newData, { new: true })
+        if (project) {
+            res.status(200).send('Vehicle Information Updated!')
+            console.log('Vehicle Information Updated!')
+        } else {
+            res.status(404).send('Project not found. No changes were made.')
+        }
+
+    } catch (error) {
+        res.status(500).send('Error updating the project: ' + error.message)
         console.log("Error fectching vechicle information:" + error.message)
     }
 })
