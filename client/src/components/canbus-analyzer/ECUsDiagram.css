@@ -32,3 +32,99 @@
 #contextMenu button:disabled {
     cursor: not-allowed;
 }
+
+.submenuColor{
+    width: 100px;
+    text-align: center;
+    background-color: rgba(192, 192, 192, 0.7);
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    border-radius: 0.4rem; /* Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+    }
+}
+
+.submenuColor:disabled {
+    cursor: not-allowed;
+}
+
+.submenuColor .dropdown-menu.show {
+    --bs-dropdown-border-radius: 0.4rem;
+    --bs-dropdown-min-width: auto;
+    background-color: rgba(192, 192, 192, 0.7);
+    --bs-dropdown-padding-y: 0px;
+  }
+  
+
+.itemColorRed {
+    width: 100px;
+    text-align: center;
+    background-color: red;
+    --tw-bg-opacity: 1;
+    border-color: black;
+    border-radius: 0.4rem; /*Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+    }
+}
+
+.itemColorGreen {
+    width: 100px;
+    text-align: center;
+    background-color: limegreen;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    border-radius: 0.4rem; /*Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+    }
+}
+
+.itemColorBlue {
+    width: 100px;
+    text-align: center;
+    background-color: rgb(40, 77, 241);
+    color: white;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    border-radius: 0.4rem; /*Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+    }
+}

@@ -4,9 +4,13 @@ const Schema = mongoose.Schema
 //Schema definition
 const vehicleSchema = new Schema({
     _id: Schema.Types.ObjectId,
+    vin: {
+		type: String,
+        unique:true,
+		required: true
+	},
     projectName: {
         type: String,
-        unique: true,
         required: true,
     },
     deviceHost: {
@@ -17,11 +21,7 @@ const vehicleSchema = new Schema({
         type: String,
         required: true,
     },
-    vin: {
-		type: String,
-        unique:true,
-		required: true
-	},
+
     make: {
         type: String,
         required: true

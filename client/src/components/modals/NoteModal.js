@@ -37,10 +37,6 @@ export default function NoteModal({ show, handleClose, handleSaveNote }) {
                     <Form className="noteForm" onSubmit={handleSubmit}>
                         <input className='modalInput' type='text' placeholder='Note' value={note} onChange={handleChange} />
                     </Form>
-                        {/* <div className="buttonContainer">
-                            <button className='noteCancelButton' onClick={handleClose}>Close</button>
-                            <button className='noteSaveButton' onClick={handleSubmit}>Save</button>
-                        </div> */}
                 </Modal.Body>
                 <Modal.Footer>
                     <button className='noteCancelButton' onClick={handleClose}>Close</button>

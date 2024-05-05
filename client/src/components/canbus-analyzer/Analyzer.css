@@ -43,20 +43,182 @@
     border-color: #9ca3aa;
     border-radius: 0.25rem;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-    background: radial-gradient(circle at center, #336699, #182848);
+    /* background: radial-gradient(circle at center, #336699, #182848); */
     z-index: 2;
+}
+
+.buttonGroup1 {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 258px;
+    height: 122px;
+    background-color: transparent;
+    border:  1px solid rgb(211,211, 211);
+    border-color: #9ca3aa;
+    border-radius: 0.4rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    z-index: 2;
+}
+
+.openButton{
+    position: absolute;
+    top: 5px;
+    right: 135px;
+    width: 110px;
+    background-color: rgb(0, 0, 202);
+    color: #ececf1;
+    padding: 10px 10px; /* Espaciado interno */
+    text-align: center;
+    display: inline-block;
+    font-size: 15px;
+    margin: 4px 2px;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    border-radius: 0.4rem; /* Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color:  rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
+}
+
+.openButton:disabled {
+    background-color: rgb(105, 105, 105);
+    cursor: not-allowed;
+}
+
+.updateButton{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 110px;
+    height: 47px;
+    background-color: rgb(0, 0, 202);
+    color: #ececf1;
+    padding: 10px 10px; /* Espaciado interno */
+    text-align: center;
+    display: inline-block;
+    font-size: 15px;
+    margin: 4px 2px;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    border-radius: 0.4rem; /* Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
+}
+
+.updateButton:disabled {
+    background-color: rgb(105, 105, 105);
+    cursor: not-allowed;
+}
+
+.reloadButton{
+    position: absolute;
+    top: 60px;
+    right: 135px;
+    width: 110px;
+    height: 47px;
+    background-color: rgb(0, 0, 202);
+    color: #ececf1;
+    padding: 10px 10px; /* Espaciado interno */
+    text-align: center;
+    display: inline-block;
+    font-size: 15px;
+    margin: 4px 2px;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    border-radius: 0.4rem; /* Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
+}
+
+.reloadButton:disabled {
+    background-color: rgb(105, 105, 105);
+    cursor: not-allowed;
+}
+
+.resetAll{
+    position: absolute;
+    top: 60px;
+    right: 5px;
+    width: 110px;
+    background-color: rgba(192, 192, 192, 0.6); /* Gris claro rgba(192, 192, 192, 1)*/
+    color: #000; /* Color del texto (negro) */
+    padding: 10px 10px; /* Espaciado interno */
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    border-radius: 0.4rem; /* Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+    }
 }
 
 .connectButton {
     position: absolute;
-    top: 20px;
+    top: 200px;
     right: 85px;
     width: 110px;
     background-color: rgba(0,128,0,0.6);
     padding: 10px 20px;
     text-align: center;
     display: inline-block;
-    font-size: 16px;
+    font-size: 15px;
     margin: 4px 2px;
     cursor: pointer;
     border-radius: 0.4rem;
@@ -102,10 +264,10 @@
 
 .range1Button {
     position: absolute;
-    top: 200px;
+    top: 260px;
     right: 150px;
     width: 110px;
-    background-color: rgb(40, 77, 241);
+    background-color: rgb(0, 0, 202);
     padding: 10px 20px;
     text-align: center;
     display: inline-block;
@@ -117,6 +279,18 @@
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color:  rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
 }
 
 .range1Button.started {
@@ -131,10 +305,10 @@
 
 .range2Button {
     position: absolute;
-    top: 200px;
+    top: 260px;
     right: 20px;
     width: 110px;
-    background-color: rgb(40, 77, 241);
+    background-color: rgb(0, 0, 202);
     padding: 10px 20px;
     text-align: center;
     display: inline-block;
@@ -146,6 +320,18 @@
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color:  rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
 }
 
 .range2Button.started {
@@ -160,10 +346,10 @@
 
 .range3Button {
     position: absolute;
-    top: 280px;
+    top: 340px;
     right: 150px;
     width: 110px;
-    background-color: rgb(40, 77, 241);
+    background-color: rgb(0, 0, 202);
     padding: 10px 20px;
     text-align: center;
     display: inline-block;
@@ -175,6 +361,18 @@
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color:  rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
 }
 
 .range3Button.started {
@@ -189,10 +387,10 @@
 
 .range4Button {
     position: absolute;
-    top: 280px;
+    top: 340px;
     right: 20px;
     width: 110px;
-    background-color: rgb(40, 77, 241);
+    background-color: rgb(0, 0, 202);
     padding: 10px 20px;
     text-align: center;
     display: inline-block;
@@ -204,6 +402,18 @@
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color:  rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
 }
 
 .range4Button.started {
@@ -218,10 +428,10 @@
 
 .range5Button {
     position: absolute;
-    top: 360px;
+    top: 420px;
     right: 150px;
     width: 110px;
-    background-color: rgb(40, 77, 241);
+    background-color: rgb(0, 0, 202);
     padding: 10px 20px;
     text-align: center;
     display: inline-block;
@@ -233,6 +443,18 @@
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color:  rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
 }
 
 .range5Button.started {
@@ -247,10 +469,10 @@
 
 .range6Button {
     position: absolute;
-    top: 360px;
+    top: 420px;
     right: 20px;
     width: 110px;
-    background-color: rgb(40, 77, 241);
+    background-color: rgb(0, 0, 202);
     padding: 10px 20px;
     text-align: center;
     display: inline-block;
@@ -262,6 +484,18 @@
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color:  rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
 }
 
 .range6Button.started {
@@ -276,10 +510,10 @@
 
 .range7Button {
     position: absolute;
-    top: 440px;
+    top: 500px;
     right: 150px;
     width: 110px;
-    background-color: rgb(40, 77, 241);
+    background-color: rgb(0, 0, 202);
     padding: 10px 20px;
     text-align: center;
     display: inline-block;
@@ -291,6 +525,18 @@
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color:  rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
 }
 
 .range7Button.started {
@@ -305,10 +551,10 @@
 
 .range8Button {
     position: absolute;
-    top: 440px;
+    top: 500px;
     right: 20px;
     width: 110px;
-    background-color: rgb(40, 77, 241);
+    background-color: rgb(0, 0, 202);
     padding: 10px 20px;
     text-align: center;
     display: inline-block;
@@ -320,6 +566,18 @@
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     z-index: 2;
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color:  rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
 }
 
 .range8Button.started {
@@ -332,56 +590,23 @@
     cursor: not-allowed;
 }
 
-.resetAll{
+.customRangeButton {
     position: absolute;
-    top: 520px;
-    right: 20px;
+    top: 580px;
+    right: 150px;
     width: 110px;
-    background-color: rgba(192, 192, 192, 0.6); /* Gris claro rgba(192, 192, 192, 1)*/
-    color: #000; /* Color del texto (negro) */
-    padding: 10px 10px; /* Espaciado interno */
+    height: 65px;
+    background-color: rgb(0, 0, 202);
+    padding: 5px 20px;
     text-align: center;
     display: inline-block;
     font-size: 16px;
-    margin: 4px 2px;
-    --tw-bg-opacity: 1;
-    border-color: rgba(102, 102, 102, 1);
-    border-radius: 0.4rem; /* Borde redondeado */
-    cursor: pointer; /* Cambia el cursor al pasar por encima */
-    outline: none; /* Quita el contorno al hacer clic */
-    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
-    z-index: 2;
-
-    /* Estilos de sombra y cambio de tamaño al hacer clic */
-    &:active {
-        transform: scale(0.95); /* Reduce ligeramente el tamaño */
-        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
-    }
-
-    /* Estilos al pasar el cursor por encima */
-    &:hover {
-        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
-    }
-}
-
-.openButton{
-    position: absolute;
-    top: 80px;
-    right: 150px;
-    width: 110px;
-    background-color: rgb(40, 77, 241);
+    margin: 2px 2px;
+    cursor: pointer;
+    border-radius: 0.4rem;
     color: #ececf1;
-    padding: 10px 10px; /* Espaciado interno */
-    text-align: center;
-    display: inline-block;
-    font-size: 15px;
-    margin: 4px 2px;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
-    border-radius: 0.4rem; /* Borde redondeado */
-    cursor: pointer; /* Cambia el cursor al pasar por encima */
-    outline: none; /* Quita el contorno al hacer clic */
-    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
     z-index: 2;
 
     /* Estilos de sombra y cambio de tamaño al hacer clic */
@@ -392,28 +617,34 @@
 
     /* Estilos al pasar el cursor por encima */
     &:hover {
-        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
-        color: #000;
+        background-color:  rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
     }
 }
 
-.openButton:disabled {
+.customRangeButton.started {
+    background-color: darkred;
+    height: 66px;
+}
+
+.customRangeButton:disabled {
     background-color: rgb(105, 105, 105);
     cursor: not-allowed;
 }
 
 .saveButton{
     position: absolute;
-    top: 520px;
-    right: 150px;
+    top: 580px;
+    right: 20px;
     width: 110px;
-    background-color: rgb(40, 77, 241);
+    height: 65px;
+    background-color: rgb(0, 0, 202);
     color: #ececf1;
-    padding: 10px 10px; /* Espaciado interno */
+    padding: 5px 10px; /* Espaciado interno */
     text-align: center;
     display: inline-block;
     font-size: 16px;
-    margin: 4px 2px;
+    margin: 2px 2px;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     border-radius: 0.4rem; /* Borde redondeado */
@@ -430,8 +661,8 @@
 
     /* Estilos al pasar el cursor por encima */
     &:hover {
-        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
-        color: #000;
+        background-color:  rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
     }
 }
 
@@ -440,41 +671,3 @@
     cursor: not-allowed;
 }
 
-.updateButton{
-    position: absolute;
-    top: 80px;
-    right: 20px;
-    width: 110px;
-    height: 47px;
-    background-color: rgb(40, 77, 241);
-    color: #ececf1;
-    padding: 10px 10px; /* Espaciado interno */
-    text-align: center;
-    display: inline-block;
-    font-size: 15px;
-    margin: 4px 2px;
-    --tw-bg-opacity: 1;
-    border-color: rgba(102, 102, 102, 1);
-    border-radius: 0.4rem; /* Borde redondeado */
-    cursor: pointer; /* Cambia el cursor al pasar por encima */
-    outline: none; /* Quita el contorno al hacer clic */
-    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
-    z-index: 2;
-
-    /* Estilos de sombra y cambio de tamaño al hacer clic */
-    &:active {
-        transform: scale(0.95); /* Reduce ligeramente el tamaño */
-        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
-    }
-
-    /* Estilos al pasar el cursor por encima */
-    &:hover {
-        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
-        color: #000;
-    }
-}
-
-.updateButton:disabled {
-    background-color: rgb(105, 105, 105);
-    cursor: not-allowed;
-}

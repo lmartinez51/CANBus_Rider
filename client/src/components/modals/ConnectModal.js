@@ -3,7 +3,7 @@ import { Modal, Form, Col } from 'react-bootstrap'
 import "./ConnectModal.css"
 
 export default function ConnectModal({ show, handleClose, handleOptionSelected }) {
-    const [selectedOption, setSelectedOption] = useState({ host: '0.0.0.0', port: '35000' })
+    const [selectedOption, setSelectedOption] = useState({ host: '192.168.0.10', port: '35000' })
 
     const handleSubmit = (event) => {
         event.preventDefault()

@@ -1,9 +1,12 @@
 import React, { useRef, useEffect, useState, forwardRef} from 'react'
+import { NavDropdown } from 'react-bootstrap';
+import { DropdownSubmenu} from "react-bootstrap-submenu";
 import * as go from 'gojs'
 import { ReactDiagram } from 'gojs-react'
 import iconCPU from './assets/cpu.png'
 import NoteModal from '../modals/NoteModal'
 import './ECUsDiagram.css'
+
 
 // Function to determine the range from the given ECU value in decimal
 function getRangeFromECU(ecuValueInDecimal) {
@@ -62,7 +65,7 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
     const model = diagramN.model
     const nodeData = model.findNodeDataForKey(ecu)
     model.setDataProperty(nodeData, 'changeCount', nodeData.changeCount + 1)
-    //console.log(`El conteo actual de ${ecu} es: ${nodeData.changeCount}`)
+    console.log(`El conteo actual de ${ecu} es: ${nodeData.changeCount}`)
     const node = diagramN.findNodeForKey(ecu)
     if (node) {
         changeNodeColor(node, nodeData.changeCount, diagramN)
@@ -98,14 +101,14 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
       'allowHorizontalScroll': false,
       model: model,
     })
-        
-    // listen for change in the payload
-    model.addChangedListener(function(e) {
+ 
+    // Add a Model Changed listener for a change in the payload
+    diagram.addModelChangedListener(function(e) {
       if (e.change === go.ChangedEvent.Property && e.propertyName === 'value') {
         handleNodeChange(e.object.key, diagram)
       }
     })
-    
+
     // This is the actual HTML context menu:
     var cxElement = document.getElementById("contextMenu");
 
@@ -142,7 +145,7 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
         )
       ),
       {
-        toolTip:  // define a tooltip for each node that displays the color as text
+        toolTip:  // define a tooltip for each node that displays saved signals
           $(go.Adornment, 'Auto',
             $(go.Shape, { fill: '#FFFFCC' }),
             $(go.TextBlock, { margin: 4 },
@@ -174,6 +177,7 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
       maybeShowItem(document.getElementById("sniff"), obj != null)
       maybeShowItem(document.getElementById("stop"), obj != null)
       maybeShowItem(document.getElementById("addNote"), obj != null && obj instanceof go.Node)
+      maybeShowItem(document.getElementById("color"), obj != null && obj instanceof go.Node)
       
       // Now show the whole context menu element
       if (hasMenuItem) {
@@ -190,19 +194,21 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
     }
     
     // // This is the general menu command handler, parameterized by the name of the command.
-    function cxcommand(event, val) {
+    function cxcommand(event, val, color) {
       if (val === undefined) val = event.currentTarget.id;
       var diagramM = diagram
       switch (val) {
         case "selectAll": diagramM.commandHandler.selectAll(); break;
         case "delete": diagramM.commandHandler.deleteSelection(); break;
-        case "sniff": {handleNodeSniffContextMenu(diagramM); break;}
-        case "addNote": {handleOpenModal(); break;}
+        case "sniff": { handleNodeSniffContextMenu(diagramM); break; }
+        case "addNote": { handleOpenModal(); break; }
+        case "color": { changeColor(diagramM, color); break; }
         default: break;
       }
       diagramM.currentTool.stopTool();
     }
 
+    // Listeners 
     document.getElementById('selectAll').addEventListener('click', function() {
       cxcommand(null, 'selectAll');
     });
@@ -218,7 +224,15 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
     document.getElementById('addNote').addEventListener('click', function() {
       cxcommand(null, 'addNote');
     });
-    
+    document.getElementById('color-red').addEventListener('click', function() {
+      cxcommand(null, 'color', 'red');
+    });
+    document.getElementById('color-green').addEventListener('click', function() {
+      cxcommand(null, 'color', 'limegreen');
+    });
+    document.getElementById('color-blue').addEventListener('click', function() {
+      cxcommand(null, 'color', '#284df1');
+    });
     diagram.linkTemplate =
       $(go.Link,
         $(go.Shape, { strokeWidth: 1, stroke: 'black' })
@@ -240,7 +254,7 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
   }
 
   useEffect(() => {
-    const diagram = diagramRef.current;
+    const diagram = diagramRef.current
     if (diagram && data && data.length) {
       const model = diagram.model
       data.forEach(({ ecu, payload }) => {
@@ -260,35 +274,53 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
           }
           model.addNodeData(nodeData)
         } else  if (payload && existingNodeData.value !== payload) {
+            diagram.startTransaction('update payload')
             model.setDataProperty(existingNodeData, 'value', payload) // Actualizamos el payload en el modelo.
+            diagram.commitTransaction('update payload')
         }
       })
     }
   }, [data])
 
   function handleNodeSniffContextMenu(diagram) {
-      diagram.startTransaction('change color')
-      diagram.selection.each((selectedNode) => {
-        if (selectedNode instanceof go.Node) {
-          // ignore any selected Links and simple Parts
-          // Examine and modify the data, not the Node directly.
-          const data = selectedNode.data
-          onNodeSniff(data.key)
-          // Call setDataProperty to support undo/redo as well as
-          // automatically evaluating any relevant bindings.
-          //diagram.model.setDataProperty(data, 'color', "limegreen")
-          // Change the color of all other nodes to '#666666'
-          diagram.nodes.each((node) => {
-            if (node !== selectedNode) {
-              originalColors.current[node.key] = node.data.color // Guarda el color original
-              console.log(`Colores actuales: ${originalColors.current[node.key]}`)
-              diagram.model.setDataProperty(node.data, 'color', '#666666')
-              node.pickable = false
-            }
+    diagram.selection.each((selectedNode) => {
+      if (selectedNode instanceof go.Node) {
+        const data = selectedNode.data
+        onNodeSniff(data.key)
+          .then(() => {
+            // Acciones a realizar cuando la promesa se resuelve
+            diagram.startTransaction('change color')
+            diagram.nodes.each((node) => {
+              if (node !== selectedNode) {
+                originalColors.current[node.key] = node.data.color // Guarda el color original
+                diagram.model.setDataProperty(node.data, 'color', '#666666')
+                node.pickable = false
+              }
+            })
+            diagram.commitTransaction('change color')
           })
-        }
-      })
-      diagram.commitTransaction('change color')
+          .catch(() => {
+            setIsSniffing(false)
+          })
+      }
+    })
+  }
+
+  // A custom command, for changing the color of the selected node(s).
+  function changeColor(diagram, color) {
+    // Always make changes in a transaction, except when initializing the diagram.
+    diagram.startTransaction('change color');
+    diagram.selection.each((node) => {
+      if (node instanceof go.Node) {
+        // ignore any selected Links and simple Parts
+        // Examine and modify the data, not the Node directly.
+        var data = node.data;
+        // Call setDataProperty to support undo/redo as well as
+        // automatically evaluating any relevant bindings.
+        diagram.model.setDataProperty(data, 'color', color);
+      }
+    });
+    diagram.commitTransaction('change color');
   }
 
   function handleAddNote(note) {
@@ -320,56 +352,74 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
       }
   }
 
+  // Función para resetear el diagrama
+  const clearDiagram = () => {
+    // Obtiene todos los nodos del diagrama
+    const allNodes = diagramRef.current.model.nodeDataArray
+
+    // Filtra los nodos para solo aquellos que existen en el diagrama y no tienen la clave 'ECU'
+    const nodesToRemove = allNodes.filter(node => diagramRef.current.model.findNodeDataForKey(node.key) && node.key !== 'ECU')
+
+    // Elimina los nodos filtrados del diagrama
+    diagramRef.current.model.removeNodeDataCollection(nodesToRemove)
+  }
+
+
+
   // Guarda las funciones en la ref. Guardar/Cargar diagrama en/desde la base de datos.
   useEffect(() => {
       ref.current = {
       saveDiagram,
-      loadDiagram
-      };
+      loadDiagram,
+      clearDiagram
+      }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   
   return (
-    <div id="myDiagram" style={{ position: 'absolute', height: '680px', width: '1880px', margin: '10px', zIndex: 2}}>
-        <div>
-          <NoteModal show={showModal} handleClose={handleCloseModal} handleSaveNote={handleAddNote} />
-        </div>
+    <div id="myDiagram" style={{ position: 'absolute', height: '680px', width: '1880px', margin: '10px', zIndex: 2 }}>
+      <div>
+        <NoteModal show={showModal} handleClose={handleCloseModal} handleSaveNote={handleAddNote} />
+      </div>
       <ReactDiagram
         initDiagram={initDiagram}
         divClassName='diagram-ECU-component'
         style={{ border: 'none' }}
         ref={diagramRef}
+        skipsDiagramUpdate={true}
       />
       <div id="contextMenu" style={{ display: 'none', position: 'absolute' }}>
         <button id="sniff" disabled={isSniffing}>Sniff</button>
         <button id="stop" style={{ backgroundColor: isSniffing ? 'red' : (isHovered ? 'rgb(214, 214, 214)' : 'rgba(192, 192, 192, 0.7)') }}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)} onClick={() => {
-          onStopSniff()
-            .then(() => {
-              const model = diagramRef.current.model
-              model.startTransaction("change color")
-              // Cambia el color de todos los nodos a blanco
-              diagramRef.current.nodes.each(function(node) {
-                const originalColor = originalColors.current[node.key] // Obtener el color original
-                console.log(`Color actual: ${originalColor}`)
-                model.setDataProperty(node.data, 'color', originalColor)
-                node.pickable = true
+            onStopSniff()
+              .catch(error => {
+                console.error('An attempt to stop the sniffer has resulted in an error.', error)
               })
-              model.commitTransaction("change color")
-              originalColors.current = {}
-            })
-            .catch(error => {
-              console.error('There was an error while trying to stop the sniffer.', error)
-            })
-            .finally(() => {
-              // Restablece setIsSniffing a false en todos los casos
-              setIsSniffing(false)
-            })
+              .finally(() => {
+                // Acciones a realizar siempre, independientemente de si la promesa se resuelve o se rechaza
+                const model = diagramRef.current.model
+                model.startTransaction("change color")
+                diagramRef.current.nodes.each(function (node) {
+                  const originalColor = originalColors.current[node.key]
+                  model.setDataProperty(node.data, 'color', originalColor)
+                  node.pickable = true
+                })
+                model.commitTransaction("change color")
+                originalColors.current = {}
+                setIsSniffing(false)
+              })
+
           }}>Stop
         </button>
         <button id="selectAll" disabled={isSniffing}>Select All</button>
         <button id="delete" disabled={isSniffing}>Delete</button>
         <button id="addNote" disabled={isSniffing}>Add Note</button>
+          <DropdownSubmenu className='submenuColor' title="Set Color" id="color" disabled={isSniffing}>
+            <NavDropdown.Item className='itemColorRed' id="color-red" eventKey="1">Red</NavDropdown.Item>
+            <NavDropdown.Item className='itemColorGreen' id="color-green" eventKey="2">Green</NavDropdown.Item>
+            <NavDropdown.Item className='itemColorBlue' id="color-blue" eventKey="3">Blue</NavDropdown.Item>
+          </DropdownSubmenu>
       </div>
     </div>
   )

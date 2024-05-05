@@ -17,7 +17,7 @@ class SocketOBD2Connection extends EventEmitter{
     })
     this.socket.on('connect', () => {
       this.emit('connected')
-      this.socket.setTimeout(90000);  // Establece el tiempo de espera del socket en un minuto
+      this.socket.setTimeout(120000)  // Establece el tiempo de espera del socket en un minuto
     })
     this.socket.on('close', () => {
       console.log('Iniciando desconexion...') // Mensaje de cierre

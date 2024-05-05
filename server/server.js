@@ -127,7 +127,9 @@ app.post('/connectOBD2', (req, res) => {
     socketOBD2Connection.once('connected', connectedHandler)
 
     socketOBD2Connection.on('disconnected', () => {
-        console.log("Desconectado del adaptador OBDII ELM327 WiFi.")
+        console.log("Desconectado del adaptador OBDII ELM327.")
+        //Agregar aqui enviar una respuesta al frontend para cuando se desconecte por timeout
+        //res.status(408),send("Socket Connection Timeout")
         sendingCommands = null
         socketOBD2Connection = null
     });
@@ -162,7 +164,7 @@ app.post('/startMonitorVehicle', (req, res) => {
     })
 
     socketOBD2Connection.on('disconnected', () => {
-        console.log("Desconectado del adaptador OBDII ELM327 WiFi.")
+        console.log("Desconectado del adaptador OBDII ELM327.")
     })
 
     // Conectarse al socket
@@ -177,7 +179,7 @@ app.post('/stopMonitorVehicle', (req, res) => {
     socketOBD2Connection.once('disconnected', () => {
         console.log('Deteniendo emision de comandos.')
         res.status(200).send('Command cycle stopped!')
-        console.log("Desconectado del adaptador OBDII ELM327 WiFi.")
+        console.log("Desconectado del adaptador OBDII ELM327.")
         sendingCommands = null
     })
 
@@ -195,6 +197,14 @@ app.post('/startSniffer', (req, res) => {
     const range = req.body.range
     const host = req.body.option.host
     const port = req.body.option.port
+    let filter, mask;
+
+    // Verifica si customRange está definido antes de acceder a sus propiedades
+    if (req.body.customRange) {
+        filter = req.body.customRange.filter
+        mask = req.body.customRange.mask
+    }
+
     console.log(`Rango: ${range}`)
     let snifferCommandsList
     switch(range) {
@@ -222,6 +232,15 @@ app.post('/startSniffer', (req, res) => {
         case 'eighth':
             snifferCommandsList = eighthFilterList
             break
+        case 'custom':
+            // Asegurarse de que filter y mask están definidos antes de usarlos
+            if (filter && mask) {
+                snifferCommandsList = ['AT WS\r', 'AT E0\r', 'AT L1\r', 'AT H1\r', 'AT S0\r', 'AT CSM0\r', `AT CF ${filter}\r`, `AT CM ${mask}\r`, 'AT MA\r']
+            } else {
+                res.status(400).send('Filtro o máscara no definidos')
+                return
+            }
+            break
         default:
             res.status(400).send('Invalid range')
             return
@@ -239,7 +258,7 @@ app.post('/startSniffer', (req, res) => {
     // Manejadores de eventos
     socketOBD2Connection.once('error', (err) => {
         console.log("Error al enviar los comandos.")
-        //res.status(500).send('Error: ' + err.message)
+        res.status(400).send('Error: ' + err.message)
         socketOBD2Connection.disconnect()
         socketOBD2Connection = null
         sendingCommands = null
@@ -251,8 +270,13 @@ app.post('/startSniffer', (req, res) => {
         sendingCommands.startCommandCycle()
     })
 
-    socketOBD2Connection.on('disconnected', () => {
-        console.log("Desconectado del adaptador OBDII ELM327 WiFi.")
+    socketOBD2Connection.once('disconnected', () => {
+        console.log("Desconectado del adaptador OBDII ELM327. Time Out")
+        // Emitir un evento de 'desconexión' usando el socketIO global en lugar de enviar una respuesta HTTP
+        const socket = global.connectedSocket
+        socket.emit('disconnection', "Socket Connection Timeout")
+        sendingCommands = null
+        socketOBD2Connection = null
     })
 
     // Conectarse al socket
@@ -272,7 +296,7 @@ app.post('/stopSniffer', (req, res) => {
     socketOBD2Connection.once('disconnected', () => {
         console.log('Deteniendo emision de comandos.')
         res.status(200).send('Command cycle stopped!')
-        console.log("Desconectado del adaptador OBDII ELM327 WiFi.")
+        console.log("Desconectado del adaptador OBDII ELM327.")
         sendingCommands = null
         socketOBD2Connection = null
     })
@@ -301,6 +325,7 @@ app.post('/sniffECU', (req, res) => {
     // Manejadores de eventos
     socketOBD2Connection.once('error', (err) => {
         console.log("Error al enviar los comandos.")
+        res.status(500).send('Error: ' + err.message)
         socketOBD2Connection.disconnect()
         socketOBD2Connection = null
         sendingCommands = null
@@ -314,7 +339,7 @@ app.post('/sniffECU', (req, res) => {
     })
 
     socketOBD2Connection.on('disconnected', () => {
-        console.log("Desconectado del adaptador OBDII ELM327 WiFi.")
+        console.log("Desconectado del adaptador OBDII ELM327.")
     })
 
     // Conectarse al socket
@@ -363,18 +388,6 @@ app.get('/projects', async (req, res) => {
     }
 })  
 
-// Get specific project from the database by project name
-app.get('/project/new', async (req, res) => {
-    const projectName = req.query.projectName
-    try {
-        const project = await Project.find({projectName})
-        res.json(project)
-    } catch (error) {
-        res.status(500).send('Error fetching the project: ' + error.message)
-        console.log("Error fectching vechicle information:" + error.message)
-    }
-})
-
 // Get specific project from the database by project id
 app.get('/project/:id', async (req, res) => {
     const projectId = req.params.id
@@ -396,7 +409,7 @@ app.get('/project/:id', async (req, res) => {
 app.post('/project/update/:id', async (req, res) => {
     const projectId = req.params.id
     const newData = req.body
-
+    console.log(`ID del proyecto a actualizar: ${projectId}`)
     try {
         const project = await Project.findOneAndUpdate({ _id: projectId }, newData, { new: true })
         if (project) {

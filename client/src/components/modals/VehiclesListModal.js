@@ -6,15 +6,15 @@ export default function ConnectModal({ show, handleClose, projects, handleVehicl
     const [selectedVehicle, setSelectedVehicle] = useState('')
 
     const handleChange = (event) => {
-        setSelectedVehicle(event.target.value);
+        setSelectedVehicle(event.target.value)
     }
 
     const handleSubmit = () => {
         if (selectedVehicle !== '') {
-            handleVehicleSelected(selectedVehicle);
-            handleClose();
+            handleVehicleSelected(selectedVehicle)
+            handleClose()
         } else {
-            alert('Please select a vehicle');
+            alert('Please select a vehicle')
         }
     }
 

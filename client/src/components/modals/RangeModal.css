@@ -1,0 +1,99 @@
+.modal-content.rangeModal {
+    width: 300px;
+    height: 200px;
+}
+
+/* Ajusta el alto del cuerpo del modal */
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: normal;
+}
+
+.rangeForm {
+    width: 200px;
+    height: 76px;
+}
+
+.rangeForm .form-group {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    margin-bottom: 5px;
+}
+
+.rangeForm .form-group label {
+    margin-right: 10px;
+}
+
+.range-footer {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    height: 50px;
+}
+
+.filterInput {
+    background-color: white;
+    color: black;
+    border-color: black;
+    height: 26px;
+    font-size: large;
+}
+
+.maskInput {
+    background-color: white;
+    color: black;
+    border-color: black;
+    height: 26px;
+    font-size: large;
+}
+
+.rangeCancelButton{
+    width: 70px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    height: 36px;
+    color: #fff;
+    background-color: #6c757d;
+    border-radius: 0.4rem;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    pa
+
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+        color: black;
+    }
+}
+
+.rangeSubmitButton{
+    width: 70px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    height: 36px;
+    color: #fff;
+    background-color: rgb(0, 0, 202);
+    border-radius: 0.4rem;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    
+    /* Estilos de sombra y cambio de tamaño al hacer clic */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(40, 77, 241); /* Cambia el tono del gris al pasar el cursor */
+        color: white;
+    }
+}

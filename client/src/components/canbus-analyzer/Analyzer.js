@@ -2,6 +2,7 @@ import "./Analyzer.css"
 import Transitions from "../Transitions"
 import ConnectModal from '../modals/ConnectModal'
 import VehiclesListModal from '../modals/VehiclesListModal'
+import RangeModal from '../modals/RangeModal'
 import ECUsDiagram from './ECUsDiagram'
 import React, { useEffect, useState, useRef } from 'react'
 import { ReactComponent as Car } from "./assets/carSvg.svg"
@@ -19,7 +20,7 @@ const updateVehicleUrl = 'http://localhost:8080/project/update/'
 const ENDPOINT = 'http://localhost:8080/'
 let socket
 
-export default function Analyzer () {
+export default function Analyzer() {
 
     // Buttons states
     const [isConnected, setIsConnected] = useState(false)
@@ -30,7 +31,7 @@ export default function Analyzer () {
     const [isNewProject, setIsNewProject] = useState(false)
     const isStartedRef = useRef(false)
     // Data (ecu - payload)
-    const [data, setData] = useState([]) 
+    const [data, setData] = useState([])
     // Vehicle Information
     const [vin, setVin] = useState('')
     const [make, setMake] = useState(null)
@@ -41,8 +42,10 @@ export default function Analyzer () {
     const [engineCylinders, setEngineCylinders] = useState(null)
     // Modals
     const [connectModalShow, setConnectModalShow] = useState(false)
-    const [connectOption, setConnectOption] = useState({host:'', port:''})
+    const [connectOption, setConnectOption] = useState({ host: '192.168.0.10', port: '35000' })
     const [vehicleModalShow, setVehicleModalShow] = useState(false)
+    const [rangeModalShow, setRangeModalShow] = useState(false)
+    const [customRange, setCustomRange] = useState({ filter: '000', mask: '0FF' })
     // Diagram
     const diagramRef = useRef(null)
     const [isDiagramLoaded, setIsDiagramLoaded] = useState(false)
@@ -76,8 +79,8 @@ export default function Analyzer () {
 
         socket.on('snifferData', (data) => {
             //console.log(data)
-            if(data.ecu !== undefined && data.payload !== undefined){
-              setData(prevData => [...prevData, { ecu: data.ecu, payload: data.payload }]); // Agrega el nuevo objeto al array 'data'
+            if (data.ecu !== undefined && data.payload !== undefined) {
+                setData(prevData => [...prevData, { ecu: data.ecu, payload: data.payload }]) // Agrega el nuevo objeto al array 'data'
             }
         })
 
@@ -94,25 +97,67 @@ export default function Analyzer () {
             setIsConnecting(false)
         })
 
+        socket.on('disconnection', (message) => {
+            console.log(message) // "Socket Connection Timeout"
+            // Aquí puedes manejar la desconexión del socket como prefieras
+            setActiveRange(null)
+            setIsStarted(false) // Activate range buttons
+            isStartedRef.current = false
+        })
+
         // Limpiar los eventos del socket al desmontar el componente
         return () => {
             socket.off('connect')
             socket.off('connect_error')
             socket.off('snifferData')
             socket.off('vinData')
+            socket.off('disconnection')
             socket.disconnect()
         }
     }, [])
 
     function handleConnectButton() {
         setConnectModalShow(true)
+        setIsNewProject(true)
+        // Si el diagrama ha sido cargado previamente, cargar nuevamente el diagrama
+        if (isDiagramLoaded) {
+            diagramRef.current.clearDiagram()
+            setIsDiagramLoaded(false) // Puedes pasar los datos del diagrama aquí si es necesario
+        }
+    }
+
+    function handleCustomButton() {
+        setRangeModalShow(true)
+
+    }
+
+    function handleCustomRange(range) {
+        setActiveRange('custom')
+        setRangeModalShow(false)
+        setCustomRange({ filter: range.filter, mask: range.mask })
+        setIsStarted(true)
+        isStartedRef.current = true
+        axios.post(snifferUrl, { range: 'custom', option: connectOption, customRange: customRange })
+            .then(response => {
+                if (response.status === 200) {
+                    console.log(response.data)
+                }
+            })
+            .catch(error => {
+                if (error.response && error.response.status === 400) {
+                    alert('There is currently no established socket connection.')
+                } else {
+                    alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
+                }
+                setIsStarted(false)
+            })
     }
 
     function handleOptionSelected(option) {
         setConnectModalShow(false)
         setIsConnecting(true)
         setConnectOption({ host: option.host, port: option.port })
-        axios.post(connectUrl, { option: option, component: 'analyzer'})
+        axios.post(connectUrl, { option: option, component: 'analyzer' })
             .then(response => {
                 if (response.status === 200) {
                     console.log(response.data)
@@ -120,7 +165,7 @@ export default function Analyzer () {
                     setTimeout(() => {
                         setConnectButtonStatus(true)
                     }, 2000)
-                } 
+                }
             })
             .catch(error => {
                 setIsConnecting(false)
@@ -134,7 +179,6 @@ export default function Analyzer () {
     function handleStartButton(range) {
         setActiveRange(range)
         setIsStarted(true)
-        setIsNewProject(true)
         isStartedRef.current = true
         axios.post(snifferUrl, { range: range, option: connectOption })
             .then(response => {
@@ -167,58 +211,69 @@ export default function Analyzer () {
                     } else {
                         alert('There was an error when trying to end data monitoring. Please verify your network connection and try again. ' + error.message)
                     }
+                    reject(error) // Rechaza la promesa aquí y se ejecuta el catch en el render de ECUsDiagram
                 })
         })
     }
 
     function handleNodeSniff(ecu) {
-    //Funcion de actualizacion 'currentConnectOption', necesaria para acceder al valor actualizado 'connectOption' debido al 'closure'
-        setConnectOption(currentConnectOption => {
-            // Verifica si el proceso está corriendo antes de intentar detenerlo
-            if (isStartedRef.current) {
-                handleStopButton().then(() => {
+        return new Promise((resolve, reject) => { // Devuelve una nueva promesa
+            setConnectOption(currentConnectOption => {
+                if (isStartedRef.current) {
+                    handleStopButton().then(() => {
+                        setActiveRange(null)
+                        setIsStarted(true) // Deactivate range buttons
+                        // Luego, envía el ECU al backend
+                        axios.post(singleECUUrl, { ecu: ecu, option: currentConnectOption })
+                            .then(response => {
+                                if (response.status === 200) {
+                                    console.log(response.data)
+                                    resolve() // Resuelve la promesa cuando la petición es exitosa
+                                }
+                            })
+                            .catch(error => {
+                                if (error.response && error.response.status === 500) {
+                                    console.error('Error sending the ECU name to the server:', error)
+                                    alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
+                                } else {
+                                    alert('There was an error when trying to start data monitoring. Please verify your network connection and try again. ' + error.message)
+                                }
+                                reject() // Rechaza la promesa cuando hay un error
+                            })
+                            .finally(() => {
+                                isStartedRef.current = false
+                            })
+                    }).catch(error => {
+                        console.error('Error stopping the process:', error)
+                        alert('There was an error when trying to stop the process. Please verify your network connection and try again. ' + error.message)
+                    })
+                } else {
                     setActiveRange(null)
                     setIsStarted(true) // Deactivate range buttons
-                    // Luego, envía el ECU al backend
+                    // Si el proceso no está corriendo, simplemente envía el ECU al backend
                     axios.post(singleECUUrl, { ecu: ecu, option: currentConnectOption })
                         .then(response => {
                             if (response.status === 200) {
                                 console.log(response.data)
+                                resolve() // Resuelve la promesa cuando la petición es exitosa
                             }
                         })
                         .catch(error => {
-                            console.error('Error sending the ECU name to the server:', error)
-                            alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
+                            if (error.response && error.response.status === 500) {
+                                console.error('Error sending the ECU name to the server:', error)
+                                alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
+                            } else {
+                                alert('There was an error when trying to start data monitoring. Please verify your network connection and try again. ' + error.message)
+                            }
+                            reject() // Rechaza la promesa cuando hay un error
                         })
                         .finally(() => {
                             // Restablece isStartedRef a false en todos los casos
                             isStartedRef.current = false
                         })
-                }).catch(error => {
-                    console.error('Error stopping the process:', error)
-                    alert('There was an error when trying to stop the process. Please verify your network connection and try again. ' + error.message)
-                })
-            } else {
-                setActiveRange(null)
-                setIsStarted(true) // Deactivate range buttons
-                // Si el proceso no está corriendo, simplemente envía el ECU al backend
-                axios.post(singleECUUrl, { ecu: ecu, option: currentConnectOption })
-                    .then(response => {
-                        if (response.status === 200) {
-                            console.log(response.data)
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error sending the ECU name to the server:', error)
-                        alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
-                    })
-                    .finally(() => {
-                        // Restablece isStartedRef a false en todos los casos
-                        isStartedRef.current = false
-                    })
-            }
-
-            return currentConnectOption // Devuelve el mismo valor para no cambiar el estado
+                }
+                return currentConnectOption // Devuelve el mismo valor para no cambiar el estado
+            })
         })
     }
 
@@ -245,19 +300,24 @@ export default function Analyzer () {
         axios.post(addVehicleUrl, data).then((response) => {
             if (response.status === 200) {
                 console.log(response.data)
+                alert('New Vehicle Informacion Saved into the Database')
                 setIsNewProject(false)
             }
         })
             .catch(error => {
                 console.error('Error saving vehicle info into the database:', error)
-                alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
+                if (error.response && error.response.status === 500) {
+                    alert('There was an issue while attempting to save the vehicle information into the database. ' + error.message)
+                } else {
+                    alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
+                }
             })
     }
 
     const handleUpdateButton = (event) => {
         event.preventDefault()
         let diagramData = diagramRef.current.saveDiagram()
-        const data = { 
+        const data = {
             diagramData: diagramData
         }
         axios.post(`${updateVehicleUrl}${projectID}`, data).then((response) => {
@@ -266,19 +326,22 @@ export default function Analyzer () {
                 alert('Vehicle Information Updated!')
             }
         })
-        .catch(error => {
-            console.error('Error updating vehicle info in the database:', error)
-            alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
-        })
+            .catch(error => {
+                console.error('Error updating vehicle info in the database:', error)
+                alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
+            })
     }
-    
+
     async function handleOpenButton() {
+        if(isConnected) {
+            setIsConnected(false) //Desactivar boton New
+        }
         const success = await handleVehicleList() // Carga la lista de proyectos cuando se abre el modal
         if (success) {
             setVehicleModalShow(true)
         }
     }
-    
+
     async function handleVehicleList() {
         try {
             const response = await axios.get(getAllVehiclesUrl)
@@ -290,7 +353,7 @@ export default function Analyzer () {
             return false // Devuelve false si la llamada falló
         }
     }
-    
+
     async function handleVehicleSelected(option) {
         const projectId = option
         setProjectID(projectId)
@@ -306,6 +369,7 @@ export default function Analyzer () {
                 setDoors(project.doors)
                 setEngineCylinders(project.engineCylinders)
                 setIsDiagramLoaded(true) // Establece isDiagramLoaded en true después de cargar el diagrama
+                setConnectOption({ host: project.deviceHost, port: project.devicePort })
             })
             .catch(error => {
                 console.error('Error loading project from the database:', error)
@@ -316,109 +380,124 @@ export default function Analyzer () {
     return (
         <>
             <Transitions>
-                <ConnectModal 
-                    show={connectModalShow} 
-                    handleClose={() => setConnectModalShow(false)} 
-                    handleOptionSelected={handleOptionSelected} 
+                <ConnectModal
+                    show={connectModalShow}
+                    handleClose={() => setConnectModalShow(false)}
+                    handleOptionSelected={handleOptionSelected}
                 />
-                <VehiclesListModal 
-                    show={vehicleModalShow} 
-                    handleClose={() => setVehicleModalShow(false)} 
+                <VehiclesListModal
+                    show={vehicleModalShow}
+                    handleClose={() => setVehicleModalShow(false)}
                     projects={projects} // Pasa la lista de proyectos al modal
                     handleVehicleSelected={handleVehicleSelected} // Pasa la función al modal
+                />
+                <RangeModal
+                    show={rangeModalShow}
+                    handleClose={() => setRangeModalShow(false)}
+                    handleCustomRange={handleCustomRange} // Pasa la función al modal
                 />
                 <div className='Analyzer'>
                     <div className="carBackground">
                         <div className="vehicleInfo">
-                            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <p>Make: {make}</p>
                                 <p>Model: {model}</p>
                                 <p>Year: {modelYear}</p>
                             </div>
                             <p>VIN: {vin}</p>
                             <p>Vehicle Type: {vehicleType}</p>
-                            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <p>Engine Cylinders: {engineCylinders}</p>
                                 <p>Doors: {doors}</p>
                             </div>
                         </div>
-                        <Car className='carSvg'/>
-                        <ECUsDiagram ref={diagramRef} data={data} onNodeSniff={handleNodeSniff} connectOption={connectOption} onStopSniff={handleStopButton}/>
+                        <Car className='carSvg' />
+                        <ECUsDiagram ref={diagramRef} data={data} onNodeSniff={handleNodeSniff} connectOption={connectOption} onStopSniff={handleStopButton} />
+                        <div className="buttonGroup1">
+                            <button disabled={isNewProject} className="openButton" onClick={handleOpenButton}>Open Diag</button>
+                            <button disabled={!isDiagramLoaded || isNewProject} className="updateButton" onClick={handleUpdateButton}>Update Diag</button>
+                            <button disabled={!isDiagramLoaded || isNewProject} className="reloadButton">Reload</button>
+                            <button className="resetAll" onClick={handleResetAllButton}>Reset All</button>
+                        </div>
                         <button
                             className={`connectButton ${isConnected ? 'connected' : isConnecting ? 'connecting' : connectButtonStatus ? 'statusTrue' : ''}`}
-                            onClick={() => handleConnectButton('getData')} 
+                            onClick={handleConnectButton}
                             disabled={isConnected || isConnecting || connectButtonStatus}
-                            >
-                            {isConnected ? 'Connected' : isConnecting ? 'Connecting...' : 'Connect'}
+                        >
+                            {isConnected ? 'Ready' : isConnecting ? 'Connecting...' : 'New Diag'}
                         </button>
-                        <button disabled={!isConnected || isNewProject} className="openButton" onClick={handleOpenButton}>Load Diag</button>
-                        <button disabled={!(isConnected && isDiagramLoaded)} className="updateButton" onClick={handleUpdateButton}>Update Diag</button>
-                        <button disabled={!isConnected || isDiagramLoaded} className="saveButton" onClick={handleSaveButton}>Save Diag</button>
-                        <button disabled={!isConnected} className="resetAll" onClick={handleResetAllButton}>Reset All</button>
-                        <button 
+                        <button
                             disabled={!isConnected || (isStarted && activeRange !== 'first') || isDiagramLoaded}
-                            className={`range1Button ${activeRange === 'first' ? 'started' : ''}`} 
-                            onClick={activeRange === 'first' ? handleStopButton : () => handleStartButton('first')} 
+                            className={`range1Button ${activeRange === 'first' ? 'started' : ''}`}
+                            onClick={activeRange === 'first' ? handleStopButton : () => handleStartButton('first')}
                         >
                             {activeRange === 'first' ? 'Stop' : 'Range 1'}
-                            {activeRange !== 'first' && <span style={{fontSize: '12px', display: 'block'}}>(000 - 0FF)</span>}
+                            {activeRange !== 'first' && <span style={{ fontSize: '12px', display: 'block' }}>(000 - 0FF)</span>}
                         </button>
-                        <button 
+                        <button
                             disabled={!isConnected || (isStarted && activeRange !== 'second') || isDiagramLoaded}
-                            className={`range2Button ${activeRange === 'second' ? 'started' : ''}`} 
-                            onClick={activeRange === 'second' ? handleStopButton : () => handleStartButton('second')} 
+                            className={`range2Button ${activeRange === 'second' ? 'started' : ''}`}
+                            onClick={activeRange === 'second' ? handleStopButton : () => handleStartButton('second')}
                         >
                             {activeRange === 'second' ? 'Stop' : 'Range 2'}
-                            {activeRange !== 'second' && <span style={{fontSize: '12px', display: 'block'}}>(100 - 17F)</span>}
+                            {activeRange !== 'second' && <span style={{ fontSize: '12px', display: 'block' }}>(100 - 17F)</span>}
                         </button>
-                        <button 
+                        <button
                             disabled={!isConnected || (isStarted && activeRange !== 'third') || isDiagramLoaded}
-                            className={`range3Button ${activeRange === 'third' ? 'started' : ''}`} 
-                            onClick={activeRange === 'third' ? handleStopButton : () => handleStartButton('third')} 
+                            className={`range3Button ${activeRange === 'third' ? 'started' : ''}`}
+                            onClick={activeRange === 'third' ? handleStopButton : () => handleStartButton('third')}
                         >
                             {activeRange === 'third' ? 'Stop' : 'Range 3'}
-                            {activeRange !== 'third' && <span style={{fontSize: '12px', display: 'block'}}>(180 - 1FF)</span>}
+                            {activeRange !== 'third' && <span style={{ fontSize: '12px', display: 'block' }}>(180 - 1FF)</span>}
                         </button>
-                        <button 
+                        <button
                             disabled={!isConnected || (isStarted && activeRange !== 'fourth') || isDiagramLoaded}
-                            className={`range4Button ${activeRange === 'fourth' ? 'started' : ''}`} 
+                            className={`range4Button ${activeRange === 'fourth' ? 'started' : ''}`}
                             onClick={activeRange === 'fourth' ? handleStopButton : () => handleStartButton('fourth')}
                         >
                             {activeRange === 'fourth' ? 'Stop' : 'Range 4'}
-                            {activeRange !== 'fourth' && <span style={{fontSize: '12px', display: 'block'}}>(200 - 27F)</span>}
+                            {activeRange !== 'fourth' && <span style={{ fontSize: '12px', display: 'block' }}>(200 - 27F)</span>}
                         </button>
-                        <button 
+                        <button
                             disabled={!isConnected || (isStarted && activeRange !== 'fifth') || isDiagramLoaded}
-                            className={`range5Button ${activeRange === 'fifth' ? 'started' : ''}`} 
-                            onClick={activeRange === 'fifth' ? handleStopButton : () => handleStartButton('fifth')} 
+                            className={`range5Button ${activeRange === 'fifth' ? 'started' : ''}`}
+                            onClick={activeRange === 'fifth' ? handleStopButton : () => handleStartButton('fifth')}
                         >
                             {activeRange === 'fifth' ? 'Stop' : 'Range 5'}
-                            {activeRange !== 'fifth' && <span style={{fontSize: '12px', display: 'block'}}>(280 - 2FF)</span>}
+                            {activeRange !== 'fifth' && <span style={{ fontSize: '12px', display: 'block' }}>(280 - 2FF)</span>}
                         </button>
-                        <button 
+                        <button
                             disabled={!isConnected || (isStarted && activeRange !== 'sixth') || isDiagramLoaded}
-                            className={`range6Button ${activeRange === 'sixth' ? 'started' : ''}`} 
-                            onClick={activeRange === 'sixth' ? handleStopButton : () => handleStartButton('sixth')} 
+                            className={`range6Button ${activeRange === 'sixth' ? 'started' : ''}`}
+                            onClick={activeRange === 'sixth' ? handleStopButton : () => handleStartButton('sixth')}
                         >
                             {activeRange === 'sixth' ? 'Stop' : 'Range 6'}
-                            {activeRange !== 'sixth' && <span style={{fontSize: '12px', display: 'block'}}>(300 - 3FF)</span>}
+                            {activeRange !== 'sixth' && <span style={{ fontSize: '12px', display: 'block' }}>(300 - 3FF)</span>}
                         </button>
-                        <button 
+                        <button
                             disabled={!isConnected || (isStarted && activeRange !== 'seventh') || isDiagramLoaded}
-                            className={`range7Button ${activeRange === 'seventh' ? 'started' : ''}`} 
-                            onClick={activeRange === 'seventh' ? handleStopButton : () => handleStartButton('seventh')} 
+                            className={`range7Button ${activeRange === 'seventh' ? 'started' : ''}`}
+                            onClick={activeRange === 'seventh' ? handleStopButton : () => handleStartButton('seventh')}
                         >
                             {activeRange === 'seventh' ? 'Stop' : 'Range 7'}
-                            {activeRange !== 'seventh' && <span style={{fontSize: '12px', display: 'block'}}>(400 - 5FF)</span>}
+                            {activeRange !== 'seventh' && <span style={{ fontSize: '12px', display: 'block' }}>(400 - 5FF)</span>}
                         </button>
-                        <button 
+                        <button
                             disabled={!isConnected || (isStarted && activeRange !== 'eighth') || isDiagramLoaded}
-                            className={`range8Button ${activeRange === 'eighth' ? 'started' : ''}`} 
-                            onClick={activeRange === 'eighth' ? handleStopButton : () => handleStartButton('eighth')} 
+                            className={`range8Button ${activeRange === 'eighth' ? 'started' : ''}`}
+                            onClick={activeRange === 'eighth' ? handleStopButton : () => handleStartButton('eighth')}
                         >
                             {activeRange === 'eighth' ? 'Stop' : 'Range 8'}
-                            {activeRange !== 'eighth' && <span style={{fontSize: '12px', display: 'block'}}>(600 - 7FF)</span>}
+                            {activeRange !== 'eighth' && <span style={{ fontSize: '12px', display: 'block' }}>(600 - 7FF)</span>}
                         </button>
+                        <button
+                            disabled={!isConnected || (isStarted && activeRange !== 'custom') || isDiagramLoaded}
+                            className={`customRangeButton ${activeRange === 'custom' ? 'started' : ''}`}
+                            onClick={activeRange === 'custom' ? handleStopButton : handleCustomButton}
+                        >
+                            {activeRange === 'custom' ? 'Stop' : 'Custom Range'}
+                        </button>
+                        <button disabled={!isConnected || isDiagramLoaded} className="saveButton" onClick={handleSaveButton}>Save Diagram</button>
                     </div>
                 </div>
             </Transitions>
