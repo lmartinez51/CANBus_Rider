@@ -31,7 +31,7 @@ class SocketOBD2Connection extends EventEmitter{
   }
 
   connect() {
-    console.log('Conectando al adaptador OBDII ELM327 WiFi')
+    console.log('Conectando al adaptador OBDII ELM327')
     this.socket.connect(this.OBD_PORT, this.OBD_IP, () => {
       this.emit('connected')
     })
@@ -40,6 +40,7 @@ class SocketOBD2Connection extends EventEmitter{
   disconnect() {
     this.socket.off('data', this.boundListen)
     this.socket.end()
+    this.removeAllListeners('dataReceived')
   }
    
   send(data) {

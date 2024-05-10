@@ -8,30 +8,48 @@ class SendingSnifferCommands extends CommandProcessor {
             payload: ''
         }
         this.counter = 0
+        this.socket = global.connectedSocket
     }
 
     startCommandCycle() {
-        this.sendCommand()
+        return new Promise((resolve, reject) => {
+            this.on('error', reject);
+            this.on('lastCommandSent', resolve);
+            this.sendCommand();
+        });
     }
-
-    processLine(line) {
-        let completeData = line.replace(/[\r\n\s]+/g, '')
-        let ecu = completeData.slice(0,3)
-        let payload = completeData.slice(3).split('<')[0]
-        // Verifica si 'ecu' y 'payload' contienen solo caracteres hexadecimales
-        const isEcuHexadecimal = /^[0-9A-F]+$/i.test(ecu)
-        const isPayloadHexadecimal = /^[0-9A-F]+$/i.test(payload)
-        if(completeData.length >= 3 && isEcuHexadecimal && isPayloadHexadecimal && ecu !== '000') {
-            this.ecuInfo.ecu = ecu
-            this.ecuInfo.payload = payload
-            console.log(this.ecuInfo)
-            const socket = global.connectedSocket
-            if(socket) {
-                socket.emit('snifferData', this.ecuInfo)
+    
+    processLine(line) {    
+        if (line.includes('FULL')) {
+            // Cierra la conexión con el socket
+            console.log('Buffer full. Disconnecting')
+            this.socketConnection.disconnect();  // Desconectarse primero asegurarse que no se emitan mas eventos.
+            this.socketConnection.off('dataReceived', this.boundHandleData)
+            this.commandIndex = 0
+    
+            // Emitir el evento 'disconnection'
+            if(this.socket) {
+                this.socket.emit('disconnection', "Buffer Full")
             }
+        } else {
+            let completeData = line.replace(/[\r\n\s]+/g, '')
+            let ecu = completeData.slice(0,3)
+            let payload = completeData.slice(3).split('<')[0]
+            // Verifica si 'ecu' y 'payload' contienen solo caracteres hexadecimales
+            const isEcuHexadecimal = /^[0-9A-F]+$/i.test(ecu)
+            const isPayloadHexadecimal = /^[0-9A-F]+$/i.test(payload)
+            if(completeData.length >= 3 && isEcuHexadecimal && isPayloadHexadecimal && ecu !== '000') {
+                this.ecuInfo.ecu = ecu
+                this.ecuInfo.payload = payload
+                console.log(this.ecuInfo)
+                if(this.socket) {
+                    this.socket.emit('snifferData', this.ecuInfo)
+                }
+            }
+            completeData = ''
         }
-        completeData = ''
     }
+    
     
     //Listen responses to commands
     handleData(data) {

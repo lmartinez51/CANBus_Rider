@@ -285,8 +285,8 @@ app.post('/startSniffer', (req, res) => {
 
 app.post('/stopSniffer', (req, res) => {
     if (!socketOBD2Connection) {
-        console.log('Intento de detener el socket sin haber una conexión existente.')
-        res.status(400).send('There is currently no established socket connection.')
+        console.log('Socket desconectado.')
+        res.status(400).send('The process has been halted. You may now proceed.')
         return
     }
 
@@ -323,23 +323,35 @@ app.post('/sniffECU', (req, res) => {
     socketOBD2Connection.removeAllListeners('error')
 
     // Manejadores de eventos
-    socketOBD2Connection.once('error', (err) => {
+    socketOBD2Connection.on('error', (err) => {
         console.log("Error al enviar los comandos.")
-        res.status(500).send('Error: ' + err.message)
         socketOBD2Connection.disconnect()
         socketOBD2Connection = null
         sendingCommands = null
     })
 
-    socketOBD2Connection.once('connected', () => {
+    socketOBD2Connection.once('connected', async () => {
         console.log(`Monitoring ${ecu}`)
         console.log('Comenzando emision de comandos.')
-        res.status(200).send('Sniffing Single Command!')
-        sendingCommands.startCommandCycle()
+        try {
+            await sendingCommands.startCommandCycle();
+            res.status(200).send('Sniffing Single Command!')
+        } catch (err) {
+            console.log("Error durante el envio de comandos.")
+            res.status(500).send('Error: ' + err.message)
+            socketOBD2Connection.disconnect()
+            socketOBD2Connection = null
+            sendingCommands = null
+        }
     })
 
     socketOBD2Connection.on('disconnected', () => {
         console.log("Desconectado del adaptador OBDII ELM327.")
+        // Emitir un evento de 'desconexión' usando el socketIO global en lugar de enviar una respuesta HTTP
+        const socket = global.connectedSocket
+        socket.emit('disconnectionOnSingleSniff', "An error has occurred, which may have been caused by a timeout. Press 'Stop' and try again")
+        socketOBD2Connection = null
+        sendingCommands = null
     })
 
     // Conectarse al socket

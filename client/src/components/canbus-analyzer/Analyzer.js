@@ -29,6 +29,7 @@ export default function Analyzer() {
     const [activeRange, setActiveRange] = useState(null)
     const [connectButtonStatus, setConnectButtonStatus] = useState(false)
     const [isNewProject, setIsNewProject] = useState(false)
+    const [isButtonToggled, setIsButtonToggled] = useState(false) // Reload Button
     const isStartedRef = useRef(false)
     // Data (ecu - payload)
     const [data, setData] = useState([])
@@ -48,11 +49,12 @@ export default function Analyzer() {
     const [customRange, setCustomRange] = useState({ filter: '000', mask: '0FF' })
     // Diagram
     const diagramRef = useRef(null)
-    const [isDiagramLoaded, setIsDiagramLoaded] = useState(false)
+    const [isDBDiagramLoaded, setIsDBDiagramLoaded] = useState(false)
     // Database related
     const [projects, setProjects] = useState([])
     const [projectID, setProjectID] = useState('')
-
+    // Shared variables between Analyzer and ECUsDiagrama
+    const [isSniffing, setIsSniffing] = useState(false)
 
     useEffect(() => {
         // Conectar el socket al servidor
@@ -98,10 +100,17 @@ export default function Analyzer() {
         })
 
         socket.on('disconnection', (message) => {
-            console.log(message) // "Socket Connection Timeout"
+            console.log(message) // "Socket Connection Timeout" or Buffer Full
             // Aquí puedes manejar la desconexión del socket como prefieras
+            alert('The socket has been disconnected due to a ' + message + ' event.')
             setActiveRange(null)
             setIsStarted(false) // Activate range buttons
+            isStartedRef.current = false
+        })
+
+        socket.on('disconnectionOnSingleSniff', (message) => {
+            console.log(message)
+            alert('The socket has been disconnected. ' + message)
             isStartedRef.current = false
         })
 
@@ -112,6 +121,7 @@ export default function Analyzer() {
             socket.off('snifferData')
             socket.off('vinData')
             socket.off('disconnection')
+            socket.off('disconnectionOnSingleSniff')
             socket.disconnect()
         }
     }, [])
@@ -119,23 +129,26 @@ export default function Analyzer() {
     function handleConnectButton() {
         setConnectModalShow(true)
         setIsNewProject(true)
-        // Si el diagrama ha sido cargado previamente, cargar nuevamente el diagrama
-        if (isDiagramLoaded) {
+        // Si el diagrama ha sido cargado previamente, 'limpiarlo'.
+        if (isDBDiagramLoaded) {
             diagramRef.current.clearDiagram()
-            setIsDiagramLoaded(false) // Puedes pasar los datos del diagrama aquí si es necesario
+            setIsDBDiagramLoaded(false) 
         }
     }
 
     function handleCustomButton() {
         setRangeModalShow(true)
-
     }
 
     function handleCustomRange(range) {
-        setActiveRange('custom')
+        if(isDBDiagramLoaded) {
+            setIsButtonToggled(true)
+        } else {
+            setActiveRange('custom')
+            setIsStarted(true)
+        }
         setRangeModalShow(false)
         setCustomRange({ filter: range.filter, mask: range.mask })
-        setIsStarted(true)
         isStartedRef.current = true
         axios.post(snifferUrl, { range: 'custom', option: connectOption, customRange: customRange })
             .then(response => {
@@ -146,10 +159,14 @@ export default function Analyzer() {
             .catch(error => {
                 if (error.response && error.response.status === 400) {
                     alert('There is currently no established socket connection.')
+                    if(isDBDiagramLoaded){
+                        setIsButtonToggled(false)
+                    }
                 } else {
                     alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
                 }
                 setIsStarted(false)
+                isStartedRef.current = false
             })
     }
 
@@ -199,15 +216,29 @@ export default function Analyzer() {
                 .then(response => {
                     if (response.status === 200) {
                         console.log(response.data)
-                        setActiveRange(null)
-                        setIsStarted(false) // Activate range buttons
-                        isStartedRef.current = false
+                        if(isButtonToggled){
+                            setIsButtonToggled(false)
+                            isStartedRef.current = false
+                        } else {
+                            setActiveRange(null)
+                            setIsStarted(false) // Activate range buttons
+                            isStartedRef.current = false
+                        }
                         resolve()
                     }
                 })
                 .catch(error => {
                     if (error.response && error.response.status === 400) {
-                        alert('There is currently no established socket connection.')
+                        alert('The process has been halted. You may now proceed.')
+                        //If it was a new diagram, reactivate ranges
+                        if(!isDBDiagramLoaded){
+                            setActiveRange(null)
+                            setIsStarted(false) // Activate range buttons
+                        } else {
+                            if(isButtonToggled){
+                                setIsButtonToggled(false)
+                            }
+                        }
                     } else {
                         alert('There was an error when trying to end data monitoring. Please verify your network connection and try again. ' + error.message)
                     }
@@ -233,7 +264,7 @@ export default function Analyzer() {
                             })
                             .catch(error => {
                                 if (error.response && error.response.status === 500) {
-                                    console.error('Error sending the ECU name to the server:', error)
+                                    console.error('Error sniffing the selected ECU:', error)
                                     alert('There was an error when trying to make a request. Please verify your network connection. ' + error.message)
                                 } else {
                                     alert('There was an error when trying to start data monitoring. Please verify your network connection and try again. ' + error.message)
@@ -368,7 +399,7 @@ export default function Analyzer() {
                 setVehicleType(project.vehicleType)
                 setDoors(project.doors)
                 setEngineCylinders(project.engineCylinders)
-                setIsDiagramLoaded(true) // Establece isDiagramLoaded en true después de cargar el diagrama
+                setIsDBDiagramLoaded(true) // Establece isDBDiagramLoaded en true después de cargar el diagrama
                 setConnectOption({ host: project.deviceHost, port: project.devicePort })
             })
             .catch(error => {
@@ -412,11 +443,18 @@ export default function Analyzer() {
                             </div>
                         </div>
                         <Car className='carSvg' />
-                        <ECUsDiagram ref={diagramRef} data={data} onNodeSniff={handleNodeSniff} connectOption={connectOption} onStopSniff={handleStopButton} />
+                        <ECUsDiagram ref={diagramRef} data={data} onNodeSniff={handleNodeSniff} connectOption={connectOption} onStopSniff={handleStopButton} isSniffing={isSniffing} setIsSniffing={setIsSniffing}/>
                         <div className="buttonGroup1">
-                            <button disabled={isNewProject} className="openButton" onClick={handleOpenButton}>Open Diag</button>
-                            <button disabled={!isDiagramLoaded || isNewProject} className="updateButton" onClick={handleUpdateButton}>Update Diag</button>
-                            <button disabled={!isDiagramLoaded || isNewProject} className="reloadButton">Reload</button>
+                            <button disabled={isNewProject} className="openButton" onClick={handleOpenButton}>Load Diagram</button>
+                            <button disabled={!isDBDiagramLoaded || isNewProject} className="updateButton" onClick={handleUpdateButton}>Update Diagram</button>
+                            <button disabled={!isDBDiagramLoaded || isNewProject} className={`reloadButton ${isButtonToggled ? 'toggled' : 'reloadButton'}`} onClick={() => isButtonToggled ? handleStopButton() : handleCustomButton()}>
+                            {isButtonToggled ? 'Stop' : (
+                                <>
+                                    Reload Diag
+                                    <span style={{ fontSize: '12px', display: 'block' }}>Custom Range</span>
+                                </>
+                            )}
+                            </button>
                             <button className="resetAll" onClick={handleResetAllButton}>Reset All</button>
                         </div>
                         <button
@@ -427,7 +465,7 @@ export default function Analyzer() {
                             {isConnected ? 'Ready' : isConnecting ? 'Connecting...' : 'New Diag'}
                         </button>
                         <button
-                            disabled={!isConnected || (isStarted && activeRange !== 'first') || isDiagramLoaded}
+                            disabled={!isConnected || (isStarted && activeRange !== 'first') || isDBDiagramLoaded}
                             className={`range1Button ${activeRange === 'first' ? 'started' : ''}`}
                             onClick={activeRange === 'first' ? handleStopButton : () => handleStartButton('first')}
                         >
@@ -435,7 +473,7 @@ export default function Analyzer() {
                             {activeRange !== 'first' && <span style={{ fontSize: '12px', display: 'block' }}>(000 - 0FF)</span>}
                         </button>
                         <button
-                            disabled={!isConnected || (isStarted && activeRange !== 'second') || isDiagramLoaded}
+                            disabled={!isConnected || (isStarted && activeRange !== 'second') || isDBDiagramLoaded}
                             className={`range2Button ${activeRange === 'second' ? 'started' : ''}`}
                             onClick={activeRange === 'second' ? handleStopButton : () => handleStartButton('second')}
                         >
@@ -443,7 +481,7 @@ export default function Analyzer() {
                             {activeRange !== 'second' && <span style={{ fontSize: '12px', display: 'block' }}>(100 - 17F)</span>}
                         </button>
                         <button
-                            disabled={!isConnected || (isStarted && activeRange !== 'third') || isDiagramLoaded}
+                            disabled={!isConnected || (isStarted && activeRange !== 'third') || isDBDiagramLoaded}
                             className={`range3Button ${activeRange === 'third' ? 'started' : ''}`}
                             onClick={activeRange === 'third' ? handleStopButton : () => handleStartButton('third')}
                         >
@@ -451,7 +489,7 @@ export default function Analyzer() {
                             {activeRange !== 'third' && <span style={{ fontSize: '12px', display: 'block' }}>(180 - 1FF)</span>}
                         </button>
                         <button
-                            disabled={!isConnected || (isStarted && activeRange !== 'fourth') || isDiagramLoaded}
+                            disabled={!isConnected || (isStarted && activeRange !== 'fourth') || isDBDiagramLoaded}
                             className={`range4Button ${activeRange === 'fourth' ? 'started' : ''}`}
                             onClick={activeRange === 'fourth' ? handleStopButton : () => handleStartButton('fourth')}
                         >
@@ -459,7 +497,7 @@ export default function Analyzer() {
                             {activeRange !== 'fourth' && <span style={{ fontSize: '12px', display: 'block' }}>(200 - 27F)</span>}
                         </button>
                         <button
-                            disabled={!isConnected || (isStarted && activeRange !== 'fifth') || isDiagramLoaded}
+                            disabled={!isConnected || (isStarted && activeRange !== 'fifth') || isDBDiagramLoaded}
                             className={`range5Button ${activeRange === 'fifth' ? 'started' : ''}`}
                             onClick={activeRange === 'fifth' ? handleStopButton : () => handleStartButton('fifth')}
                         >
@@ -467,7 +505,7 @@ export default function Analyzer() {
                             {activeRange !== 'fifth' && <span style={{ fontSize: '12px', display: 'block' }}>(280 - 2FF)</span>}
                         </button>
                         <button
-                            disabled={!isConnected || (isStarted && activeRange !== 'sixth') || isDiagramLoaded}
+                            disabled={!isConnected || (isStarted && activeRange !== 'sixth') || isDBDiagramLoaded}
                             className={`range6Button ${activeRange === 'sixth' ? 'started' : ''}`}
                             onClick={activeRange === 'sixth' ? handleStopButton : () => handleStartButton('sixth')}
                         >
@@ -475,7 +513,7 @@ export default function Analyzer() {
                             {activeRange !== 'sixth' && <span style={{ fontSize: '12px', display: 'block' }}>(300 - 3FF)</span>}
                         </button>
                         <button
-                            disabled={!isConnected || (isStarted && activeRange !== 'seventh') || isDiagramLoaded}
+                            disabled={!isConnected || (isStarted && activeRange !== 'seventh') || isDBDiagramLoaded}
                             className={`range7Button ${activeRange === 'seventh' ? 'started' : ''}`}
                             onClick={activeRange === 'seventh' ? handleStopButton : () => handleStartButton('seventh')}
                         >
@@ -483,7 +521,7 @@ export default function Analyzer() {
                             {activeRange !== 'seventh' && <span style={{ fontSize: '12px', display: 'block' }}>(400 - 5FF)</span>}
                         </button>
                         <button
-                            disabled={!isConnected || (isStarted && activeRange !== 'eighth') || isDiagramLoaded}
+                            disabled={!isConnected || (isStarted && activeRange !== 'eighth') || isDBDiagramLoaded}
                             className={`range8Button ${activeRange === 'eighth' ? 'started' : ''}`}
                             onClick={activeRange === 'eighth' ? handleStopButton : () => handleStartButton('eighth')}
                         >
@@ -491,13 +529,13 @@ export default function Analyzer() {
                             {activeRange !== 'eighth' && <span style={{ fontSize: '12px', display: 'block' }}>(600 - 7FF)</span>}
                         </button>
                         <button
-                            disabled={!isConnected || (isStarted && activeRange !== 'custom') || isDiagramLoaded}
+                            disabled={!isConnected || (isStarted && activeRange !== 'custom') || isDBDiagramLoaded}
                             className={`customRangeButton ${activeRange === 'custom' ? 'started' : ''}`}
                             onClick={activeRange === 'custom' ? handleStopButton : handleCustomButton}
                         >
                             {activeRange === 'custom' ? 'Stop' : 'Custom Range'}
                         </button>
-                        <button disabled={!isConnected || isDiagramLoaded} className="saveButton" onClick={handleSaveButton}>Save Diagram</button>
+                        <button disabled={!isConnected || isDBDiagramLoaded} className="saveButton" onClick={handleSaveButton}>Save New Diagram</button>
                     </div>
                 </div>
             </Transitions>

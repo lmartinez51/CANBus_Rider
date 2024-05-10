@@ -68,12 +68,12 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
     console.log(`El conteo actual de ${ecu} es: ${nodeData.changeCount}`)
     const node = diagramN.findNodeForKey(ecu)
     if (node) {
-        changeNodeColor(node, nodeData.changeCount, diagramN)
+        updateNodeColor(node, nodeData.changeCount, diagramN)
     }
   }
 
   // Function to change the color of a node based on the change count
-  function changeNodeColor(node, changeCount, diagram) {
+  function updateNodeColor(node, changeCount, diagram) {
     let color;
     if (changeCount > 1 && changeCount < 200) {
       color = "limegreen";
@@ -202,7 +202,7 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
         case "delete": diagramM.commandHandler.deleteSelection(); break;
         case "sniff": { handleNodeSniffContextMenu(diagramM); break; }
         case "addNote": { handleOpenModal(); break; }
-        case "color": { changeColor(diagramM, color); break; }
+        case "color": { changeNodeColor(diagramM, color); break; }
         default: break;
       }
       diagramM.currentTool.stopTool();
@@ -226,13 +226,37 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
     });
     document.getElementById('color-red').addEventListener('click', function() {
       cxcommand(null, 'color', 'red');
+      // Encuentra el elemento del menú desplegable y elimina la clase 'show'
+      const dropdownMenu = document.querySelector('.submenuColor .dropdown-menu');
+      if (dropdownMenu) {
+        dropdownMenu.classList.remove('show');
+      }
     });
     document.getElementById('color-green').addEventListener('click', function() {
       cxcommand(null, 'color', 'limegreen');
+      // Encuentra el elemento del menú desplegable y elimina la clase 'show'
+      const dropdownMenu = document.querySelector('.submenuColor .dropdown-menu');
+      if (dropdownMenu) {
+        dropdownMenu.classList.remove('show');
+      }
     });
-    document.getElementById('color-blue').addEventListener('click', function() {
-      cxcommand(null, 'color', '#284df1');
+    document.getElementById('color-white').addEventListener('click', function() {
+      cxcommand(null, 'color', 'white');
+      // Encuentra el elemento del menú desplegable y elimina la clase 'show'
+      const dropdownMenu = document.querySelector('.submenuColor .dropdown-menu');
+      if (dropdownMenu) {
+        dropdownMenu.classList.remove('show');
+      }
     });
+    document.getElementById('color-gray').addEventListener('click', function() {
+      cxcommand(null, 'color', 'gray');
+      // Encuentra el elemento del menú desplegable y elimina la clase 'show'
+      const dropdownMenu = document.querySelector('.submenuColor .dropdown-menu');
+      if (dropdownMenu) {
+        dropdownMenu.classList.remove('show');
+      }
+    });
+
     diagram.linkTemplate =
       $(go.Link,
         $(go.Shape, { strokeWidth: 1, stroke: 'black' })
@@ -291,8 +315,8 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
             // Acciones a realizar cuando la promesa se resuelve
             diagram.startTransaction('change color')
             diagram.nodes.each((node) => {
+              originalColors.current[node.key] = node.data.color // Guarda el color original
               if (node !== selectedNode) {
-                originalColors.current[node.key] = node.data.color // Guarda el color original
                 diagram.model.setDataProperty(node.data, 'color', '#666666')
                 node.pickable = false
               }
@@ -307,7 +331,7 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
   }
 
   // A custom command, for changing the color of the selected node(s).
-  function changeColor(diagram, color) {
+  function changeNodeColor(diagram, color) {
     // Always make changes in a transaction, except when initializing the diagram.
     diagram.startTransaction('change color');
     diagram.selection.each((node) => {
@@ -409,17 +433,17 @@ const ECUsDiagram = forwardRef(({ data, onNodeSniff, onStopSniff }, ref) => {
                 originalColors.current = {}
                 setIsSniffing(false)
               })
-
           }}>Stop
         </button>
         <button id="selectAll" disabled={isSniffing}>Select All</button>
         <button id="delete" disabled={isSniffing}>Delete</button>
         <button id="addNote" disabled={isSniffing}>Add Note</button>
-          <DropdownSubmenu className='submenuColor' title="Set Color" id="color" disabled={isSniffing}>
-            <NavDropdown.Item className='itemColorRed' id="color-red" eventKey="1">Red</NavDropdown.Item>
-            <NavDropdown.Item className='itemColorGreen' id="color-green" eventKey="2">Green</NavDropdown.Item>
-            <NavDropdown.Item className='itemColorBlue' id="color-blue" eventKey="3">Blue</NavDropdown.Item>
-          </DropdownSubmenu>
+        <DropdownSubmenu className={isSniffing ? 'submenuColor disabled' : 'submenuColor'} title="Set Color" id="color" disabled={isSniffing}>
+          <NavDropdown.Item className='itemColorRed' id="color-red" eventKey="1">Red</NavDropdown.Item>
+          <NavDropdown.Item className='itemColorGreen' id="color-green" eventKey="2">Green</NavDropdown.Item>
+          <NavDropdown.Item className='itemColorWhite' id="color-white" eventKey="3">White</NavDropdown.Item>
+          <NavDropdown.Item className='itemColorGray' id="color-gray" eventKey="4">Gray</NavDropdown.Item>
+        </DropdownSubmenu>
       </div>
     </div>
   )

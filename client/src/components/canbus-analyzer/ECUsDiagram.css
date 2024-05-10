@@ -17,6 +17,7 @@
     width: 100px;  /* Ajuste este valor según sea necesario */
     border-radius: 0.4rem; /* Borde redondeado */
     background-color: rgba(192, 192, 192, 0.7);
+    color: black;
     /* Estilos de sombra y cambio de tamaño al hacer clic */
     &:active {
         transform: scale(0.95); /* Reduce ligeramente el tamaño */
@@ -31,13 +32,16 @@
 
 #contextMenu button:disabled {
     cursor: not-allowed;
+    opacity: 0.38;
+    color: rgba(0, 0, 0, 0.38);
+    background-color: rgb(214, 214, 214);
 }
 
 .submenuColor{
     width: 100px;
     text-align: center;
+    color: black;
     background-color: rgba(192, 192, 192, 0.7);
-    --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     border-radius: 0.4rem; /* Borde redondeado */
     cursor: pointer; /* Cambia el cursor al pasar por encima */
@@ -54,9 +58,13 @@
     }
 }
 
-.submenuColor:disabled {
-    cursor: not-allowed;
+.submenuColor.disabled {
+    pointer-events: none;
+    opacity: 0.38;
+    color: rgba(0, 0, 0, 0.38);
+    background-color: rgb(214, 214, 214);
 }
+
 
 .submenuColor .dropdown-menu.show {
     --bs-dropdown-border-radius: 0.4rem;
@@ -108,11 +116,32 @@
     }
 }
 
-.itemColorBlue {
+.itemColorWhite {
     width: 100px;
     text-align: center;
-    background-color: rgb(40, 77, 241);
-    color: white;
+    background-color: white;
+    color: black;
+    --tw-bg-opacity: 1;
+    border-color: rgba(102, 102, 102, 1);
+    border-radius: 0.4rem; /*Borde redondeado */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    outline: none; /* Quita el contorno al hacer clic */
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+    &:active {
+        transform: scale(0.95); /* Reduce ligeramente el tamaño */
+        box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2); /* Agrega una sombra interna */
+    }
+    /* Estilos al pasar el cursor por encima */
+    &:hover {
+        background-color: rgb(214, 214, 214); /* Cambia el tono del gris al pasar el cursor */
+    }
+}
+
+.itemColorGray {
+    width: 100px;
+    text-align: center;
+    background-color: gray;
+    color: black;
     --tw-bg-opacity: 1;
     border-color: rgba(102, 102, 102, 1);
     border-radius: 0.4rem; /*Borde redondeado */
