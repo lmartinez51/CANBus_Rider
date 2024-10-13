@@ -46,8 +46,8 @@ app.use(cors())
 
 setupSocketIO(httpServer)
 
-const socketCANSetup = new SocketCANSetup();
-socketCANSetup.setup();
+const socketCANSetup = new SocketCANSetup()
+socketCANSetup.setup()
 
 // Run the AI Assistant
 app.post('/playground', chatAssistant.createChatCompletion)
