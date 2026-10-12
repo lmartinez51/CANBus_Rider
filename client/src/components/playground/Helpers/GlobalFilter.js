@@ -10,6 +10,6 @@ export function GlobalFilter ({ globalFilter, setGlobalFilter }) {
   }, 200);
 
   return (
-    <input id='searchBox' className="searchInput" placeholder='Search...' value={value || ""} onChange={(e) => {setValue(e.target.value); onChange(e.target.value);}}/>
+    <input id='searchBox' className="searchInput" placeholder='Search...' aria-label="Search messages" value={value || ""} onChange={(e) => {setValue(e.target.value); onChange(e.target.value);}}/>
   )
 }
