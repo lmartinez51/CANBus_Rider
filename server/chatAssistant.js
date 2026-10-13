@@ -57,7 +57,7 @@ let self = module.exports = {
             res.send({ message: response.data.data[0].content[0].text.value })
         } catch (error) {
             console.error(error)
-            res.status(500).send({ error: error.message || "Failed to process chat completion" })
+            res.status(500).send({ error: error.message || 'Internal Server Error' })
         }
     },
 
@@ -133,7 +133,7 @@ let self = module.exports = {
                 }
                 if (run.data.status === "failed") {
                     console.log("Run failed. Try again.")
-                    throw new Error("Run failed")
+                    throw new Error("Assistant run failed")
                 }
                 await self.delay(20000) // Consider making this delay configurable
             }     
