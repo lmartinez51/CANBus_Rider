@@ -512,10 +512,10 @@ export default function CANTable() {
               </thead>
               <tbody>
                 <tr>
-                  <td><input className="calcTableInput" value={lsb} onChange={e => setLsb(e.target.value)} /></td>
-                  <td><input className="calcTableInput" value={scale} onChange={e => setScale(e.target.value)} /></td>
-                  <td><input className="calcTableInput" value={offset} onChange={e => setOffset(e.target.value)} /></td>
-                  <td><input className="calcTableInput" value={newValue} onChange={e => setNewValue(e.target.value)} /></td>
+                  <td><input className="calcTableInput" aria-label="Least Significant Bit" value={lsb} onChange={e => setLsb(e.target.value)} /></td>
+                  <td><input className="calcTableInput" aria-label="Scale" value={scale} onChange={e => setScale(e.target.value)} /></td>
+                  <td><input className="calcTableInput" aria-label="Offset" value={offset} onChange={e => setOffset(e.target.value)} /></td>
+                  <td><input className="calcTableInput" aria-label="Expected Value" value={newValue} onChange={e => setNewValue(e.target.value)} /></td>
                 </tr>
               </tbody>
             </Table>
