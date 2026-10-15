@@ -33,7 +33,7 @@ function SelectCAN() {
           <Form onSubmit={handleSubmit}>
                <Form.Group controlId="custom-select">
                     <Form.Label>Select CAN Bus</Form.Label>
-                    <Form.Select className="rounded-0 shadow" onChange={handleChange} value={CAN.CAN}>
+                    <Form.Select className="rounded-0 shadow" onChange={handleChange} value={CAN}>
                          <option value={'can0'}>CAN Bus #1</option>
                          <option value={'can1'}>CAN Bus #2</option>
                          <option value={'can2'}>CAN Bus #3</option>
@@ -77,7 +77,7 @@ function SelectCAN() {
                               type="radio"
                               label="1 Mbps"
                               name="radios"
-                              id="formHorizontalRadios3"
+                              id="formHorizontalRadios4"
                               value='1000000'
                               checked={rate === '1000000'}
                               onChange={handleChangeCheck}
@@ -86,10 +86,8 @@ function SelectCAN() {
                </Form.Group>
                <hr />
                <div className='Buttons'>
-                    <button className= "continue" type = "submit"> Confirm </button>
-                    <Link to="/">
-                         <button className="cancel"> Cancel </button>  
-                    </Link>
+                    <button className="continue" type="submit"> Confirm </button>
+                    <Link to="/" className="cancel"> Cancel </Link>
                </div>
           </Form>
 
