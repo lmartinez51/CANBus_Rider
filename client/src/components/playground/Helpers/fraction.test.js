@@ -1,6 +1,92 @@
 import Fraction from './fraction';
 
 describe('Fraction', () => {
+  describe('gcd', () => {
+    test('calculates fractional gcd of two rational numbers', () => {
+      // Ex: new Fraction(5,8).gcd(3,7) => 1/56
+      const f1 = new Fraction(5, 8);
+      const res = f1.gcd(3, 7);
+      expect(res.n).toBe(1);
+      expect(res.d).toBe(56);
+      expect(res.toFraction()).toBe('1/56');
+    });
+
+    test('calculates gcd with Fraction object argument', () => {
+      const f1 = new Fraction(5, 8);
+      const f2 = new Fraction(3, 7);
+      const res = f1.gcd(f2);
+      expect(res.n).toBe(1);
+      expect(res.d).toBe(56);
+    });
+
+    test('calculates gcd with integer argument', () => {
+      // new Fraction(1, 2).gcd(3) => gcd(1/2, 3/1) = gcd(1,3)/lcm(2,1) = 1/2
+      const f1 = new Fraction(1, 2);
+      const res = f1.gcd(3);
+      expect(res.n).toBe(1);
+      expect(res.d).toBe(2);
+    });
+
+    test('calculates gcd with string fraction argument', () => {
+      const f1 = new Fraction(5, 8);
+      const res = f1.gcd('3/7');
+      expect(res.n).toBe(1);
+      expect(res.d).toBe(56);
+    });
+
+    test('calculates gcd with array argument', () => {
+      const f1 = new Fraction(5, 8);
+      const res = f1.gcd([3, 7]);
+      expect(res.n).toBe(1);
+      expect(res.d).toBe(56);
+    });
+
+    test('calculates gcd when one fraction is zero', () => {
+      // gcd(0, 3/4) = 3/4
+      const f1 = new Fraction(0);
+      const res = f1.gcd(3, 4);
+      expect(res.n).toBe(3);
+      expect(res.d).toBe(4);
+    });
+
+    test('calculates gcd when second fraction is zero', () => {
+      // gcd(3/4, 0) = 3/4
+      const f1 = new Fraction(3, 4);
+      const res = f1.gcd(0);
+      expect(res.n).toBe(3);
+      expect(res.d).toBe(4);
+    });
+
+    test('calculates gcd with negative fractions (returns positive fraction result)', () => {
+      // gcd(-5/8, 3/7) = 1/56
+      const f1 = new Fraction(-5, 8);
+      const res = f1.gcd(3, 7);
+      expect(res.s).toBe(1);
+      expect(res.n).toBe(1);
+      expect(res.d).toBe(56);
+    });
+
+    test('calculates gcd when both fractions are identical', () => {
+      const f1 = new Fraction(3, 4);
+      const res = f1.gcd(3, 4);
+      expect(res.n).toBe(3);
+      expect(res.d).toBe(4);
+    });
+
+    test('calculates gcd for whole numbers', () => {
+      // gcd(12, 18) = 6
+      const f1 = new Fraction(12);
+      const res = f1.gcd(18);
+      expect(res.n).toBe(6);
+      expect(res.d).toBe(1);
+    });
+
+    test('throws Invalid argument for invalid parameter in gcd', () => {
+      const f1 = new Fraction(1, 2);
+      expect(() => f1.gcd('invalid')).toThrow('Invalid argument');
+    });
+  });
+
   describe('mod', () => {
     test('calculates modulo of valid fractions', () => {
       const f1 = new Fraction(7, 2);
