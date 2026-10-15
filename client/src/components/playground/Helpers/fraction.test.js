@@ -1,190 +1,75 @@
 import Fraction from './fraction';
 
-describe('Fraction.prototype.mul', () => {
-  describe('basic multiplication', () => {
-    it('multiplies two basic fractions correctly', () => {
+describe('Fraction.prototype.valueOf', () => {
+  describe('Happy path - standard fraction calculations', () => {
+    test('returns correct decimal value for positive integer fractions', () => {
       const f1 = new Fraction(1, 2);
-      const result = f1.mul(3, 4);
-      expect(result.n).toBe(3);
-      expect(result.d).toBe(8);
-      expect(result.s).toBe(1);
-      expect(result.toFraction()).toBe('3/8');
-      expect(result.valueOf()).toBe(0.375);
+      expect(f1.valueOf()).toBe(0.5);
+
+      const f2 = new Fraction(3, 4);
+      expect(f2.valueOf()).toBe(0.75);
+
+      const f3 = new Fraction(5, 1);
+      expect(f3.valueOf()).toBe(5);
     });
 
-    it('simplifies the resulting fraction using GCD reduction', () => {
-      const f1 = new Fraction(2, 3);
-      const result = f1.mul(3, 4);
-      expect(result.n).toBe(1);
-      expect(result.d).toBe(2);
-      expect(result.s).toBe(1);
-      expect(result.toFraction()).toBe('1/2');
+    test('returns correct decimal value for zero fraction', () => {
+      const f = new Fraction(0, 1);
+      expect(f.valueOf()).toBe(0);
     });
 
-    it('multiplies a fraction by an integer', () => {
-      const f1 = new Fraction(3, 4);
-      const result = f1.mul(2);
-      expect(result.n).toBe(3);
-      expect(result.d).toBe(2);
-      expect(result.s).toBe(1);
-      expect(result.toFraction()).toBe('3/2');
-    });
-
-    it('multiplies repeating decimals correctly as described in docstring example', () => {
-      // Ex: new Fraction("-17.(345)").mul(3) => -5776 / 111
-      const f1 = new Fraction('-17.(345)');
-      const result = f1.mul(3);
-      expect(result.s).toBe(-1);
-      expect(result.n).toBe(5776);
-      expect(result.d).toBe(111);
-      expect(result.toFraction()).toBe('-5776/111');
-    });
-  });
-
-  describe('signs and negative values', () => {
-    it('handles positive multiplied by negative fraction', () => {
-      const f1 = new Fraction(1, 2);
-      const result = f1.mul(-3, 4);
-      expect(result.s).toBe(-1);
-      expect(result.n).toBe(3);
-      expect(result.d).toBe(8);
-      expect(result.toFraction()).toBe('-3/8');
-    });
-
-    it('handles negative multiplied by positive fraction', () => {
+    test('returns correct decimal value for negative fractions', () => {
       const f1 = new Fraction(-1, 2);
-      const result = f1.mul(3, 4);
-      expect(result.s).toBe(-1);
-      expect(result.n).toBe(3);
-      expect(result.d).toBe(8);
-      expect(result.toFraction()).toBe('-3/8');
+      expect(f1.valueOf()).toBe(-0.5);
+
+      const f2 = new Fraction(1, -4);
+      expect(f2.valueOf()).toBe(-0.25);
+
+      const f3 = new Fraction(-3, -4);
+      expect(f3.valueOf()).toBe(0.75);
     });
 
-    it('handles negative multiplied by negative fraction', () => {
-      const f1 = new Fraction(-1, 2);
-      const result = f1.mul(-3, 4);
-      expect(result.s).toBe(1);
-      expect(result.n).toBe(3);
-      expect(result.d).toBe(8);
-      expect(result.toFraction()).toBe('3/8');
-    });
-  });
+    test('returns correct decimal value for decimal strings and repeating decimals', () => {
+      const f1 = new Fraction("100.'91823'");
+      expect(f1.valueOf()).toBeCloseTo(100.91823918239183, 10);
 
-  describe('zero multiplication', () => {
-    it('multiplies fraction by zero', () => {
-      const f1 = new Fraction(3, 4);
-      const result = f1.mul(0);
-      expect(result.n).toBe(0);
-      expect(result.d).toBe(1);
-      expect(result.s).toBe(1);
-      expect(result.toFraction()).toBe('0');
-      expect(result.valueOf()).toBe(0);
+      const f2 = new Fraction('0.5');
+      expect(f2.valueOf()).toBe(0.5);
+
+      const f3 = new Fraction('1/3');
+      expect(f3.valueOf()).toBeCloseTo(1 / 3, 10);
     });
 
-    it('multiplies zero fraction by a fraction', () => {
-      const f1 = new Fraction(0);
-      const result = f1.mul(3, 4);
-      expect(result.n).toBe(0);
-      expect(result.d).toBe(1);
-      expect(result.s).toBe(1);
-      expect(result.toFraction()).toBe('0');
+    test('returns correct decimal value for object representation', () => {
+      const f = new Fraction({ n: 3, d: 4, s: -1 });
+      expect(f.valueOf()).toBe(-0.75);
     });
   });
 
-  describe('various parameter input formats', () => {
-    it('accepts two arguments (numerator, denominator)', () => {
-      const f1 = new Fraction(1, 3);
-      const result = f1.mul(3, 5);
-      expect(result.toFraction()).toBe('1/5');
+  describe('Implicit type coercion using valueOf', () => {
+    test('coerces to number with unary plus operator', () => {
+      const f = new Fraction(3, 4);
+      expect(+f).toBe(0.75);
     });
 
-    it('accepts a fraction string "3/4"', () => {
-      const f1 = new Fraction(1, 2);
-      const result = f1.mul('3/4');
-      expect(result.toFraction()).toBe('3/8');
+    test('works with arithmetic operations', () => {
+      const f = new Fraction(1, 4);
+      expect(f + 2).toBe(2.25);
+      expect(f * 4).toBe(1);
     });
 
-    it('accepts a string representation with ratio colon "3:4"', () => {
-      const f1 = new Fraction(1, 2);
-      const result = f1.mul('3:4');
-      expect(result.toFraction()).toBe('3/8');
-    });
-
-    it('accepts a decimal string "0.25"', () => {
-      const f1 = new Fraction(1, 2);
-      const result = f1.mul('0.25');
-      expect(result.toFraction()).toBe('1/8');
-    });
-
-    it('accepts a repeating decimal string "0.(3)"', () => {
-      const f1 = new Fraction(1, 2);
-      const result = f1.mul('0.(3)');
-      expect(result.toFraction()).toBe('1/6');
-    });
-
-    it('accepts a mixed fraction string "1 1/2"', () => {
-      const f1 = new Fraction(1, 2);
-      const result = f1.mul('1 1/2');
-      expect(result.toFraction()).toBe('3/4');
-    });
-
-    it('accepts an object representation {n, d}', () => {
-      const f1 = new Fraction(1, 2);
-      const result = f1.mul({ n: 3, d: 4 });
-      expect(result.toFraction()).toBe('3/8');
-    });
-
-    it('accepts an object representation with sign {n, d, s}', () => {
-      const f1 = new Fraction(1, 2);
-      const result = f1.mul({ n: 3, d: 4, s: -1 });
-      expect(result.toFraction()).toBe('-3/8');
-    });
-
-    it('accepts an array representation [n, d]', () => {
-      const f1 = new Fraction(1, 2);
-      const result = f1.mul([3, 4]);
-      expect(result.toFraction()).toBe('3/8');
-    });
-
-    it('accepts another Fraction instance', () => {
+    test('works in comparisons', () => {
       const f1 = new Fraction(1, 2);
       const f2 = new Fraction(3, 4);
-      const result = f1.mul(f2);
-      expect(result.toFraction()).toBe('3/8');
+      expect(f1 < f2).toBe(true);
+      expect(f2 > f1).toBe(true);
     });
   });
 
-  describe('immutability and chaining', () => {
-    it('does not mutate the original fraction object', () => {
-      const f1 = new Fraction(1, 2);
-      const result = f1.mul(3, 4);
-      expect(f1.n).toBe(1);
-      expect(f1.d).toBe(2);
-      expect(f1.s).toBe(1);
-      expect(f1.toFraction()).toBe('1/2');
-      expect(result).not.toBe(f1);
-    });
-
-    it('supports method chaining', () => {
-      const result = new Fraction(1, 2).mul(2, 3).mul(3, 4);
-      expect(result.toFraction()).toBe('1/4');
-    });
-  });
-
-  describe('error handling and edge cases', () => {
-    it('throws DivisionByZero when multiplying by zero denominator (a, 0)', () => {
-      const f1 = new Fraction(1, 2);
-      expect(() => f1.mul(1, 0)).toThrow('Division by Zero');
-    });
-
-    it('throws NonIntegerParameter when non-integer values are passed as (a, b)', () => {
-      const f1 = new Fraction(1, 2);
-      expect(() => f1.mul(1.5, 2)).toThrow('Parameters must be integer');
-    });
-
-    it('throws InvalidParameter when an invalid argument is provided', () => {
-      const f1 = new Fraction(1, 2);
-      expect(() => f1.mul('invalid_string')).toThrow('Invalid argument');
+  describe('Edge cases', () => {
+    test('returns NaN when fraction is created with NaN', () => {
+      const f = new Fraction(NaN);
+      expect(f.valueOf()).toBeNaN();
     });
   });
 });
