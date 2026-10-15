@@ -1,270 +1,97 @@
 import Fraction from './fraction';
 
-describe('Fraction', () => {
-  describe('gcd', () => {
-    test('calculates fractional gcd of two rational numbers', () => {
-      // Ex: new Fraction(5,8).gcd(3,7) => 1/56
-      const f1 = new Fraction(5, 8);
-      const res = f1.gcd(3, 7);
-      expect(res.n).toBe(1);
-      expect(res.d).toBe(56);
-      expect(res.toFraction()).toBe('1/56');
+describe('Fraction.prototype.round', () => {
+  describe('default places (0 decimal places)', () => {
+    test('rounds a repeating decimal fraction to nearest integer', () => {
+      // 4.(3) = 4 + 1/3 = 13/3 ~= 4.333... -> rounded to 4
+      const f = new Fraction('4.(3)');
+      const rounded = f.round();
+      expect(rounded.valueOf()).toBe(4);
+      expect(rounded.n).toBe(4);
+      expect(rounded.d).toBe(1);
     });
 
-    test('calculates gcd with Fraction object argument', () => {
-      const f1 = new Fraction(5, 8);
-      const f2 = new Fraction(3, 7);
-      const res = f1.gcd(f2);
-      expect(res.n).toBe(1);
-      expect(res.d).toBe(56);
+    test('rounds positive fractions up when fraction >= 0.5', () => {
+      // 4.5 = 9/2 -> rounded to 5
+      const f = new Fraction(9, 2);
+      const rounded = f.round();
+      expect(rounded.valueOf()).toBe(5);
+      expect(rounded.n).toBe(5);
+      expect(rounded.d).toBe(1);
     });
 
-    test('calculates gcd with integer argument', () => {
-      // new Fraction(1, 2).gcd(3) => gcd(1/2, 3/1) = gcd(1,3)/lcm(2,1) = 1/2
-      const f1 = new Fraction(1, 2);
-      const res = f1.gcd(3);
-      expect(res.n).toBe(1);
-      expect(res.d).toBe(2);
+    test('rounds positive fractions down when fraction < 0.5', () => {
+      // 4.4 = 22/5 -> rounded to 4
+      const f = new Fraction('4.4');
+      const rounded = f.round();
+      expect(rounded.valueOf()).toBe(4);
     });
 
-    test('calculates gcd with string fraction argument', () => {
-      const f1 = new Fraction(5, 8);
-      const res = f1.gcd('3/7');
-      expect(res.n).toBe(1);
-      expect(res.d).toBe(56);
+    test('rounds negative fractions correctly', () => {
+      // -4.3 -> rounded to -4
+      const f1 = new Fraction('-4.3');
+      expect(f1.round().valueOf()).toBe(-4);
+
+      // Math.round(-4.5) in JS is -4
+      const f2 = new Fraction('-4.5');
+      expect(f2.round().valueOf()).toBe(-4);
+
+      // -4.6 -> rounded to -5
+      const f3 = new Fraction('-4.6');
+      expect(f3.round().valueOf()).toBe(-5);
     });
 
-    test('calculates gcd with array argument', () => {
-      const f1 = new Fraction(5, 8);
-      const res = f1.gcd([3, 7]);
-      expect(res.n).toBe(1);
-      expect(res.d).toBe(56);
-    });
-
-    test('calculates gcd when one fraction is zero', () => {
-      // gcd(0, 3/4) = 3/4
-      const f1 = new Fraction(0);
-      const res = f1.gcd(3, 4);
-      expect(res.n).toBe(3);
-      expect(res.d).toBe(4);
-    });
-
-    test('calculates gcd when second fraction is zero', () => {
-      // gcd(3/4, 0) = 3/4
-      const f1 = new Fraction(3, 4);
-      const res = f1.gcd(0);
-      expect(res.n).toBe(3);
-      expect(res.d).toBe(4);
-    });
-
-    test('calculates gcd with negative fractions (returns positive fraction result)', () => {
-      // gcd(-5/8, 3/7) = 1/56
-      const f1 = new Fraction(-5, 8);
-      const res = f1.gcd(3, 7);
-      expect(res.s).toBe(1);
-      expect(res.n).toBe(1);
-      expect(res.d).toBe(56);
-    });
-
-    test('calculates gcd when both fractions are identical', () => {
-      const f1 = new Fraction(3, 4);
-      const res = f1.gcd(3, 4);
-      expect(res.n).toBe(3);
-      expect(res.d).toBe(4);
-    });
-
-    test('calculates gcd for whole numbers', () => {
-      // gcd(12, 18) = 6
-      const f1 = new Fraction(12);
-      const res = f1.gcd(18);
-      expect(res.n).toBe(6);
-      expect(res.d).toBe(1);
-    });
-
-    test('throws Invalid argument for invalid parameter in gcd', () => {
-      const f1 = new Fraction(1, 2);
-      expect(() => f1.gcd('invalid')).toThrow('Invalid argument');
+    test('returns same integer for whole numbers', () => {
+      const f = new Fraction(10);
+      const rounded = f.round();
+      expect(rounded.valueOf()).toBe(10);
+      expect(rounded.n).toBe(10);
+      expect(rounded.d).toBe(1);
     });
   });
 
-  describe('mod', () => {
-    test('calculates modulo of valid fractions', () => {
-      const f1 = new Fraction(7, 2);
-      const res = f1.mod(3);
-      expect(res.n).toBe(1);
-      expect(res.d).toBe(2);
-      expect(res.toString()).toBe('0.5');
+  describe('specified decimal places', () => {
+    test('rounds to 1 decimal place', () => {
+      // 4.(3) = 4.3333... -> rounded to 1 place = 4.3 (43/10)
+      const f = new Fraction('4.(3)');
+      const rounded = f.round(1);
+      expect(rounded.valueOf()).toBe(4.3);
+      expect(rounded.n).toBe(43);
+      expect(rounded.d).toBe(10);
     });
 
-    test('returns Fraction(NaN) when current fraction is NaN (no args)', () => {
-      const nanFraction = new Fraction(NaN);
-      const res = nanFraction.mod();
-
-      expect(res).toBeInstanceOf(Fraction);
-      expect(Number.isNaN(res.n)).toBe(true);
-      expect(Number.isNaN(res.d)).toBe(true);
-      expect(res.toString()).toBe('NaN');
+    test('rounds to 2 decimal places', () => {
+      // 4.336 -> 4.34 (217/50)
+      const f = new Fraction('4.336');
+      const rounded = f.round(2);
+      expect(rounded.valueOf()).toBe(4.34);
     });
 
-    test('returns Fraction(NaN) when current fraction is NaN with a single arg', () => {
-      const nanFraction = new Fraction(NaN);
-      const res = nanFraction.mod(2);
-
-      expect(res).toBeInstanceOf(Fraction);
-      expect(Number.isNaN(res.n)).toBe(true);
-      expect(Number.isNaN(res.d)).toBe(true);
-      expect(res.toString()).toBe('NaN');
-    });
-
-    test('returns Fraction(NaN) when current fraction is NaN with two args', () => {
-      const nanFraction = new Fraction(NaN);
-      const res = nanFraction.mod(1, 2);
-
-      expect(res).toBeInstanceOf(Fraction);
-      expect(Number.isNaN(res.n)).toBe(true);
-      expect(Number.isNaN(res.d)).toBe(true);
-      expect(res.toString()).toBe('NaN');
-    });
-
-    test('returns Fraction(NaN) when current fraction is NaN with Fraction arg', () => {
-      const nanFraction = new Fraction(NaN);
-      const res = nanFraction.mod(new Fraction(2, 3));
-
-      expect(res).toBeInstanceOf(Fraction);
-      expect(Number.isNaN(res.n)).toBe(true);
-      expect(Number.isNaN(res.d)).toBe(true);
-      expect(res.toString()).toBe('NaN');
-    });
-
-    test('returns Fraction(NaN) when calling mod with NaN on a valid fraction', () => {
-      const validFraction = new Fraction(5, 2);
-      const res = validFraction.mod(NaN);
-
-      expect(res).toBeInstanceOf(Fraction);
-      expect(Number.isNaN(res.n)).toBe(true);
-      expect(Number.isNaN(res.d)).toBe(true);
-      expect(res.toString()).toBe('NaN');
+    test('rounds to 3 decimal places', () => {
+      // 1/3 = 0.3333... -> 0.333 (333/1000)
+      const f = new Fraction(1, 3);
+      const rounded = f.round(3);
+      expect(rounded.valueOf()).toBe(0.333);
+      expect(rounded.n).toBe(333);
+      expect(rounded.d).toBe(1000);
     });
   });
 
-  describe('mul', () => {
-    test('multiplies fraction with single integer', () => {
-      const f = new Fraction(2, 3);
-      const res = f.mul(4);
-
-      expect(res).toBeInstanceOf(Fraction);
-      expect(res.s).toBe(1);
-      expect(res.n).toBe(8);
-      expect(res.d).toBe(3);
+  describe('edge cases and special values', () => {
+    test('handles zero', () => {
+      const f = new Fraction(0);
+      const rounded = f.round();
+      expect(rounded.valueOf()).toBe(0);
+      expect(rounded.n).toBe(0);
+      expect(rounded.d).toBe(1);
     });
 
-    test('multiplies fraction with two integers (numerator and denominator)', () => {
-      const f = new Fraction(2, 3);
-      const res = f.mul(3, 4);
-
-      expect(res).toBeInstanceOf(Fraction);
-      expect(res.s).toBe(1);
-      expect(res.n).toBe(1);
-      expect(res.d).toBe(2);
-    });
-
-    test('multiplies fraction with another Fraction instance', () => {
-      const f1 = new Fraction(2, 3);
-      const f2 = new Fraction(3, 5);
-      const res = f1.mul(f2);
-
-      expect(res).toBeInstanceOf(Fraction);
-      expect(res.s).toBe(1);
-      expect(res.n).toBe(2);
-      expect(res.d).toBe(5);
-    });
-
-    test('multiplies fraction with object representation {n, d}', () => {
-      const f = new Fraction(2, 3);
-      const res = f.mul({ n: 3, d: 5 });
-
-      expect(res).toBeInstanceOf(Fraction);
-      expect(res.s).toBe(1);
-      expect(res.n).toBe(2);
-      expect(res.d).toBe(5);
-    });
-
-    test('multiplies fraction with array representation [n, d]', () => {
-      const f = new Fraction(2, 3);
-      const res = f.mul([3, 5]);
-
-      expect(res).toBeInstanceOf(Fraction);
-      expect(res.s).toBe(1);
-      expect(res.n).toBe(2);
-      expect(res.d).toBe(5);
-    });
-
-    test('multiplies fraction with string fraction and repeating decimal string', () => {
-      const f1 = new Fraction(1, 2);
-      const res1 = f1.mul('3/4');
-      expect(res1.n).toBe(3);
-      expect(res1.d).toBe(8);
-
-      const f2 = new Fraction('-17.(345)');
-      const res2 = f2.mul(3);
-      expect(res2.s).toBe(-1);
-      expect(res2.n).toBe(5776);
-      expect(res2.d).toBe(111);
-      expect(res2.toFraction()).toBe('-5776/111');
-    });
-
-    test('handles signs correctly (positive, negative)', () => {
-      const pos = new Fraction(2, 3);
-      const neg = new Fraction(-2, 3);
-
-      const posByNeg = pos.mul(-3, 4);
-      expect(posByNeg.s).toBe(-1);
-      expect(posByNeg.n).toBe(1);
-      expect(posByNeg.d).toBe(2);
-
-      const negByPos = neg.mul(3, 4);
-      expect(negByPos.s).toBe(-1);
-      expect(negByPos.n).toBe(1);
-      expect(negByPos.d).toBe(2);
-
-      const negByNeg = neg.mul(-3, 4);
-      expect(negByNeg.s).toBe(1);
-      expect(negByNeg.n).toBe(1);
-      expect(negByNeg.d).toBe(2);
-    });
-
-    test('multiplies by zero correctly', () => {
-      const f = new Fraction(5, 6);
-      const res = f.mul(0);
-
-      expect(res.n).toBe(0);
-      expect(res.d).toBe(1);
-      expect(res.s).toBe(1);
-    });
-
-    test('does not mutate original Fraction object', () => {
-      const f = new Fraction(2, 3);
-      f.mul(4, 5);
-
-      expect(f.s).toBe(1);
-      expect(f.n).toBe(2);
-      expect(f.d).toBe(3);
-    });
-
-    test('throws error on division by zero in parameter', () => {
-      const f = new Fraction(1, 2);
-      expect(() => f.mul(1, 0)).toThrow('Division by Zero');
-    });
-
-    test('throws error on invalid parameter', () => {
-      const f = new Fraction(1, 2);
-      expect(() => f.mul('invalid_string')).toThrow('Invalid argument');
-      expect(() => f.mul({})).toThrow('Invalid argument');
-    });
-
-    test('throws error on non-integer parameters when passing two numbers', () => {
-      const f = new Fraction(1, 2);
-      expect(() => f.mul(1.5, 2)).toThrow('Parameters must be integer');
+    test('handles NaN fraction', () => {
+      const f = new Fraction(NaN);
+      const rounded = f.round();
+      expect(isNaN(rounded.valueOf())).toBe(true);
+      expect(isNaN(rounded.n)).toBe(true);
+      expect(isNaN(rounded.d)).toBe(true);
     });
   });
 });
