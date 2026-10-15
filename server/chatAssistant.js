@@ -1,9 +1,9 @@
-require('dotenv').config("./.env")
+require('dotenv').config({ path: "./.env" })
 const axios = require('axios');
 const { response } = require('express');
 const {OpenAI} = require("openai")
 const openai = new OpenAI({
-	apiKey: process.env.CHATGPT_API_KEY
+	apiKey: process.env.CHATGPT_API_KEY || "dummy_key_for_test"
 })
 const canWizardID = process.env.CAN_WIZARD_ID
 const user = "Lorenzo"
@@ -56,7 +56,8 @@ let self = module.exports = {
             console.log(`Assitant response: ${response.data.data[0].content[0].text.value}`)
             res.send({ message: response.data.data[0].content[0].text.value })
         } catch (error) {
-            console.log(error)
+            console.error(error)
+            res.status(500).send({ error: error.message || 'Internal Server Error' })
         }
     },
 
@@ -75,6 +76,7 @@ let self = module.exports = {
             return user_thread
         } catch (error) {
             console.error(error)
+            throw error
         }
     },
 
@@ -93,6 +95,7 @@ let self = module.exports = {
             await axios.post(url, data, { headers: headers })
         } catch (error) {
             console.error(error)
+            throw error
         }
     },
     
@@ -122,8 +125,7 @@ let self = module.exports = {
                     console.log(`Status Actual: ${run.data.status}`)
                 } catch (error) {
                     console.error(error)
-                    break
-                    // Consider adding error handling logic here
+                    throw error
                 }
                 if (run.data.status === "completed") {
                     console.log("Run is completed.")
@@ -131,18 +133,18 @@ let self = module.exports = {
                 }
                 if (run.data.status === "failed") {
                     console.log("Run failed. Try again.")
-                    break
+                    throw new Error("Assistant run failed")
                 }
                 await self.delay(20000) // Consider making this delay configurable
             }     
         } catch (error) {
             console.error(error)
-            // Consider adding error handling logic here
+            throw error
         }
     },
     
     // Function to delay the inquires to the assistant - (Just in case I need it )
     delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+        return new Promise(resolve => setTimeout(resolve, ms));
     },
 }
