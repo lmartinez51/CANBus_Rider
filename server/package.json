@@ -4,7 +4,8 @@
   "description": "CAN Bus Tools",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -30,5 +31,8 @@
   "bugs": {
     "url": "https://github.com/lmartinez51/CANBus_Rider/issues"
   },
-  "homepage": "https://github.com/lmartinez51/CANBus_Rider#readme"
+  "homepage": "https://github.com/lmartinez51/CANBus_Rider#readme",
+  "devDependencies": {
+    "jest": "^30.5.2"
+  }
 }

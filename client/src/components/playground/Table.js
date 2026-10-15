@@ -63,21 +63,6 @@ export default function CANTable() {
     }
   }, [])
 
-  /* Effect to send the file name to the backend */
-  // useEffect(() => {
-  //   if (logFileName) {
-  //     // Send the file name to the backend
-  //     console.log(`File Name: ${logFileName}`) // Ahora debería imprimir el nombre del archivo
-  //     const data = {params: {fileName: logFileName}}
-  //     axios.post(url, data).then((response) => {
-  //       console.log(response.data.message) // Response from the backend to confirm the file name was received
-  //     })
-  //     .catch((error) => {
-  //       console.log(error)
-  //     })
-  //   }
-  // }, [logFileName]); // Este efecto se ejecuta cada vez que logFileName cambia
-
   const handleSubmit = (event) => {
     event.preventDefault()
     const hexValue = inverseCalculator(parseFloat(newValue), parseInt(lsb), parseFloat(scale), parseFloat(offset))
@@ -512,10 +497,10 @@ export default function CANTable() {
               </thead>
               <tbody>
                 <tr>
-                  <td><input className="calcTableInput" value={lsb} onChange={e => setLsb(e.target.value)} /></td>
-                  <td><input className="calcTableInput" value={scale} onChange={e => setScale(e.target.value)} /></td>
-                  <td><input className="calcTableInput" value={offset} onChange={e => setOffset(e.target.value)} /></td>
-                  <td><input className="calcTableInput" value={newValue} onChange={e => setNewValue(e.target.value)} /></td>
+                  <td><input className="calcTableInput" aria-label="Least Significant Bit" value={lsb} onChange={e => setLsb(e.target.value)} /></td>
+                  <td><input className="calcTableInput" aria-label="Scale" value={scale} onChange={e => setScale(e.target.value)} /></td>
+                  <td><input className="calcTableInput" aria-label="Offset" value={offset} onChange={e => setOffset(e.target.value)} /></td>
+                  <td><input className="calcTableInput" aria-label="Expected Value" value={newValue} onChange={e => setNewValue(e.target.value)} /></td>
                 </tr>
               </tbody>
             </Table>
