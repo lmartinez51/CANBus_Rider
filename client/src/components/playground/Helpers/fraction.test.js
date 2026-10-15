@@ -60,4 +60,43 @@ describe('Fraction', () => {
       expect(res.toString()).toBe('NaN');
     });
   });
+
+  describe('div', () => {
+    test('divides two rational numbers correctly', () => {
+      const f1 = new Fraction(3, 4);
+      const res = f1.div(1, 2);
+      expect(res.n).toBe(3);
+      expect(res.d).toBe(2);
+      expect(res.toString()).toBe('1.5');
+    });
+
+    test('divides by negative fraction correctly', () => {
+      const f1 = new Fraction(3, 4);
+      const res = f1.div(new Fraction(-1, 2));
+      expect(res.s).toBe(-1);
+      expect(res.n).toBe(3);
+      expect(res.d).toBe(2);
+    });
+
+    test('throws error on division by zero number', () => {
+      const f = new Fraction(1, 2);
+      expect(() => f.div(0)).toThrow('Division by Zero');
+    });
+
+    test('throws error on division by zero Fraction object', () => {
+      const f = new Fraction(3, 4);
+      const zeroFrac = new Fraction(0);
+      expect(() => f.div(zeroFrac)).toThrow('Division by Zero');
+    });
+
+    test('throws error on division by zero string', () => {
+      const f = new Fraction(1, 2);
+      expect(() => f.div('0')).toThrow('Division by Zero');
+    });
+
+    test('throws error on division by two arguments representing zero', () => {
+      const f = new Fraction(1, 2);
+      expect(() => f.div(0, 1)).toThrow('Division by Zero');
+    });
+  });
 });
