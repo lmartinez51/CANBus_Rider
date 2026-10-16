@@ -104,6 +104,140 @@ describe('Fraction.prototype.valueOf', () => {
     });
   });
 
+  describe('gcd', () => {
+    describe('Happy path - standard fraction calculations', () => {
+      test('calculates gcd of two standard irreducible fractions (5/8 and 3/7)', () => {
+        const res = new Fraction(5, 8).gcd(3, 7);
+        expect(res.toFraction()).toBe('1/56');
+        expect(res.n).toBe(1);
+        expect(res.d).toBe(56);
+        expect(res.s).toBe(1);
+      });
+
+      test('calculates gcd of fractions that simplify (5/6 and 15/8)', () => {
+        const res = new Fraction(5, 6).gcd(15, 8);
+        expect(res.toFraction()).toBe('5/24');
+        expect(res.n).toBe(5);
+        expect(res.d).toBe(24);
+      });
+
+      test('calculates gcd of identical fractions', () => {
+        const res = new Fraction(3, 4).gcd(3, 4);
+        expect(res.toFraction()).toBe('3/4');
+      });
+
+      test('calculates gcd when one fraction divides the other', () => {
+        const res = new Fraction(1, 2).gcd(1, 4);
+        expect(res.toFraction()).toBe('1/4');
+      });
+
+      test('calculates gcd of whole integers', () => {
+        const res = new Fraction(12).gcd(18);
+        expect(res.toFraction()).toBe('6');
+        expect(res.valueOf()).toBe(6);
+      });
+    });
+
+    describe('Input formats supported by parse(a, b)', () => {
+      test('accepts two numeric arguments (numerator, denominator)', () => {
+        const res = new Fraction(5, 8).gcd(3, 7);
+        expect(res.toFraction()).toBe('1/56');
+      });
+
+      test('accepts a single integer', () => {
+        const res = new Fraction(6, 7).gcd(2);
+        expect(res.toFraction()).toBe('2/7');
+      });
+
+      test('accepts a single double/float', () => {
+        const res = new Fraction(1, 2).gcd(0.25);
+        expect(res.toFraction()).toBe('1/4');
+      });
+
+      test('accepts another Fraction instance', () => {
+        const f1 = new Fraction(5, 8);
+        const f2 = new Fraction(3, 7);
+        const res = f1.gcd(f2);
+        expect(res.toFraction()).toBe('1/56');
+      });
+
+      test('accepts object input with {n, d}', () => {
+        const res = new Fraction(5, 8).gcd({ n: 3, d: 7 });
+        expect(res.toFraction()).toBe('1/56');
+      });
+
+      test('accepts object input with {n, d, s}', () => {
+        const res = new Fraction(5, 8).gcd({ n: 3, d: 7, s: 1 });
+        expect(res.toFraction()).toBe('1/56');
+      });
+
+      test('accepts fraction string input', () => {
+        const res = new Fraction(5, 8).gcd('3/7');
+        expect(res.toFraction()).toBe('1/56');
+      });
+
+      test('accepts reduced fraction string input', () => {
+        const res = new Fraction(1, 2).gcd('1/4');
+        expect(res.toFraction()).toBe('1/4');
+      });
+
+      test('accepts array format input [n, d]', () => {
+        const res = new Fraction(5, 8).gcd([3, 7]);
+        expect(res.toFraction()).toBe('1/56');
+      });
+    });
+
+    describe('Edge cases and error handling', () => {
+      test('handles zero fraction on caller or argument', () => {
+        const zeroCall = new Fraction(0, 1).gcd(5, 6);
+        expect(zeroCall.toFraction()).toBe('5/6');
+
+        const zeroArg = new Fraction(5, 6).gcd(0, 1);
+        expect(zeroArg.toFraction()).toBe('5/6');
+
+        const bothZero = new Fraction(0, 1).gcd(0, 1);
+        expect(bothZero.toFraction()).toBe('0');
+        expect(bothZero.valueOf()).toBe(0);
+      });
+
+      test('returns positive GCD when fractions are negative', () => {
+        const res1 = new Fraction(-5, 8).gcd(3, 7);
+        expect(res1.toFraction()).toBe('1/56');
+        expect(res1.s).toBe(1);
+
+        const res2 = new Fraction(5, 8).gcd(-3, 7);
+        expect(res2.toFraction()).toBe('1/56');
+        expect(res2.s).toBe(1);
+
+        const res3 = new Fraction(-5, 8).gcd(-3, 7);
+        expect(res3.toFraction()).toBe('1/56');
+        expect(res3.s).toBe(1);
+      });
+
+      test('throws Division by Zero error when denominator is zero', () => {
+        expect(() => {
+          new Fraction(1, 2).gcd(1, 0);
+        }).toThrow('Division by Zero');
+      });
+
+      test('throws Parameters must be integer error when non-integer values passed in 2-arg signature', () => {
+        expect(() => {
+          new Fraction(1, 2).gcd(1.5, 2);
+        }).toThrow('Parameters must be integer');
+      });
+
+      test('throws Invalid argument error when invalid string or object passed', () => {
+        expect(() => {
+          new Fraction(1, 2).gcd('abc');
+        }).toThrow('Invalid argument');
+
+        expect(() => {
+          new Fraction(1, 2).gcd({});
+        }).toThrow('Invalid argument');
+      });
+    });
+  });
+
   describe('round', () => {
     describe('Default rounding (places parameter omitted or 0)', () => {
       test('rounds positive fractions down when fractional part < 0.5', () => {
