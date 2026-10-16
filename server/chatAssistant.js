@@ -120,19 +120,14 @@ let self = module.exports = {
                 'OpenAI-Beta': 'assistants=v1'
             }
             while (true) {
-                try {
-                    run = await axios.get(run_url, { headers: run_headers })
-                    console.log(`Status Actual: ${run.data.status}`)
-                } catch (error) {
-                    console.error(error)
-                    throw error
-                }
+                run = await axios.get(run_url, { headers: run_headers })
+                console.log(`Status Actual: ${run.data.status}`)
                 if (run.data.status === "completed") {
                     console.log("Run is completed.")
                     break
                 }
-                if (run.data.status === "failed") {
-                    console.log("Run failed. Try again.")
+                if (run.data.status === "failed" || run.data.status === "cancelled" || run.data.status === "expired") {
+                    console.log(`Run ${run.data.status}. Try again.`)
                     throw new Error("Assistant run failed")
                 }
                 await self.delay(20000) // Consider making this delay configurable

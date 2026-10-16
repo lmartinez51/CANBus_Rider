@@ -33,7 +33,7 @@ describe('chatAssistant', () => {
             axios.post.mockResolvedValueOnce({ data: { id: 'run_123' } });
             axios.get.mockResolvedValueOnce({ data: { status: 'failed' } });
 
-            await expect(chatAssistant.run_assistant('thread_123', 'assistant_123')).rejects.toThrow('Run failed');
+            await expect(chatAssistant.run_assistant('thread_123', 'assistant_123')).rejects.toThrow('Assistant run failed');
         });
 
         it('should throw error when axios.get inside run polling fails', async () => {
