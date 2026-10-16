@@ -159,4 +159,34 @@ describe('Fraction.prototype.valueOf', () => {
       expect(res.toString()).toBe('NaN');
     });
   });
+
+  describe('compare', () => {
+    test('returns 0 when two fractions are equal', () => {
+      const f = new Fraction(1, 2);
+      expect(f.compare(1, 2)).toBe(0);
+      expect(f.compare(2, 4)).toBe(0);
+      expect(f.compare([1, 2])).toBe(0);
+      expect(f.compare('0.5')).toBe(0);
+      expect(f.compare({ n: 1, d: 2 })).toBe(0);
+      expect(f.compare(new Fraction(1, 2))).toBe(0);
+      expect(new Fraction(-1, 2).compare(-1, 2)).toBe(0);
+      expect(new Fraction(0).compare(0)).toBe(0);
+    });
+
+    test('returns 1 when current fraction is greater than the target', () => {
+      const f = new Fraction(3, 4);
+      expect(f.compare(1, 2)).toBe(1);
+      expect(new Fraction(1, 2).compare(-1, 2)).toBe(1);
+      expect(new Fraction(-1, 4).compare(-1, 2)).toBe(1);
+      expect(new Fraction(1, 2).compare(0)).toBe(1);
+    });
+
+    test('returns -1 when current fraction is less than the target', () => {
+      const f = new Fraction(1, 4);
+      expect(f.compare(1, 2)).toBe(-1);
+      expect(new Fraction(-1, 2).compare(1, 2)).toBe(-1);
+      expect(new Fraction(-1, 2).compare(-1, 4)).toBe(-1);
+      expect(new Fraction(-1, 2).compare(0)).toBe(-1);
+    });
+  });
 });
