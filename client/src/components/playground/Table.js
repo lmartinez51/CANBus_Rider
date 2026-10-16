@@ -22,7 +22,6 @@ export default function CANTable() {
   const [ecuState, setEcuState] = useState("")
   const [info, setInfo] = useState([])
   const [fileName, setFileName] = useState('')
-  const [logFileName, setLogFileName] = useState('')
   const [selectedRow, setSelectedRow] = useState(null)
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 })
   const contextMenuRef = useRef(null)
@@ -229,7 +228,6 @@ export default function CANTable() {
     }
     try {
       const [fileHandle] = await window.showOpenFilePicker(options);
-      setLogFileName(fileHandle.name)
       const fileName = fileHandle.name; // Almacena el nombre del archivo en una variable local
       // Reset table values
       setInfo([])
@@ -303,7 +301,6 @@ export default function CANTable() {
     }
     try {
       const [fileHandle] = await window.showOpenFilePicker(options);
-      setLogFileName(fileHandle.name)
       const fileName = fileHandle.name; // Almacena el nombre del archivo en una variable local
       // Reset table values
       setInfo([])
