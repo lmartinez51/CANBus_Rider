@@ -38,9 +38,7 @@ const SelectVirtualCAN = () => {
       <br></br>
       <div className="Buttons">
         <button className="continue" type="submit">Confirm</button>
-        <Link to="/">
-          <button className="cancel"> Cancel </button>
-        </Link>
+        <Link to="/" className="cancel"> Cancel </Link>
       </div>
     </Form>
   )
