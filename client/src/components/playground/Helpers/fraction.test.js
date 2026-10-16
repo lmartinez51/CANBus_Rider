@@ -274,4 +274,93 @@ describe('Fraction.prototype.valueOf', () => {
       expect(new Fraction(-1, 2).compare(0)).toBe(-1);
     });
   });
+
+  describe('inverse', () => {
+    test('inverts a standard positive fraction', () => {
+      const f = new Fraction(3, 4);
+      const inv = f.inverse();
+      expect(inv).toBeInstanceOf(Fraction);
+      expect(inv.n).toBe(4);
+      expect(inv.d).toBe(3);
+      expect(inv.s).toBe(1);
+      expect(inv.valueOf()).toBeCloseTo(4 / 3);
+      expect(inv.toFraction()).toBe('4/3');
+    });
+
+    test('inverts a whole number fraction with denominator 1', () => {
+      const f = new Fraction(5, 1);
+      const inv = f.inverse();
+      expect(inv.n).toBe(1);
+      expect(inv.d).toBe(5);
+      expect(inv.s).toBe(1);
+      expect(inv.valueOf()).toBe(0.2);
+      expect(inv.toFraction()).toBe('1/5');
+    });
+
+    test('inverts negative fractions correctly', () => {
+      const f1 = new Fraction(-3, 4);
+      const inv1 = f1.inverse();
+      expect(inv1.n).toBe(4);
+      expect(inv1.d).toBe(3);
+      expect(inv1.s).toBe(-1);
+      expect(inv1.valueOf()).toBeCloseTo(-4 / 3);
+      expect(inv1.toFraction()).toBe('-4/3');
+
+      const f2 = new Fraction(1, -4);
+      const inv2 = f2.inverse();
+      expect(inv2.n).toBe(4);
+      expect(inv2.d).toBe(1);
+      expect(inv2.s).toBe(-1);
+      expect(inv2.valueOf()).toBe(-4);
+      expect(inv2.toFraction()).toBe('-4');
+    });
+
+    test('inverts fractions initialized from string and array forms', () => {
+      const fArray = new Fraction([-3, 4]);
+      const invArray = fArray.inverse();
+      expect(invArray.n).toBe(4);
+      expect(invArray.d).toBe(3);
+      expect(invArray.s).toBe(-1);
+
+      const fString = new Fraction('0.25');
+      const invString = fString.inverse();
+      expect(invString.n).toBe(4);
+      expect(invString.d).toBe(1);
+      expect(invString.s).toBe(1);
+      expect(invString.valueOf()).toBe(4);
+    });
+
+    test('double inversion returns equal fraction', () => {
+      const f = new Fraction(7, 11);
+      const doubleInv = f.inverse().inverse();
+      expect(doubleInv.equals(f)).toBe(true);
+      expect(doubleInv.n).toBe(f.n);
+      expect(doubleInv.d).toBe(f.d);
+      expect(doubleInv.s).toBe(f.s);
+    });
+
+    test('does not mutate the original fraction instance', () => {
+      const f = new Fraction(2, 5);
+      const inv = f.inverse();
+      expect(f.n).toBe(2);
+      expect(f.d).toBe(5);
+      expect(f.s).toBe(1);
+      expect(inv.n).toBe(5);
+      expect(inv.d).toBe(2);
+    });
+
+    test('throws Division by Zero error when inverting zero fraction', () => {
+      const f = new Fraction(0, 1);
+      expect(() => f.inverse()).toThrow('Division by Zero');
+    });
+
+    test('returns Fraction with NaN components when inverting NaN fraction', () => {
+      const nanFraction = new Fraction(NaN);
+      const inv = nanFraction.inverse();
+      expect(inv).toBeInstanceOf(Fraction);
+      expect(Number.isNaN(inv.n)).toBe(true);
+      expect(Number.isNaN(inv.d)).toBe(true);
+      expect(Number.isNaN(inv.valueOf())).toBe(true);
+    });
+  });
 });
