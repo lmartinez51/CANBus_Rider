@@ -186,7 +186,6 @@ export default function CANTable() {
     try {
     const handle = await window.showSaveFilePicker(options);
     setFileName(handle.name);
-    //setDisable(false);
     const writable = await handle.createWritable();
     await writable.write(blob);
     await writable.close();
