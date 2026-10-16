@@ -363,4 +363,68 @@ describe('Fraction.prototype.valueOf', () => {
       expect(Number.isNaN(inv.valueOf())).toBe(true);
     });
   });
+
+  describe('ceil', () => {
+    test('calculates ceil of a positive fraction to 0 decimal places by default', () => {
+      const f = new Fraction('4.(3)'); // 4 + 1/3
+      const ceiled = f.ceil();
+      expect(ceiled.n).toBe(5);
+      expect(ceiled.d).toBe(1);
+      expect(ceiled.s).toBe(1);
+      expect(ceiled.toFraction()).toBe('5');
+    });
+
+    test('calculates ceil of an integer fraction without change', () => {
+      const f = new Fraction(4, 2); // 2
+      const ceiled = f.ceil();
+      expect(ceiled.n).toBe(2);
+      expect(ceiled.d).toBe(1);
+      expect(ceiled.s).toBe(1);
+      expect(ceiled.toFraction()).toBe('2');
+    });
+
+    test('calculates ceil of a negative fraction correctly', () => {
+      const f1 = new Fraction(-4.3);
+      const ceiled1 = f1.ceil();
+      expect(ceiled1.n).toBe(4);
+      expect(ceiled1.d).toBe(1);
+      expect(ceiled1.s).toBe(-1);
+      expect(ceiled1.toFraction()).toBe('-4');
+
+      const f2 = new Fraction(-4.8);
+      const ceiled2 = f2.ceil();
+      expect(ceiled2.n).toBe(4);
+      expect(ceiled2.d).toBe(1);
+      expect(ceiled2.s).toBe(-1);
+      expect(ceiled2.toFraction()).toBe('-4');
+    });
+
+    test('calculates ceil to specified decimal places', () => {
+      const f = new Fraction('4.3412');
+      const ceiled2 = f.ceil(2);
+      expect(ceiled2.valueOf()).toBe(4.35);
+
+      const negF = new Fraction('-4.3456');
+      const negCeiled2 = negF.ceil(2);
+      expect(negCeiled2.valueOf()).toBe(-4.34);
+    });
+
+    test('handles zero fraction', () => {
+      const f = new Fraction(0);
+      const ceiled = f.ceil(2);
+      expect(ceiled.n).toBe(0);
+      expect(ceiled.d).toBe(1);
+      expect(ceiled.valueOf()).toBe(0);
+    });
+
+    test('returns Fraction(NaN) when current fraction is NaN', () => {
+      const nanFraction = new Fraction(NaN);
+      const res = nanFraction.ceil(2);
+
+      expect(res).toBeInstanceOf(Fraction);
+      expect(Number.isNaN(res.n)).toBe(true);
+      expect(Number.isNaN(res.d)).toBe(true);
+      expect(res.toString()).toBe('NaN');
+    });
+  });
 });
