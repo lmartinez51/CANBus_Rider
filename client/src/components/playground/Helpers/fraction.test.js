@@ -105,58 +105,143 @@ describe('Fraction.prototype.valueOf', () => {
   });
 
   describe('round', () => {
-    test('rounds a positive fraction to 0 decimal places by default', () => {
-      const f = new Fraction('4.(3)'); // 4 + 1/3
-      const rounded = f.round();
-      expect(rounded.n).toBe(4);
-      expect(rounded.d).toBe(1);
-      expect(rounded.s).toBe(1);
-      expect(rounded.toFraction()).toBe('4');
+    describe('Default rounding (places parameter omitted or 0)', () => {
+      test('rounds positive fractions down when fractional part < 0.5', () => {
+        const f = new Fraction('4.(3)'); // 4.333...
+        const rounded = f.round();
+        expect(rounded).toBeInstanceOf(Fraction);
+        expect(rounded.n).toBe(4);
+        expect(rounded.d).toBe(1);
+        expect(rounded.s).toBe(1);
+        expect(rounded.toFraction()).toBe('4');
+        expect(rounded.valueOf()).toBe(4);
+      });
+
+      test('rounds positive fractions up when fractional part >= 0.5', () => {
+        const f = new Fraction('4.(6)'); // 4.666...
+        const rounded = f.round();
+        expect(rounded).toBeInstanceOf(Fraction);
+        expect(rounded.n).toBe(5);
+        expect(rounded.d).toBe(1);
+        expect(rounded.s).toBe(1);
+        expect(rounded.toFraction()).toBe('5');
+        expect(rounded.valueOf()).toBe(5);
+      });
+
+      test('rounds exact half values up for positive numbers', () => {
+        const f = new Fraction(1, 2); // 0.5
+        const rounded = f.round();
+        expect(rounded.valueOf()).toBe(1);
+      });
+
+      test('rounds negative fractions correctly', () => {
+        const f1 = new Fraction(-4.3);
+        const rounded1 = f1.round();
+        expect(rounded1.n).toBe(4);
+        expect(rounded1.d).toBe(1);
+        expect(rounded1.s).toBe(-1);
+        expect(rounded1.toFraction()).toBe('-4');
+        expect(rounded1.valueOf()).toBe(-4);
+
+        const f2 = new Fraction(-4.6);
+        const rounded2 = f2.round();
+        expect(rounded2.valueOf()).toBe(-5);
+      });
+
+      test('handles 0 explicit places argument', () => {
+        const f = new Fraction('2.718');
+        const rounded = f.round(0);
+        expect(rounded.valueOf()).toBe(3);
+        expect(rounded.n).toBe(3);
+        expect(rounded.d).toBe(1);
+      });
     });
 
-    test('rounds a repeating decimal fraction up when fractional part >= 0.5', () => {
-      const f = new Fraction('4.(6)'); // 4 + 2/3 ≈ 4.666...
-      const rounded = f.round();
-      expect(rounded.n).toBe(5);
-      expect(rounded.d).toBe(1);
-      expect(rounded.s).toBe(1);
-      expect(rounded.toFraction()).toBe('5');
+    describe('Rounding to specified positive decimal places', () => {
+      test('rounds to 1 decimal place', () => {
+        const f1 = new Fraction('3.14159');
+        const rounded1 = f1.round(1);
+        expect(rounded1.valueOf()).toBe(3.1);
+
+        const f2 = new Fraction('3.16159');
+        const rounded2 = f2.round(1);
+        expect(rounded2.valueOf()).toBe(3.2);
+      });
+
+      test('rounds to 2 and 3 decimal places', () => {
+        const f = new Fraction('4.3456');
+        const rounded2 = f.round(2);
+        expect(rounded2.valueOf()).toBe(4.35);
+
+        const rounded3 = f.round(3);
+        expect(rounded3.valueOf()).toBe(4.346);
+      });
+
+      test('rounds repeating decimals to specified places', () => {
+        const f = new Fraction('1/3'); // 0.333...
+        const rounded2 = f.round(2);
+        expect(rounded2.valueOf()).toBe(0.33);
+
+        const f2 = new Fraction('2/3'); // 0.666...
+        const rounded2_2 = f2.round(2);
+        expect(rounded2_2.valueOf()).toBe(0.67);
+      });
+
+      test('handles negative fractions with positive decimal places', () => {
+        const f = new Fraction(-4.3456);
+        const rounded2 = f.round(2);
+        expect(rounded2.valueOf()).toBe(-4.35);
+      });
     });
 
-    test('rounds a negative fraction correctly', () => {
-      const f = new Fraction(-4.3);
-      const rounded = f.round();
-      expect(rounded.n).toBe(4);
-      expect(rounded.d).toBe(1);
-      expect(rounded.s).toBe(-1);
-      expect(rounded.toFraction()).toBe('-4');
-    });
+    describe('Rounding with special values and edge cases', () => {
+      test('handles zero fraction', () => {
+        const f = new Fraction(0);
+        const roundedDefault = f.round();
+        expect(roundedDefault.n).toBe(0);
+        expect(roundedDefault.d).toBe(1);
+        expect(roundedDefault.valueOf()).toBe(0);
 
-    test('rounds to specified decimal places', () => {
-      const f = new Fraction('4.3456');
-      const rounded2 = f.round(2);
-      expect(rounded2.valueOf()).toBe(4.35);
+        const roundedPlaces = f.round(2);
+        expect(roundedPlaces.n).toBe(0);
+        expect(roundedPlaces.d).toBe(1);
+        expect(roundedPlaces.valueOf()).toBe(0);
+      });
 
-      const rounded3 = f.round(3);
-      expect(rounded3.valueOf()).toBe(4.346);
-    });
+      test('returns Fraction(NaN) when current fraction is NaN', () => {
+        const nanFraction = new Fraction(NaN);
+        const resDefault = nanFraction.round();
 
-    test('handles zero fraction', () => {
-      const f = new Fraction(0);
-      const rounded = f.round(2);
-      expect(rounded.n).toBe(0);
-      expect(rounded.d).toBe(1);
-      expect(rounded.valueOf()).toBe(0);
-    });
+        expect(resDefault).toBeInstanceOf(Fraction);
+        expect(Number.isNaN(resDefault.n)).toBe(true);
+        expect(Number.isNaN(resDefault.d)).toBe(true);
+        expect(resDefault.toString()).toBe('NaN');
 
-    test('returns Fraction(NaN) when current fraction is NaN', () => {
-      const nanFraction = new Fraction(NaN);
-      const res = nanFraction.round(2);
+        const resWithPlaces = nanFraction.round(2);
+        expect(resWithPlaces).toBeInstanceOf(Fraction);
+        expect(Number.isNaN(resWithPlaces.n)).toBe(true);
+        expect(Number.isNaN(resWithPlaces.d)).toBe(true);
+        expect(resWithPlaces.toString()).toBe('NaN');
+      });
 
-      expect(res).toBeInstanceOf(Fraction);
-      expect(Number.isNaN(res.n)).toBe(true);
-      expect(Number.isNaN(res.d)).toBe(true);
-      expect(res.toString()).toBe('NaN');
+      test('handles null or undefined places parameter gracefully', () => {
+        const f = new Fraction('3.7');
+        expect(f.round(undefined).valueOf()).toBe(4);
+        expect(f.round(null).valueOf()).toBe(4);
+      });
+
+      test('preserves immutability of original Fraction instance', () => {
+        const f = new Fraction('4.(3)');
+        const originalN = f.n;
+        const originalD = f.d;
+        const originalS = f.s;
+
+        f.round(2);
+
+        expect(f.n).toBe(originalN);
+        expect(f.d).toBe(originalD);
+        expect(f.s).toBe(originalS);
+      });
     });
   });
 });
