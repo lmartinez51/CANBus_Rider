@@ -9,7 +9,7 @@ const Navbar = () => {
       <nav
         className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
-          <a className="navbar-brand" href="/">
+          <a className="navbar-brand" href="/" aria-label="CAN Bus Rider home">
             <img src={logo} alt="" width={30} height={30} className="d-inline-block align-top "/>
              CAN Bus Rider
           </a>
