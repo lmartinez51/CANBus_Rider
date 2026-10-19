@@ -23,7 +23,6 @@ const io = require("socket.io")(httpServer, {
 	  pingTimeout: 90000,
 	})
 
-let pid = ''
 let now = new Date()
 let fileName = ''
 
@@ -93,7 +92,7 @@ app.get('/play', (req, res) => {
 app.get('/vcan', (req,res) => {
 	const device = req.query.CAN;
 	vcanconfig.initializeVirtualCAN(device)
-	pid = startcangen.cangen(device)
+	startcangen.cangen(device)
 	res.send("Virtual CAN Bus 29-bits initialized")
 })
 
