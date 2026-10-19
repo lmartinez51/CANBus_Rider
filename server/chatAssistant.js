@@ -6,7 +6,6 @@ const openai = new OpenAI({
 	apiKey: process.env.CHATGPT_API_KEY || "dummy_key_for_test"
 })
 const canWizardID = process.env.CAN_WIZARD_ID
-const user = "Lorenzo"
 let conversations = {}
 
 class Contacts {
@@ -30,6 +29,7 @@ const contacts = new Contacts()
 let self = module.exports = {
     async createChatCompletion(req, res) {
         try {
+            const user = (req.body && req.body.user) ? req.body.user : "Lorenzo";
             // Step 1: Retrive the assisant. (I already have the assistant ID)
             let check_user = contacts.search_names(user)
             let user_thread;

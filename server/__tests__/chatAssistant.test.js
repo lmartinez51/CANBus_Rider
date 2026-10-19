@@ -95,5 +95,33 @@ describe('chatAssistant', () => {
 
             expect(res.send).toHaveBeenCalledWith({ message: 'Hello back!' });
         });
+
+        it('should support dynamic user provided in request body', async () => {
+            const req = { body: { message: 'Hello', user: 'Alice' } };
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            axios.post.mockResolvedValueOnce({ data: { id: 'thread_alice' } });
+            axios.post.mockResolvedValueOnce({ data: {} });
+            axios.post.mockResolvedValueOnce({ data: { id: 'run_alice' } });
+            axios.get.mockResolvedValueOnce({ data: { status: 'completed' } });
+            axios.get.mockResolvedValueOnce({
+                data: {
+                    data: [
+                        {
+                            content: [
+                                { text: { value: 'Hello Alice!' } }
+                            ]
+                        }
+                    ]
+                }
+            });
+
+            await chatAssistant.createChatCompletion(req, res);
+
+            expect(res.send).toHaveBeenCalledWith({ message: 'Hello Alice!' });
+        });
     });
 });
