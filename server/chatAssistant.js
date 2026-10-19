@@ -1,25 +1,27 @@
 require('dotenv').config({ path: "./.env" })
 const axios = require('axios');
-const { response } = require('express');
 const {OpenAI} = require("openai")
 const openai = new OpenAI({
 	apiKey: process.env.CHATGPT_API_KEY || "dummy_key_for_test"
 })
 const canWizardID = process.env.CAN_WIZARD_ID
 const user = "Lorenzo"
-let conversations = {}
 
 class Contacts {
     constructor() {
-        this.contacts = new Set();
+        this.contacts = new Map();
     }
 
-    add_contacts(contact) {
-        this.contacts.add(contact);
+    add_contacts(contact, threadId) {
+        this.contacts.set(contact, threadId);
+    }
+
+    get_thread(contact) {
+        return this.contacts.get(contact);
     }
 
     search_names(contact) {
-        let ordered_contacts = Array.from(this.contacts).sort();
+        let ordered_contacts = Array.from(this.contacts.keys()).sort();
         console.log(`Connected contacts: ${ordered_contacts}`);
         return this.contacts.has(contact);
     }
@@ -32,20 +34,22 @@ let self = module.exports = {
         try {
             // Step 1: Retrive the assisant. (I already have the assistant ID)
             let check_user = contacts.search_names(user)
-            let user_thread;
+            let threadId;
             if (check_user) {
                 console.log(`Usuario encontrado: ${user}`)
-                await self.create_message(conversations[user], req.body.message)
+                threadId = contacts.get_thread(user)
+                await self.create_message(threadId, req.body.message)
             } else {
                 console.log('Usuario no encontrado. Creando nuevo usuario...')
-                contacts.add_contacts(user)
                 // Step 2, 3: Create a thread and then a message
-                user_thread = await self.create_thread(user, req.body.message)
+                const user_thread = await self.create_thread(user, req.body.message)
+                threadId = user_thread.id
+                contacts.add_contacts(user, threadId)
             }
             //Step 4, 5: Run the assistant and check the status
-            await self.run_assistant(conversations[user], canWizardID)
+            await self.run_assistant(threadId, canWizardID)
             // Step 6: Display the Assistant's Response
-            const url = `https://api.openai.com/v1/threads/${conversations[user]}/messages`
+            const url = `https://api.openai.com/v1/threads/${threadId}/messages`
             const headers = {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${process.env.CHATGPT_API_KEY}`,
@@ -72,7 +76,6 @@ let self = module.exports = {
             const response = await axios.post(url, {}, { headers: headers })
             const user_thread = response.data
             await self.create_message(user_thread.id, context)
-            conversations[user] = user_thread.id
             return user_thread
         } catch (error) {
             console.error(error)
