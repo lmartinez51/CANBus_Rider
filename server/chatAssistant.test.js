@@ -53,6 +53,20 @@ describe('chatAssistant', () => {
             await expect(chatAssistant.run_assistant('thread_123', 'assistant_123'))
                 .resolves.not.toThrow();
         });
+
+        it('should poll multiple times until status becomes completed', async () => {
+            axios.post.mockResolvedValueOnce({
+                data: { id: 'run_123' }
+            });
+            axios.get
+                .mockResolvedValueOnce({ data: { status: 'queued' } })
+                .mockResolvedValueOnce({ data: { status: 'in_progress' } })
+                .mockResolvedValueOnce({ data: { status: 'completed' } });
+
+            const result = await chatAssistant.run_assistant('thread_123', 'assistant_123', 10);
+            expect(result).toEqual({ status: 'completed' });
+            expect(axios.get).toHaveBeenCalledTimes(3);
+        });
     });
 
     describe('createChatCompletion', () => {
