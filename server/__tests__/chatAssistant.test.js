@@ -43,11 +43,15 @@ describe('chatAssistant', () => {
             await expect(chatAssistant.run_assistant('thread_123', 'assistant_123')).rejects.toThrow('GET error');
         });
 
-        it('should complete successfully when status is completed', async () => {
+        it('should complete successfully when status is completed after polling', async () => {
             axios.post.mockResolvedValueOnce({ data: { id: 'run_123' } });
-            axios.get.mockResolvedValueOnce({ data: { status: 'completed' } });
+            axios.get
+                .mockResolvedValueOnce({ data: { status: 'queued' } })
+                .mockResolvedValueOnce({ data: { status: 'in_progress' } })
+                .mockResolvedValueOnce({ data: { status: 'completed' } });
 
             await expect(chatAssistant.run_assistant('thread_123', 'assistant_123')).resolves.not.toThrow();
+            expect(chatAssistant.delay).toHaveBeenCalledTimes(2);
         });
     });
 
