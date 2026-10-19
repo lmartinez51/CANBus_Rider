@@ -2,12 +2,10 @@ const HTTPPORT = 8080
 const can = require('socketcan')
 const fs = require('fs')
 const express = require('express')
-const mongoose = require('mongoose')
 const cors = require('cors')
 const app = express()
 const httpServer = require('http').Server(app)
 require('dotenv').config()
-const MONGODBURI = process.env.MONGODBURI
 const play = require('./modules/playPackets')
 const vcanconfig = require('./modules/vcanconfig')
 const startcangen = require('./modules/cangen')
@@ -219,9 +217,6 @@ db_bus.messages["VD"].signals["TotalVehicleDistance"].onUpdate(function(s) {
 db_bus.messages["VD"].signals["TripDistance"].onUpdate(function(s) {
 	console.log("Trip Distance: " + s.value)
 }) */
-
-// Connect to MongoDB
-mongoose.connect(MONGODBURI).then(() => console.log("Connected to the MONGODB CAN Bus database")).catch(console.error)
 
 httpServer.listen(HTTPPORT, () => {
     console.log(`Server is running on port: ${HTTPPORT}`)
