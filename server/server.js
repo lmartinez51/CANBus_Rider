@@ -12,7 +12,6 @@ const play = require('./modules/playPackets')
 const vcanconfig = require('./modules/vcanconfig')
 const startcangen = require('./modules/cangen')
 const chatAssistant = require('./chatAssistant')
-//const saveRawPackets = require('./modules/dataSaver')
 const io = require("socket.io")(httpServer, {
 	cors: {
 		origin: "http://localhost:3000",
@@ -51,8 +50,6 @@ var channel = can.createRawChannel('vcan0',true)
 var db_bus = new can.DatabaseService(channel, network.buses["Private"])
 // Start listening channel
 channel.start()
-// Save raw packets
-//saveRawPackets() // This works to save raw packets in a file. Just uncomment const saveRawPackets on top of this file
 
 //Listen for messgages to dump it into a file
 channel.addListener("onMessage", dumpPacket)
