@@ -2,6 +2,9 @@ const exec = require('child_process').execSync;
 
 // This function initialize the virtual CAN bus interface.
 function initializeVirtualCAN (device) {
+    if (typeof device !== 'string' || !/^[a-zA-Z0-9]+$/.test(device)) {
+        throw new Error('Invalid device name');
+    }
     // Check if the vcan interface is already running and turn it off
     try{
         exec('sudo ip link del ' + device); //Checar primero antes de utilizar esta instruccion
@@ -19,7 +22,7 @@ function initializeVirtualCAN (device) {
     }
     exec('sudo ip link set up ' + device);
     // The next two statements are not necessary but they show if the virtual CAN is running or not
-    result = exec('ifconfig ' + device);
+    const result = exec('ifconfig ' + device);
     console.log(result.toString())
 }
 module.exports = {initializeVirtualCAN}
