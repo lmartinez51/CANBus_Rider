@@ -183,4 +183,31 @@ describe('handleFilterLogFiles', () => {
 
         expect(console.error).toHaveBeenCalledWith('Error reading file:', error);
     });
+
+    test('logs error to console when file reading fails', async () => {
+        const error = new Error('Failed to read file contents');
+        const mockFileHandle = {
+            getFile: jest.fn().mockRejectedValue(error),
+        };
+        window.showOpenFilePicker = jest.fn().mockResolvedValue([mockFileHandle]);
+
+        await handleFilterLogFiles();
+
+        expect(console.error).toHaveBeenCalledWith('Error reading file:', error);
+    });
+
+    test('logs error to console when showSaveFilePicker throws an error', async () => {
+        const validLine = '(1623456789.123456) can0 18F005FE#1122334455667788';
+        const mockFile = { text: jest.fn().mockResolvedValue(validLine) };
+        const mockFileHandle = { getFile: jest.fn().mockResolvedValue(mockFile) };
+
+        window.showOpenFilePicker = jest.fn().mockResolvedValue([mockFileHandle]);
+
+        const saveError = new Error('Save cancelled');
+        window.showSaveFilePicker = jest.fn().mockRejectedValue(saveError);
+
+        await handleFilterLogFiles();
+
+        expect(console.error).toHaveBeenCalledWith('Error reading file:', saveError);
+    });
 });
