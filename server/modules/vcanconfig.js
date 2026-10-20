@@ -22,7 +22,7 @@ function initializeVirtualCAN (device) {
     }
     exec('sudo ip link set up ' + device);
     // The next two statements are not necessary but they show if the virtual CAN is running or not
-    result = exec('ifconfig ' + device);
+    const result = exec('ifconfig ' + device);
     console.log(result.toString())
 }
 module.exports = {initializeVirtualCAN}
