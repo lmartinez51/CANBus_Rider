@@ -43,11 +43,15 @@ describe('chatAssistant', () => {
             await expect(chatAssistant.run_assistant('thread_123', 'assistant_123')).rejects.toThrow('GET error');
         });
 
-        it('should complete successfully when status is completed', async () => {
+        it('should complete successfully when status is completed after polling', async () => {
             axios.post.mockResolvedValueOnce({ data: { id: 'run_123' } });
-            axios.get.mockResolvedValueOnce({ data: { status: 'completed' } });
+            axios.get
+                .mockResolvedValueOnce({ data: { status: 'queued' } })
+                .mockResolvedValueOnce({ data: { status: 'in_progress' } })
+                .mockResolvedValueOnce({ data: { status: 'completed' } });
 
             await expect(chatAssistant.run_assistant('thread_123', 'assistant_123')).resolves.not.toThrow();
+            expect(chatAssistant.delay).toHaveBeenCalledTimes(2);
         });
     });
 
@@ -94,6 +98,34 @@ describe('chatAssistant', () => {
             await chatAssistant.createChatCompletion(req, res);
 
             expect(res.send).toHaveBeenCalledWith({ message: 'Hello back!' });
+        });
+
+        it('should support dynamic user provided in request body', async () => {
+            const req = { body: { message: 'Hello', user: 'Alice' } };
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            axios.post.mockResolvedValueOnce({ data: { id: 'thread_alice' } });
+            axios.post.mockResolvedValueOnce({ data: {} });
+            axios.post.mockResolvedValueOnce({ data: { id: 'run_alice' } });
+            axios.get.mockResolvedValueOnce({ data: { status: 'completed' } });
+            axios.get.mockResolvedValueOnce({
+                data: {
+                    data: [
+                        {
+                            content: [
+                                { text: { value: 'Hello Alice!' } }
+                            ]
+                        }
+                    ]
+                }
+            });
+
+            await chatAssistant.createChatCompletion(req, res);
+
+            expect(res.send).toHaveBeenCalledWith({ message: 'Hello Alice!' });
         });
     });
 });

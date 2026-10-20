@@ -118,8 +118,8 @@ export default function CANTable() {
     var unit='';
     var signalValue = null;
     var datos = values.replace('{','').replace('}','').split(", ");
-    for(var i in datos){
-      signalValue = datos[i].split(": ");
+    for(var dato of datos){
+      signalValue = dato.split(": ");
       signal = signalValue[0];
       valueUnit = signalValue[1].split(" ");
       value = valueUnit[0];
@@ -166,9 +166,9 @@ export default function CANTable() {
   }
 
   async function handleSavePackets () {
-    var packet = ''
-    info.map((x,y)=> (
-      packet+=x.time+" "+x.can+" "+x.id+"#"+x.dt1+x.dt2+x.dt3+x.dt4+x.dt5+x.dt6+x.dt7+x.dt8+"\n"))
+    const packet = info.map(x => (
+      `${x.time} ${x.can} ${x.id}#${x.dt1}${x.dt2}${x.dt3}${x.dt4}${x.dt5}${x.dt6}${x.dt7}${x.dt8}\n`
+    )).join('')
     const blob = new Blob([packet], {type:"text/plain"});
     const options = {
       suggestedName:'test.log',
@@ -503,7 +503,7 @@ export default function CANTable() {
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <button className="calculate" type="submit">Calculate</button>
               <button className="clear" type="button" onClick={handleClear}>Clear</button>
-            </div>  
+            </div>
           </form>
         </div>
   </>
