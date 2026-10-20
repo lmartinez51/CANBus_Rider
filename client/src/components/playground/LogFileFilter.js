@@ -1,15 +1,16 @@
-const validHex = ['18F005FE', '18FEF2FE', 'CF004FE', '18FEF1FE', '18FCDCFE'];
-const maxLines = 2000;
+export const validHex = ['18F005FE', '18FEF2FE', 'CF004FE', '18FEF1FE', '18FCDCFE'];
+export const maxLines = 2000;
 
-function isValidLine(line) {
-    const regex = /\(\d{10}\.\d{6}\) \w*can\w* \w{6}FE#\w{16}/;
+export function isValidLine(line) {
+    if (typeof line !== 'string') return false;
+    const regex = /\(\d{10}\.\d{6}\) \w*can\w* \w{5,6}FE#\w{16}/;
     if (!regex.test(line)) return false;
 
-    const hexValue = line.split(' ')[2];
+    const hexValue = line.split(' ')[2]?.split('#')[0];
     return validHex.includes(hexValue);
 }
 
-async function handleFilterLogFiles() {
+export async function handleFilterLogFiles() {
     const options = {
         types: [
             {
@@ -21,7 +22,7 @@ async function handleFilterLogFiles() {
         ],
         excludeAcceptAllOption: true,
         multiple: false,
-    }
+    };
 
     try {
         const [fileHandle] = await window.showOpenFilePicker(options);
@@ -56,3 +57,5 @@ async function handleFilterLogFiles() {
         console.error('Error reading file:', err);
     }
 }
+
+export default handleFilterLogFiles;

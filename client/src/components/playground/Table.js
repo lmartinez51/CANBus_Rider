@@ -503,7 +503,7 @@ export default function CANTable() {
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <button className="calculate" type="submit">Calculate</button>
               <button className="clear" type="button" onClick={handleClear}>Clear</button>
-            </div>  
+            </div>
           </form>
         </div>
   </>
