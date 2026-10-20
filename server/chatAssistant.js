@@ -119,8 +119,13 @@ let self = module.exports = {
                 'OpenAI-Beta': 'assistants=v1'
             }
             while (true) {
-                run = await axios.get(run_url, { headers: run_headers })
-                console.log(`Status Actual: ${run.data.status}`)
+                try {
+                    run = await axios.get(run_url, { headers: run_headers })
+                    console.log(`Status Actual: ${run.data.status}`)
+                } catch (error) {
+                    console.error(error)
+                    throw error
+                }
                 if (run.data.status === "completed") {
                     console.log("Run is completed.")
                     break
