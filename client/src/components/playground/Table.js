@@ -112,18 +112,13 @@ export default function CANTable() {
     setMessage([]);
     setEcuState(ecu); // Aquí se establece el valor de ECU
     console.log(`Valores: ${values}`)
-    var signal='';
-    var valueUnit = null;
-    var value='';
-    var unit='';
-    var signalValue = null;
-    var datos = values.replace('{','').replace('}','').split(", ");
-    for(var dato of datos){
-      signalValue = dato.split(": ");
-      signal = signalValue[0];
-      valueUnit = signalValue[1].split(" ");
-      value = valueUnit[0];
-      unit = valueUnit[1];
+    const datos = values.replace('{','').replace('}','').split(", ");
+    for (const dato of datos) {
+      const signalValue = dato.split(": ");
+      const signal = signalValue[0];
+      const valueUnit = signalValue[1].split(" ");
+      const value = valueUnit[0];
+      const unit = valueUnit[1];
       
       const parsedMessage = {
       Signal: signal,

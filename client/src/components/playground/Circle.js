@@ -178,7 +178,7 @@ class Circle {
         ctx.save();
         ctx.translate(this.x, this.y);
 
-        for (let angle in angles) {
+        for (let angle = 0; angle < angles.length; angle++) {
             if (((skip === 'even') && (angle % 2 === 1)) ||
                 ((skip === 'odd') && (angle % 2 === 0)) ||
                 (skip === 'all')) {
@@ -262,7 +262,7 @@ class Circle {
         ctx.save();
         ctx.translate(this.x, this.y);
 
-        for (let angle in angles) {
+        for (let angle = 0; angle < angles.length; angle++) {
             const x = Math.cos(angles[angle]) * (radius - (radius / length)) - this.textMarksOffsetX;
             const y = Math.sin(angles[angle]) * (radius - (radius / length)) + this.textMarksOffsetY;
 
