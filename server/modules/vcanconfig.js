@@ -2,6 +2,9 @@ const exec = require('child_process').execSync;
 
 // This function initialize the virtual CAN bus interface.
 function initializeVirtualCAN (device) {
+    if (typeof device !== 'string' || !/^[a-zA-Z0-9]+$/.test(device)) {
+        throw new Error('Invalid device name. Device must be alphanumeric.');
+    }
     // Check if the vcan interface is already running and turn it off
     try{
         exec('sudo ip link del ' + device); //Checar primero antes de utilizar esta instruccion

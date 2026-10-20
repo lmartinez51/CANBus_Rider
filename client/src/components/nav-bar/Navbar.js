@@ -7,7 +7,8 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className="navbar navbar-expand-lg navbar-light bg-light">
+        className="navbar navbar-expand-lg navbar-light bg-light"
+        aria-label="Main navigation">
         <div className="container-fluid">
           <a className="navbar-brand" href="/" aria-label="CAN Bus Rider home">
             <img src={logo} alt="" width={30} height={30} className="d-inline-block align-top "/>
