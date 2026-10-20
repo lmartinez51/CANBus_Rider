@@ -167,7 +167,7 @@ export default function CANTable() {
 
   async function handleSavePackets () {
     const packet = info.map(x => (
-      `${x.time} ${x.can} ${x.id}#${x.dt1}${x.dt2}${x.dt3}${x.dt4}${x.dt5}${x.dt6}${x.dt7}${x.dt8}\n`
+      x.time + " " + x.can + " " + x.id + "#" + x.dt1 + x.dt2 + x.dt3 + x.dt4 + x.dt5 + x.dt6 + x.dt7 + x.dt8 + "\n"
     )).join('')
     const blob = new Blob([packet], {type:"text/plain"});
     const options = {
