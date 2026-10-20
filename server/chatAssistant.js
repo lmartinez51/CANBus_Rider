@@ -32,6 +32,7 @@ const contacts = new Contacts()
 let self = module.exports = {
     async createChatCompletion(req, res) {
         try {
+            const user = (req.body && req.body.user) ? req.body.user : "Lorenzo";
             // Step 1: Retrive the assisant. (I already have the assistant ID)
             let check_user = contacts.search_names(user)
             let threadId;
@@ -55,7 +56,6 @@ let self = module.exports = {
                 'Authorization': `Bearer ${process.env.CHATGPT_API_KEY}`,
                 'OpenAI-Beta': 'assistants=v1'
             }
-            await self.delay(5000);  // Wait for 5 seconds (Suppose to fix failed errors)
             let response = await axios.get(url, { headers: headers })
             console.log(`Assitant response: ${response.data.data[0].content[0].text.value}`)
             res.send({ message: response.data.data[0].content[0].text.value })
@@ -102,7 +102,7 @@ let self = module.exports = {
         }
     },
     
-    async run_assistant(user_thread_id, assistant_id) {
+    async run_assistant(user_thread_id, assistant_id, pollInterval = 1000) {
         const url = `https://api.openai.com/v1/threads/${user_thread_id}/runs`
         const headers = {
             'Content-Type': 'application/json',
@@ -123,17 +123,22 @@ let self = module.exports = {
                 'OpenAI-Beta': 'assistants=v1'
             }
             while (true) {
-                run = await axios.get(run_url, { headers: run_headers })
-                console.log(`Status Actual: ${run.data.status}`)
+                try {
+                    run = await axios.get(run_url, { headers: run_headers })
+                    console.log(`Status Actual: ${run.data.status}`)
+                } catch (error) {
+                    console.error(error)
+                    throw error
+                }
                 if (run.data.status === "completed") {
                     console.log("Run is completed.")
-                    break
+                    return run.data
                 }
                 if (run.data.status === "failed" || run.data.status === "cancelled" || run.data.status === "expired") {
                     console.log(`Run ${run.data.status}. Try again.`)
                     throw new Error("Assistant run failed")
                 }
-                await self.delay(20000) // Consider making this delay configurable
+                await self.delay(pollInterval)
             }     
         } catch (error) {
             console.error(error)

@@ -2,17 +2,14 @@ const HTTPPORT = 8080
 const can = require('socketcan')
 const fs = require('fs')
 const express = require('express')
-const mongoose = require('mongoose')
 const cors = require('cors')
 const app = express()
 const httpServer = require('http').Server(app)
 require('dotenv').config()
-const MONGODBURI = process.env.MONGODBURI
 const play = require('./modules/playPackets')
 const vcanconfig = require('./modules/vcanconfig')
 const startcangen = require('./modules/cangen')
 const chatAssistant = require('./chatAssistant')
-//const saveRawPackets = require('./modules/dataSaver')
 const io = require("socket.io")(httpServer, {
 	cors: {
 		origin: "http://localhost:3000",
@@ -23,7 +20,6 @@ const io = require("socket.io")(httpServer, {
 	  pingTimeout: 90000,
 	})
 
-let pid = ''
 let now = new Date()
 let fileName = ''
 
@@ -51,8 +47,6 @@ var channel = can.createRawChannel('vcan0',true)
 var db_bus = new can.DatabaseService(channel, network.buses["Private"])
 // Start listening channel
 channel.start()
-// Save raw packets
-//saveRawPackets() // This works to save raw packets in a file. Just uncomment const saveRawPackets on top of this file
 
 //Listen for messgages to dump it into a file
 channel.addListener("onMessage", dumpPacket)
@@ -93,7 +87,7 @@ app.get('/play', (req, res) => {
 app.get('/vcan', (req,res) => {
 	const device = req.query.CAN;
 	vcanconfig.initializeVirtualCAN(device)
-	pid = startcangen.cangen(device)
+	startcangen.cangen(device)
 	res.send("Virtual CAN Bus 29-bits initialized")
 })
 
@@ -219,9 +213,6 @@ db_bus.messages["VD"].signals["TotalVehicleDistance"].onUpdate(function(s) {
 db_bus.messages["VD"].signals["TripDistance"].onUpdate(function(s) {
 	console.log("Trip Distance: " + s.value)
 }) */
-
-// Connect to MongoDB
-mongoose.connect(MONGODBURI).then(() => console.log("Connected to the MONGODB CAN Bus database")).catch(console.error)
 
 httpServer.listen(HTTPPORT, () => {
     console.log(`Server is running on port: ${HTTPPORT}`)
