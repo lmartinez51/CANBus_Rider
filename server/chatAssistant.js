@@ -128,7 +128,7 @@ let self = module.exports = {
                 }
                 if (run.data.status === "completed") {
                     console.log("Run is completed.")
-                    break
+                    return run.data
                 }
                 if (run.data.status === "failed" || run.data.status === "cancelled" || run.data.status === "expired") {
                     console.log(`Run ${run.data.status}. Try again.`)
