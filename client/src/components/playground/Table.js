@@ -118,8 +118,8 @@ export default function CANTable() {
     var unit='';
     var signalValue = null;
     var datos = values.replace('{','').replace('}','').split(", ");
-    for(var i in datos){
-      signalValue = datos[i].split(": ");
+    for(var dato of datos){
+      signalValue = dato.split(": ");
       signal = signalValue[0];
       valueUnit = signalValue[1].split(" ");
       value = valueUnit[0];
