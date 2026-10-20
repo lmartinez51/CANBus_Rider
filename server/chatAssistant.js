@@ -5,7 +5,6 @@ const openai = new OpenAI({
 	apiKey: process.env.CHATGPT_API_KEY || "dummy_key_for_test"
 })
 const canWizardID = process.env.CAN_WIZARD_ID
-const user = "Lorenzo"
 
 class Contacts {
     constructor() {
