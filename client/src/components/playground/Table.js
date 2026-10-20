@@ -118,8 +118,8 @@ export default function CANTable() {
     var unit='';
     var signalValue = null;
     var datos = values.replace('{','').replace('}','').split(", ");
-    for(var i in datos){
-      signalValue = datos[i].split(": ");
+    for(var i of datos){
+      signalValue = i.split(": ");
       signal = signalValue[0];
       valueUnit = signalValue[1].split(" ");
       value = valueUnit[0];
@@ -166,9 +166,9 @@ export default function CANTable() {
   }
 
   async function handleSavePackets () {
-    var packet = ''
-    info.map((x,y)=> (
-      packet+=x.time+" "+x.can+" "+x.id+"#"+x.dt1+x.dt2+x.dt3+x.dt4+x.dt5+x.dt6+x.dt7+x.dt8+"\n"))
+    const packet = info.reduce((acc, x) => (
+      acc + `${x.time} ${x.can} ${x.id}#${x.dt1}${x.dt2}${x.dt3}${x.dt4}${x.dt5}${x.dt6}${x.dt7}${x.dt8}\n`
+    ), '')
     const blob = new Blob([packet], {type:"text/plain"});
     const options = {
       suggestedName:'test.log',
