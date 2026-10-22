@@ -14,16 +14,17 @@ import axios from 'axios'
 import Worker from 'worker-loader!./Helpers/FileProcessingWorker'
 const url = 'http://localhost:8080/upload'
 const playUrl = 'http://localhost:8080/play'
-let eventSource;  
+let eventSource;
 
 export default function CANTable() {
-  
+
   const [message, setMessage] = useState([])
   const [ecuState, setEcuState] = useState("")
   const [info, setInfo] = useState([])
   const [fileName, setFileName] = useState('')
   const [selectedRow, setSelectedRow] = useState(null)
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 })
+  const [copied, setCopied] = useState(false)
   const contextMenuRef = useRef(null)
   const { setSignal } = useContext(ContextValues)
   const [lsb, setLsb] = useState('')
@@ -36,7 +37,7 @@ export default function CANTable() {
 
   // Modifica el nombre de la clase dependiendo del valor de ecuState
   let ecuClass = `ecuValue ${ecuState ? 'withValue' : 'withoutValue'}`;
-  let hexValueClass = `hexValue ${result ? 'withValue' : 'withoutValue'}`;  
+  let hexValueClass = `hexValue ${result ? 'withValue' : 'withoutValue'}`;
   let bitPosClass = `bitPosValue ${bitPosition ? 'withValue' : 'withoutValue'}`;
 
   /* Effect to terminate the File Processing Worker */
@@ -45,7 +46,7 @@ export default function CANTable() {
     return () => {
         worker.terminate()
     }
-  // eslint-disable-next-line 
+  // eslint-disable-next-line
   }, [])
 
   /* Efect to handle the click of the mouse to close the Copy Row context menu */
@@ -55,7 +56,7 @@ export default function CANTable() {
         closeContextMenu()
       }
     }
-  
+
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
@@ -69,7 +70,7 @@ export default function CANTable() {
     setResult(hexValue)
     setBitPosition(bitPosition)
   }
-  
+
   const calculateBitPosition = (lsb) => {
     let lowerBound = Math.floor(lsb / 8) * 8
     let upperBound = lowerBound + 7
@@ -90,10 +91,10 @@ export default function CANTable() {
     console.log(`LSB: ${lsb}`)
     // Restar el offset y dividir por la escala
     let originalAfterShift = (newValue - offset) / scale
-  
+
     // Realizar un desplazamiento de bits a la izquierda
     let original = originalAfterShift << (lsb % 8)
-  
+
     // Convertir el resultado a hexadecimal
     let dataHex = original.toString(16).toUpperCase()
     console.log(`Hex Value: ${dataHex}`)
@@ -102,9 +103,9 @@ export default function CANTable() {
     console.log(`Hex Value: ${dataHex}`)
     return dataHex
   }
-  
+
   const handleMessage = (ecu, values, dt1, dt2, dt3, dt4, dt5, dt6, dt7, dt8) => {
-    // En caso de que se abren raw packets. Verificar si ecu y values son undefined. 
+    // En caso de que se abren raw packets. Verificar si ecu y values son undefined.
     if (ecu === undefined || values === undefined) {
       // Si alguno es undefined, terminar la ejecución de la función
       return;
@@ -119,21 +120,24 @@ export default function CANTable() {
       const valueUnit = signalValue[1].split(" ");
       const value = valueUnit[0];
       const unit = valueUnit[1];
-      
+
       const parsedMessage = {
       Signal: signal,
       Value: value,
       Unit: unit,
       };
-    
+
       setMessage((infodata) => [...infodata, parsedMessage]);
     }
   }
 
-  const handleRightClick = (event, row) => {
+  const handleRightClick = (event, row = null) => {
     event.preventDefault()
 
-    setSelectedRow(row)
+    if (row) {
+      setSelectedRow(row)
+    }
+    setCopied(false)
     setContextMenu({
       visible: true,
       x: event.clientX,
@@ -143,21 +147,25 @@ export default function CANTable() {
 
   const closeContextMenu = () => {
     setContextMenu({ visible: false, x: 0, y: 0 })
+    setCopied(false)
   }
 
   const copyRow = () => {
-    if (selectedRow) {
-      const rowValues = Object.values(selectedRow.original)
-      const formattedRowString = `${rowValues[0]} ${rowValues[1]} ${rowValues[2]}#${rowValues.slice(3).join('')}` 
-      navigator.clipboard.writeText(formattedRowString)
-        .then(() => {
-          console.log('Row copied to clipboard');
-          closeContextMenu(); // Close the context menu
-        })
-        .catch(err => {
-          console.error('Could not copy text: ', err);
-        })
-    }
+    const rowValues = selectedRow ? Object.values(selectedRow.original) : []
+    const formattedRowString = selectedRow
+      ? `${rowValues[0]} ${rowValues[1]} ${rowValues[2]}#${rowValues.slice(3).join('')}`
+      : ''
+    navigator.clipboard.writeText(formattedRowString)
+      .then(() => {
+        console.log('Row copied to clipboard');
+        setCopied(true);
+        setTimeout(() => {
+          closeContextMenu();
+        }, 800);
+      })
+      .catch(err => {
+        console.error('Could not copy text: ', err);
+      })
   }
 
   async function handleSavePackets () {
@@ -200,9 +208,9 @@ export default function CANTable() {
       setInfo((data) => [...data,parsedData])
     }
   };
-  
+
   function handleStopTraffic () {
-    eventSource.close(); 
+    eventSource.close();
     console.log("Connection closed");
   }
 
@@ -255,7 +263,7 @@ export default function CANTable() {
     // Agregar los datos procesados al estado existente
     setInfo(info => [...info, ...parsedData]);
   })
-    
+
   function handleReplayPackets () {
     //Reset table values
     setInfo([])
@@ -331,7 +339,7 @@ export default function CANTable() {
       replayEventSource.close()
     }
   }
-  
+
   const data = useMemo(() => [...info], [info])
   const columns = useMemo(() => COLUMNS, [])
 
@@ -349,7 +357,7 @@ export default function CANTable() {
       })
     )
   }
-    
+
     // State and functions returned from useTable to build the UI
     const {
       getTableProps,
@@ -405,7 +413,7 @@ export default function CANTable() {
         </Navbar>
         </div>
         {/* TABLE*/}
-        <Table className="rawDataTable margins" striped bordered hover responsive variant = "dark" {...getTableProps()}>
+        <Table className="rawDataTable margins" striped bordered hover responsive variant = "dark" onContextMenu={(event) => handleRightClick(event)} {...getTableProps()}>
             <thead className="headerHeight">
             {headerGroups.map(headerGroup => (
                 <tr {...headerGroup.getHeaderGroupProps()} className="customRow">
@@ -423,7 +431,7 @@ export default function CANTable() {
                 prepareRow(row)
                 return (
                 <tr key={i} className="rawrow" onClick = {() => handleMessage(row.original.ecu, row.original.values, row.original.dt1,
-                row.original.dt2, row.original.dt3, row.original.dt4, row.original.dt5, row.original.dt6, row.original.dt7, row.original.dt8)} onContextMenu={(event) => handleRightClick(event, row)} {...row.getRowProps()}>
+                row.original.dt2, row.original.dt3, row.original.dt4, row.original.dt5, row.original.dt6, row.original.dt7, row.original.dt8)} onContextMenu={(event) => { event.stopPropagation(); handleRightClick(event, row); }} {...row.getRowProps()}>
                   <td width='40'>{i+1}</td>
                     {row.cells.map(cell => {
                     return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
@@ -434,8 +442,16 @@ export default function CANTable() {
             </tbody>
         </Table>
         {contextMenu.visible && (
-          <div style={{ top: contextMenu.y, left: contextMenu.x }} ref={contextMenuRef} className="context-menu">
-            <button onClick={copyRow}>Copy Row</button>
+          <div
+            style={{ top: contextMenu.y, left: contextMenu.x }}
+            ref={contextMenuRef}
+            className="context-menu"
+            role="menu"
+            aria-label="Table row actions"
+          >
+            <button role="menuitem" onClick={copyRow}>
+              {copied ? '✓ Copied!' : 'Copy Row'}
+            </button>
          </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', height: '310px' }}>
