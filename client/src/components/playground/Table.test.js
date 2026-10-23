@@ -16,6 +16,8 @@ jest.mock(
   'worker-loader!./Helpers/FileProcessingWorker',
   () => {
     return function Worker() {
+      workerInstance = this;
+      this.listeners = {};
       this.postMessage = jest.fn();
       this.addEventListener = jest.fn((event, cb) => {
         if (event === 'message') {
