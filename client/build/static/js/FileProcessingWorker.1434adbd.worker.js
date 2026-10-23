@@ -1,0 +1,2 @@
+self.onmessage=async t=>{const e=t.data,d=[],s=e.stream().getReader();for(;;){const{done:t,value:e}=await s.read();if(t)break;e&&(new TextDecoder).decode(e).split("\n").forEach(t=>{if(""===t.trim()||!t.includes(" "))return;const e=t.split(" "),s=e[0],a=e[1],[n,c]=e[2].split("#"),i=c.match(/.{1,2}/g);d.push({time:s,can:a,id:n,dt1:i[0],dt2:i[1],dt3:i[2],dt4:i[3],dt5:i[4],dt6:i[5],dt7:i[6],dt8:i[7]})})}self.postMessage(d)};
+//# sourceMappingURL=FileProcessingWorker.1434adbd.worker.js.map

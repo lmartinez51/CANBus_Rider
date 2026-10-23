@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.727ea267.css",
+    "main.js": "/static/js/main.b36d81bc.js",
+    "static/media/icons.svg": "/static/media/icons.2bad3a0cff3b3bfd7ed91c1beb0da27a.svg",
+    "static/media/CanBus.png": "/static/media/CanBus.18bf5861ba7334d9398c.png",
+    "index.html": "/index.html",
+    "static/js/FileProcessingWorker.1434adbd.worker.js": "/static/js/FileProcessingWorker.1434adbd.worker.js",
+    "main.727ea267.css.map": "/static/css/main.727ea267.css.map",
+    "main.b36d81bc.js.map": "/static/js/main.b36d81bc.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.727ea267.css",
+    "static/js/main.b36d81bc.js"
+  ]
+}
