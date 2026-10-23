@@ -10,6 +10,7 @@ const play = require('./modules/playPackets')
 const vcanconfig = require('./modules/vcanconfig')
 const startcangen = require('./modules/cangen')
 const chatAssistant = require('./chatAssistant')
+// Note: Raw packet logging is handled by dumpPacket below (replacing legacy saveRawPackets / dataSaver)
 const io = require("socket.io")(httpServer, {
 	cors: {
 		origin: "http://localhost:3000",
@@ -48,7 +49,7 @@ var db_bus = new can.DatabaseService(channel, network.buses["Private"])
 // Start listening channel
 channel.start()
 
-//Listen for messgages to dump it into a file
+// Listen for messages to dump raw packets into log files (replaces legacy saveRawPackets)
 channel.addListener("onMessage", dumpPacket)
 
 //Helper function. Emulates candump -L 
@@ -159,60 +160,6 @@ db_bus.messages["CCVS"].signals["CruiseCtrlActive"].onUpdate(function(s) {
 db_bus.messages["CCVS"].signals["ParkingBrakeSwitch"].onUpdate(function(s) {
 	decodedInfo.parking=(s.value)
 })
-
-/* Esta seccion es para imprimir las senales en la terminal
-// Asegurarse de poner todas las senales de cada mensaje para no ver tantos mensajes de error
-db_bus.messages["ASC1"].signals["DoorRelease"].onUpdate(function(s) {
-    console.log("Door Release: " + (s.value === 1 ? "Door Opened" : s.value === 0 ? "Door closed" : "Not available"));
-})
-
-db_bus.messages["EEC2"].signals["AccelPedalPos2"].onUpdate(function(s) {
-    console.log("Accelerator Pedal 2 Position: " + s.value)
-})
-
-db_bus.messages["EEC2"].signals["RemoteAccelPedalPos"].onUpdate(function(s) {
-    console.log("Remote Accelerator Pedal Position: " + s.value)
-})
-
-db_bus.messages["EEC2"].signals["AccelPedalPos1"].onUpdate(function(s) {
-    console.log("Accelerator Pedal Position: " + s.value)
-})
-
-db_bus.messages["EEC1"].signals["EngSpeed"].onUpdate(function(s) {
-    console.log("Engine Speed: " + s.value)
-})
-
-db_bus.messages["CCVS"].signals["CruiseCtrlActive"].onUpdate(function(s) {
-	console.log("Cruise Control: " + s.value)
-})
-
-db_bus.messages["CCVS"].signals["WheelBasedVehicleSpeed"].onUpdate(function(s) {
-    console.log("Wheel Based Vehicle Speed: " + s.value)
-})
-
-db_bus.messages["CCVS"].signals["CruiseCtrlSetSpeed"].onUpdate(function(s) {
-    console.log("Cruise Control Set Speed: " + s.value)
-})
-
-db_bus.messages["CCVS"].signals["ParkingBrakeSwitch"].onUpdate(function(s) {
-	console.log("Parking Brake Switch: " + s.value)
-})
-
-db_bus.messages["CCVS"].signals["BrakeSwitch"].onUpdate(function(s) {
-	console.log("Brake Switch: " + s.value)
-})
-
-db_bus.messages["CCVS"].signals["ClutchSwitch"].onUpdate(function(s) {
-	console.log("Clutch Switch: " + s.value)
-})
-
-db_bus.messages["VD"].signals["TotalVehicleDistance"].onUpdate(function(s) {
-    console.log("Total Vehicle Distance: " + s.value)
-})
-
-db_bus.messages["VD"].signals["TripDistance"].onUpdate(function(s) {
-	console.log("Trip Distance: " + s.value)
-}) */
 
 httpServer.listen(HTTPPORT, () => {
     console.log(`Server is running on port: ${HTTPPORT}`)
