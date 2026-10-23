@@ -10,6 +10,7 @@ jest.mock('./Helpers/GlobalFilter', () => ({
 }));
 
 let workerListener = null;
+let workerInstance = null;
 
 // Mock worker-loader as constructor function
 jest.mock(
