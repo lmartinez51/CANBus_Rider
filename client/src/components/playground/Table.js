@@ -24,6 +24,7 @@ export default function CANTable() {
   const [fileName, setFileName] = useState('')
   const [selectedRow, setSelectedRow] = useState(null)
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 })
+  const [copied, setCopied] = useState(false)
   const contextMenuRef = useRef(null)
   const { setSignal } = useContext(ContextValues)
   const [lsb, setLsb] = useState('')
@@ -143,6 +144,7 @@ export default function CANTable() {
 
   const closeContextMenu = () => {
     setContextMenu({ visible: false, x: 0, y: 0 })
+    setCopied(false)
   }
 
   const copyRow = () => {
@@ -151,11 +153,14 @@ export default function CANTable() {
       const formattedRowString = `${rowValues[0]} ${rowValues[1]} ${rowValues[2]}#${rowValues.slice(3).join('')}` 
       navigator.clipboard.writeText(formattedRowString)
         .then(() => {
-          console.log('Row copied to clipboard');
-          closeContextMenu(); // Close the context menu
+          setCopied(true)
+          setTimeout(() => {
+            setCopied(false)
+            closeContextMenu()
+          }, 800)
         })
         .catch(err => {
-          console.error('Could not copy text: ', err);
+          console.error('Could not copy text: ', err)
         })
     }
   }
@@ -434,8 +439,10 @@ export default function CANTable() {
             </tbody>
         </Table>
         {contextMenu.visible && (
-          <div style={{ top: contextMenu.y, left: contextMenu.x }} ref={contextMenuRef} className="context-menu">
-            <button onClick={copyRow}>Copy Row</button>
+          <div style={{ top: contextMenu.y, left: contextMenu.x }} ref={contextMenuRef} className="context-menu" role="menu" aria-label="Table row actions">
+            <button role="menuitem" onClick={copyRow}>
+              {copied ? '✓ Copied!' : 'Copy Row'}
+            </button>
          </div>
         )}
         <div style={{ display: 'flex', justifyContent: 'space-between', height: '310px' }}>
