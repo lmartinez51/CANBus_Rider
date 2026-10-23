@@ -1,9 +1,5 @@
 require('dotenv').config({ path: "./.env" })
 const axios = require('axios');
-const {OpenAI} = require("openai")
-const openai = new OpenAI({
-	apiKey: process.env.CHATGPT_API_KEY || "dummy_key_for_test"
-})
 const canWizardID = process.env.CAN_WIZARD_ID
 
 class Contacts {
