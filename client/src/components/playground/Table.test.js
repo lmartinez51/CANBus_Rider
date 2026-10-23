@@ -9,13 +9,21 @@ jest.mock('./Helpers/GlobalFilter', () => ({
   GlobalFilter: () => <div data-testid="global-filter" />,
 }));
 
+let workerListener = null;
+
 // Mock worker-loader as constructor function
 jest.mock(
   'worker-loader!./Helpers/FileProcessingWorker',
   () => {
     return function Worker() {
+      workerInstance = this;
+      this.listeners = {};
       this.postMessage = jest.fn();
-      this.addEventListener = jest.fn();
+      this.addEventListener = jest.fn((event, cb) => {
+        if (event === 'message') {
+          workerListener = cb;
+        }
+      });
       this.removeEventListener = jest.fn();
       this.terminate = jest.fn();
     };
@@ -25,11 +33,17 @@ jest.mock(
 
 describe('CANTable Context Menu UX & Accessibility', () => {
   beforeEach(() => {
+    workerListener = null;
+    jest.useFakeTimers();
     Object.assign(navigator, {
       clipboard: {
         writeText: jest.fn().mockImplementation(() => Promise.resolve()),
       },
     });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   test('renders Table and confirms accessibility attributes for calculator inputs', () => {
