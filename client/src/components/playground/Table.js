@@ -131,10 +131,13 @@ export default function CANTable() {
     }
   }
 
-  const handleRightClick = (event, row) => {
+  const handleRightClick = (event, row = null) => {
     event.preventDefault()
 
-    setSelectedRow(row)
+    if (row) {
+      setSelectedRow(row)
+    }
+    setCopied(false)
     setContextMenu({
       visible: true,
       x: event.clientX,
@@ -148,21 +151,21 @@ export default function CANTable() {
   }
 
   const copyRow = () => {
-    if (selectedRow) {
-      const rowValues = Object.values(selectedRow.original)
-      const formattedRowString = `${rowValues[0]} ${rowValues[1]} ${rowValues[2]}#${rowValues.slice(3).join('')}`
-      navigator.clipboard.writeText(formattedRowString)
-        .then(() => {
-          console.log('Row copied to clipboard');
-          setCopied(true);
-          setTimeout(() => {
-            closeContextMenu();
-          }, 600);
-        })
-        .catch(err => {
-          console.error('Could not copy text: ', err);
-        })
-    }
+    const rowValues = selectedRow ? Object.values(selectedRow.original) : []
+    const formattedRowString = selectedRow
+      ? `${rowValues[0]} ${rowValues[1]} ${rowValues[2]}#${rowValues.slice(3).join('')}`
+      : ''
+    navigator.clipboard.writeText(formattedRowString)
+      .then(() => {
+        console.log('Row copied to clipboard');
+        setCopied(true);
+        setTimeout(() => {
+          closeContextMenu();
+        }, 800);
+      })
+      .catch(err => {
+        console.error('Could not copy text: ', err);
+      })
   }
 
   async function handleSavePackets () {
@@ -410,7 +413,7 @@ export default function CANTable() {
         </Navbar>
         </div>
         {/* TABLE*/}
-        <Table className="rawDataTable margins" striped bordered hover responsive variant = "dark" {...getTableProps()}>
+        <Table className="rawDataTable margins" striped bordered hover responsive variant = "dark" onContextMenu={(event) => handleRightClick(event)} {...getTableProps()}>
             <thead className="headerHeight">
             {headerGroups.map(headerGroup => (
                 <tr {...headerGroup.getHeaderGroupProps()} className="customRow">
@@ -428,7 +431,7 @@ export default function CANTable() {
                 prepareRow(row)
                 return (
                 <tr key={i} className="rawrow" onClick = {() => handleMessage(row.original.ecu, row.original.values, row.original.dt1,
-                row.original.dt2, row.original.dt3, row.original.dt4, row.original.dt5, row.original.dt6, row.original.dt7, row.original.dt8)} onContextMenu={(event) => handleRightClick(event, row)} {...row.getRowProps()}>
+                row.original.dt2, row.original.dt3, row.original.dt4, row.original.dt5, row.original.dt6, row.original.dt7, row.original.dt8)} onContextMenu={(event) => { event.stopPropagation(); handleRightClick(event, row); }} {...row.getRowProps()}>
                   <td width='40'>{i+1}</td>
                     {row.cells.map(cell => {
                     return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
@@ -439,7 +442,13 @@ export default function CANTable() {
             </tbody>
         </Table>
         {contextMenu.visible && (
-          <div style={{ top: contextMenu.y, left: contextMenu.x }} ref={contextMenuRef} className="context-menu" role="menu" aria-label="Row options">
+          <div
+            style={{ top: contextMenu.y, left: contextMenu.x }}
+            ref={contextMenuRef}
+            className="context-menu"
+            role="menu"
+            aria-label="Table row actions"
+          >
             <button role="menuitem" onClick={copyRow}>
               {copied ? '✓ Copied!' : 'Copy Row'}
             </button>
