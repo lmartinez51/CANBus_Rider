@@ -37,10 +37,10 @@ function emitSSE(res, index, time, can, id, dt1, dt2, dt3, dt4, dt5, dt6, dt7, d
         var clines = lines.filter(element => {
             return element !== '';
           });
-        for (let i = 0; i < clines.length; i++) {
+        for (const line of clines) {
             counter++;
             packet ='';
-            packet = clines[i].split("::");
+            packet = line.split("::");
             raw = packet[0].trim().replace(/\s+/g, '*')
             if (packet[1] === undefined) {
                 continue;
