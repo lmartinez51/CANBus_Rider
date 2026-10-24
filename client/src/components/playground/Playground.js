@@ -58,6 +58,7 @@ export default function Playground() {
     const [isTextareaEmpty, setIsTextareaEmpty] = useState(true)
     const [showHelpAndButtons, setShowHelpAndButtons] = useState(true)
     const [signal, setSignal] = useState('WheelBasedVehicleSpeed');
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         // Escuchar el evento del socket para actualizar los datos
@@ -109,6 +110,8 @@ export default function Playground() {
     }, []); // Este efecto se ejecuta una vez cuando el componente se monta
     
     const getMessages = async (message) => {
+        if (!message || isLoading) return;
+        setIsLoading(true);
         console.log(`Mensaje a enviar: ${message}`)
         setShowHelpAndButtons(false)
         const options = {
@@ -126,6 +129,8 @@ export default function Playground() {
             setMessage(data.message)
         } catch (error) {
             console.error(error)
+        } finally {
+            setIsLoading(false);
         }
     }
     
@@ -170,7 +175,7 @@ export default function Playground() {
                                 <div className="projection-buttons-container">
                                     <div className="projection-button">
                                             <span data-projection-id="46">
-                                                <button className="btn" aria-label={`Find description of the ${signal} signal`} data-title="Click to send" onClick={handleButtonClick}>
+                                                <button disabled={isLoading} className="btn" aria-label={`Find description of the ${signal} signal`} data-title="Click to send" onClick={handleButtonClick}>
                                                     <div className="flex1">
                                                         <div className="flex2">
                                                             <div className="flex3">
@@ -193,7 +198,7 @@ export default function Playground() {
                                         </div>
                                     <div className="projection-button">
                                         <span data-projection-id="46">
-                                            <button className="btn" aria-label={`Find LSB, scale and offset of the ${signal} signal`} data-title="Click to send" onClick={handleButtonClick}>
+                                            <button disabled={isLoading} className="btn" aria-label={`Find LSB, scale and offset of the ${signal} signal`} data-title="Click to send" onClick={handleButtonClick}>
                                                 <div className="flex1">
                                                     <div className="flex2">
                                                         <div className="flex3">
@@ -222,12 +227,19 @@ export default function Playground() {
                                 <p className="role">{chatMessage.role}</p>
                                 <p>{chatMessage.content}</p>
                             </li>)}
+                            {isLoading && (
+                                <li className="loading-message" role="status" aria-live="polite">
+                                    <p className="role">Mike:</p>
+                                    <p>Mike is thinking...</p>
+                                </li>
+                            )}
                         </ul>
                         <div className="bottom-section">
                             <div className="input-container">
                                 <textarea
                                     id="txtChatArea"
                                     aria-label="Message Mike"
+                                    disabled={isLoading}
                                     value={value}
                                     onChange={(e) => {
                                         const val = e.target.value;
@@ -246,7 +258,7 @@ export default function Playground() {
                                     cols={10}
                                     placeholder="Message Mike..."
                                 />
-                                <button disabled={isTextareaEmpty} onClick={() => getMessages(value)} className="custom-button" aria-label="Send message" data-testid="send-button">
+                                <button disabled={isTextareaEmpty || isLoading} onClick={() => getMessages(value)} className="custom-button" aria-label="Send message" data-testid="send-button">
                                     <span className="span2" data-state="closed">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-white dark:text-black">
                                             <path d="M7 11L12 6L17 11M12 18V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
