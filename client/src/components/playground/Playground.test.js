@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import Playground from './Playground';
 
 // Mock socket.io-client
@@ -31,4 +31,44 @@ test('renders prompt buttons, chat input, and send button with accessible aria-l
 
   const promptButton2 = screen.getByLabelText('Find LSB, scale and offset of the WheelBasedVehicleSpeed signal');
   expect(promptButton2).toBeInTheDocument();
+});
+
+test('shows accessible loading status and disables controls when fetching messages', async () => {
+  let resolveFetch;
+  const fetchPromise = new Promise((resolve) => {
+    resolveFetch = resolve;
+  });
+
+  global.fetch = jest.fn().mockImplementation(() =>
+    fetchPromise.then(() => ({
+      json: () => Promise.resolve({ message: 'Hello from Mike' }),
+    }))
+  );
+
+  render(<Playground />);
+
+  const chatInput = screen.getByLabelText('Message Mike');
+  const sendButton = screen.getByLabelText('Send message');
+
+  fireEvent.change(chatInput, { target: { value: 'How does CAN bus work?' } });
+  expect(sendButton).not.toBeDisabled();
+
+  fireEvent.click(sendButton);
+
+  // During fetch execution
+  const statusElement = screen.getByRole('status');
+  expect(statusElement).toBeInTheDocument();
+  expect(statusElement).toHaveTextContent('Mike is thinking...');
+
+  expect(chatInput).toBeDisabled();
+  expect(sendButton).toBeDisabled();
+
+  // Resolve fetch promise
+  await act(async () => {
+    resolveFetch();
+  });
+
+  // After fetch completes, status element disappears
+  expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  expect(chatInput).not.toBeDisabled();
 });
