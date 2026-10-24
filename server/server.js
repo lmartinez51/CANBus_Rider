@@ -10,7 +10,6 @@ const play = require('./modules/playPackets')
 const vcanconfig = require('./modules/vcanconfig')
 const startcangen = require('./modules/cangen')
 const chatAssistant = require('./chatAssistant')
-// Note: Raw packet logging is handled by dumpPacket below (replacing legacy saveRawPackets / dataSaver)
 const io = require("socket.io")(httpServer, {
 	cors: {
 		origin: "http://localhost:3000",
@@ -49,7 +48,7 @@ var db_bus = new can.DatabaseService(channel, network.buses["Private"])
 // Start listening channel
 channel.start()
 
-// Listen for messages to dump raw packets into log files (replaces legacy saveRawPackets)
+// Listen for messages to dump raw packets into log files
 channel.addListener("onMessage", dumpPacket)
 
 //Helper function. Emulates candump -L 
