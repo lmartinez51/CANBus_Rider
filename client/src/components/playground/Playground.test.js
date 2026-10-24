@@ -17,8 +17,11 @@ jest.mock('./Helpers/Canvas', () => () => <div data-testid="canvas" />);
 // Mock CANTable to isolate Playground rendering
 jest.mock('./Table', () => () => <div data-testid="can-table" />);
 
-test('renders prompt buttons and send button with accessible aria-labels', () => {
+test('renders prompt buttons, chat input, and send button with accessible aria-labels', () => {
   render(<Playground />);
+
+  const chatInput = screen.getByLabelText('Message Mike');
+  expect(chatInput).toBeInTheDocument();
 
   const sendButton = screen.getByLabelText('Send message');
   expect(sendButton).toBeInTheDocument();

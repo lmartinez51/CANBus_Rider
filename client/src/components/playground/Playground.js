@@ -225,12 +225,27 @@ export default function Playground() {
                         </ul>
                         <div className="bottom-section">
                             <div className="input-container">
-                                <textarea id="txtChatArea" value={value} onChange={(e) => {setValue(e.target.value); setIsTextareaEmpty(e.target.value === '')}} onKeyDown={(e) => {
-                                    if (e.code === 'Enter') {
-                                        e.preventDefault(); // Previene la acción por defecto del 'Enter'
-                                        getMessages(value);
-                                    }
-                                }} rows="1" cols={10} placeholder="Message Mike..."/>
+                                <textarea
+                                    id="txtChatArea"
+                                    aria-label="Message Mike"
+                                    value={value}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setValue(val);
+                                        setIsTextareaEmpty(val.trim() === '');
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.code === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            if (value.trim()) {
+                                                getMessages(value);
+                                            }
+                                        }
+                                    }}
+                                    rows="1"
+                                    cols={10}
+                                    placeholder="Message Mike..."
+                                />
                                 <button disabled={isTextareaEmpty} onClick={() => getMessages(value)} className="custom-button" aria-label="Send message" data-testid="send-button">
                                     <span className="span2" data-state="closed">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-white dark:text-black">
