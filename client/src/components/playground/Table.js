@@ -33,6 +33,7 @@ export default function CANTable() {
   const [newValue, setNewValue] = useState('')
   const [result, setResult] = useState('')
   const [bitPosition, setBitPosition] = useState('')
+  const [calcStatus, setCalcStatus] = useState('')
   const worker = new Worker()
 
   // Modifica el nombre de la clase dependiendo del valor de ecuState
@@ -69,6 +70,7 @@ export default function CANTable() {
     const bitPosition = calculateBitPosition(parseInt(lsb))
     setResult(hexValue)
     setBitPosition(bitPosition)
+    setCalcStatus(`Calculated Bit Position ${bitPosition} and New Hex Value ${hexValue}`)
   }
 
   const calculateBitPosition = (lsb) => {
@@ -84,6 +86,7 @@ export default function CANTable() {
     setNewValue('')
     setResult('')
     setBitPosition('')
+    setCalcStatus('Calculator inputs and results cleared')
   }
 
   const inverseCalculator = (newValue, lsb, scale, offset) => {
@@ -487,6 +490,9 @@ export default function CANTable() {
               <h5 className="tableTitle">BitWise Whisperer</h5>
               <h4 className="tableSubtitle"><span className="italicText">Selected Message: {ecuState}</span></h4>
             </div>
+            <div className="visually-hidden" role="status" aria-live="polite">
+              {calcStatus}
+            </div>
             <Table className="calcTable marginLeft"striped bordered hover responsive variant="dark">
               <thead className="customCalcHeader">
                 <tr className="customCalcRow">
@@ -512,8 +518,8 @@ export default function CANTable() {
               </tbody>
             </Table>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button className="calculate" type="submit">Calculate</button>
-              <button className="clear" type="button" onClick={handleClear}>Clear</button>
+              <button className="calculate" type="submit" aria-label="Calculate bitwise value">Calculate</button>
+              <button className="clear" type="button" onClick={handleClear} aria-label="Clear calculator inputs">Clear</button>
             </div>
           </form>
         </div>
