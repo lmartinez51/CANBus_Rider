@@ -512,8 +512,8 @@ export default function CANTable() {
               </tbody>
             </Table>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button className="calculate" type="submit">Calculate</button>
-              <button className="clear" type="button" onClick={handleClear}>Clear</button>
+              <button className="calculate" type="submit" aria-label="Calculate bitwise value">Calculate</button>
+              <button className="clear" type="button" onClick={handleClear} aria-label="Clear calculator fields">Clear</button>
             </div>
           </form>
         </div>
