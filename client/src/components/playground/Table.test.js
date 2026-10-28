@@ -95,4 +95,35 @@ describe('CANTable Context Menu UX & Accessibility', () => {
     const copiedMenuItem = await screen.findByRole('menuitem', { name: '✓ Copied!' });
     expect(copiedMenuItem).toBeInTheDocument();
   });
+
+  test('calculator provides accessible live status announcements on submit and clear', () => {
+    render(
+      <ContextValues.Provider value={{ signal: 'test', setSignal: jest.fn() }}>
+        <CANTable />
+      </ContextValues.Provider>
+    );
+
+    const lsbInput = screen.getByLabelText('Least Significant Bit');
+    const scaleInput = screen.getByLabelText('Scale');
+    const offsetInput = screen.getByLabelText('Offset');
+    const valueInput = screen.getByLabelText('Expected Value');
+    const calculateBtn = screen.getByRole('button', { name: 'Calculate' });
+    const clearBtn = screen.getByRole('button', { name: 'Clear' });
+    const statusBox = screen.getByRole('status');
+
+    expect(statusBox).toHaveTextContent('');
+
+    fireEvent.change(lsbInput, { target: { value: '0' } });
+    fireEvent.change(scaleInput, { target: { value: '1' } });
+    fireEvent.change(offsetInput, { target: { value: '0' } });
+    fireEvent.change(valueInput, { target: { value: '10' } });
+
+    fireEvent.click(calculateBtn);
+
+    expect(statusBox).toHaveTextContent('Calculated Bit Position 0-7 and Hex Value 0A');
+
+    fireEvent.click(clearBtn);
+
+    expect(statusBox).toHaveTextContent('Calculator inputs reset');
+  });
 });

@@ -33,6 +33,7 @@ export default function CANTable() {
   const [newValue, setNewValue] = useState('')
   const [result, setResult] = useState('')
   const [bitPosition, setBitPosition] = useState('')
+  const [calcStatus, setCalcStatus] = useState('')
   const worker = new Worker()
 
   // Modifica el nombre de la clase dependiendo del valor de ecuState
@@ -69,6 +70,7 @@ export default function CANTable() {
     const bitPosition = calculateBitPosition(parseInt(lsb))
     setResult(hexValue)
     setBitPosition(bitPosition)
+    setCalcStatus(`Calculated Bit Position ${bitPosition} and Hex Value ${hexValue}`)
   }
 
   const calculateBitPosition = (lsb) => {
@@ -84,6 +86,7 @@ export default function CANTable() {
     setNewValue('')
     setResult('')
     setBitPosition('')
+    setCalcStatus('Calculator inputs reset')
   }
 
   const inverseCalculator = (newValue, lsb, scale, offset) => {
@@ -514,6 +517,9 @@ export default function CANTable() {
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <button className="calculate" type="submit">Calculate</button>
               <button className="clear" type="button" onClick={handleClear}>Clear</button>
+            </div>
+            <div className="visually-hidden" role="status" aria-live="polite">
+              {calcStatus}
             </div>
           </form>
         </div>
