@@ -95,4 +95,64 @@ describe('CANTable Context Menu UX & Accessibility', () => {
     const copiedMenuItem = await screen.findByRole('menuitem', { name: '✓ Copied!' });
     expect(copiedMenuItem).toBeInTheDocument();
   });
+
+  test('decoded signals rows have accessible attributes and keyboard navigation', async () => {
+    const setSignalMock = jest.fn();
+    const { container } = render(
+      <ContextValues.Provider value={{ signal: 'EngSpeed', setSignal: setSignalMock }}>
+        <CANTable />
+      </ContextValues.Provider>
+    );
+
+    // Populate data via mock worker message
+    act(() => {
+      workerListener({
+        data: [
+          {
+            time: '1234567890.123456',
+            can: 'vcan0',
+            id: '18F005FE',
+            dt1: '00',
+            dt2: '00',
+            dt3: '00',
+            dt4: '00',
+            dt5: '00',
+            dt6: '00',
+            dt7: '00',
+            dt8: '00',
+            ecu: 'EEC1',
+            values: '{EngSpeed: 1200 rpm, ActualEngTorque: 50 %}',
+          },
+        ],
+      });
+    });
+
+    // Click on the raw data table row to decode messages
+    const rawRow = container.querySelector('.rawrow');
+    expect(rawRow).toBeInTheDocument();
+    fireEvent.click(rawRow);
+
+    // Expect decoded signal rows to be rendered
+    const engSpeedRow = screen.getByRole('button', { name: 'Select signal EngSpeed' });
+    const torqueRow = screen.getByRole('button', { name: 'Select signal ActualEngTorque' });
+
+    expect(engSpeedRow).toBeInTheDocument();
+    expect(torqueRow).toBeInTheDocument();
+
+    // EngSpeed matches current signal: aria-pressed should be true and have selected-signal class
+    expect(engSpeedRow).toHaveAttribute('aria-pressed', 'true');
+    expect(engSpeedRow).toHaveClass('selected-signal');
+
+    // ActualEngTorque is not current signal
+    expect(torqueRow).toHaveAttribute('aria-pressed', 'false');
+    expect(torqueRow).not.toHaveClass('selected-signal');
+
+    // Keyboard selection with Enter
+    fireEvent.keyDown(torqueRow, { key: 'Enter' });
+    expect(setSignalMock).toHaveBeenCalledWith('ActualEngTorque');
+
+    // Keyboard selection with Space
+    fireEvent.keyDown(engSpeedRow, { key: ' ' });
+    expect(setSignalMock).toHaveBeenCalledWith('EngSpeed');
+  });
 });

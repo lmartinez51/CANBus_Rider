@@ -235,6 +235,24 @@ table.decodedTable td:nth-child(3) {
     background-color: #262546;
 }
 
+.signals {
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.signals:hover {
+    background-color: rgba(40, 77, 241, 0.35);
+}
+
+.signals:focus-visible {
+    outline: 2px solid #00f7ff;
+    outline-offset: -2px;
+}
+
+.signals.selected-signal {
+    background-color: rgba(40, 77, 241, 0.6);
+}
+
 /* Form Styles Settings */
 .calcForm {
     width: 390px;
