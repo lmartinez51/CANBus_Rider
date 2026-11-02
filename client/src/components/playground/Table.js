@@ -473,7 +473,20 @@ export default function CANTable() {
               </thead>
               <tbody className="tbodyHeight">
                   {message.map(({Signal, Value, Unit}, idx) => (
-                    <tr key={idx} className= 'signals' onClick={() => setSignal(Signal)}>
+                    <tr
+                      key={idx}
+                      className="signals"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Select signal ${Signal}`}
+                      onClick={() => setSignal(Signal)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSignal(Signal);
+                        }
+                      }}
+                    >
                       <td>{Signal}</td>
                       <td>{Value}</td>
                       <td>{Unit}</td>

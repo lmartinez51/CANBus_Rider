@@ -95,4 +95,62 @@ describe('CANTable Context Menu UX & Accessibility', () => {
     const copiedMenuItem = await screen.findByRole('menuitem', { name: '✓ Copied!' });
     expect(copiedMenuItem).toBeInTheDocument();
   });
+
+  test('decoded signals are accessible and selectable via mouse click and keyboard (Enter/Space)', async () => {
+    const setSignalMock = jest.fn();
+    render(
+      <ContextValues.Provider value={{ signal: 'test', setSignal: setSignalMock }}>
+        <CANTable />
+      </ContextValues.Provider>
+    );
+
+    // Simulate worker sending a parsed CAN packet with signals
+    act(() => {
+      if (workerListener) {
+        workerListener({
+          data: [
+            {
+              time: '0.001',
+              can: 'vcan0',
+              id: '18FEF1FE',
+              dt1: '00',
+              dt2: '00',
+              dt3: '00',
+              dt4: '00',
+              dt5: '00',
+              dt6: '00',
+              dt7: '00',
+              dt8: '00',
+              ecu: 'CruiseControl',
+              values: '{WheelBasedVehicleSpeed: 55 km/h, BrakeSwitch: 0 state}',
+            },
+          ],
+        });
+      }
+    });
+
+    // Click on the raw table row to decode the message
+    const rawRow = screen.getByText('18FEF1FE').closest('tr');
+    fireEvent.click(rawRow);
+
+    // Now decoded signals should appear as accessible buttons
+    const speedSignal = screen.getByRole('button', { name: 'Select signal WheelBasedVehicleSpeed' });
+    const brakeSignal = screen.getByRole('button', { name: 'Select signal BrakeSwitch' });
+
+    expect(speedSignal).toBeInTheDocument();
+    expect(speedSignal).toHaveAttribute('tabIndex', '0');
+    expect(brakeSignal).toBeInTheDocument();
+
+    // Mouse click selects signal
+    fireEvent.click(speedSignal);
+    expect(setSignalMock).toHaveBeenCalledWith('WheelBasedVehicleSpeed');
+
+    // Keyboard 'Enter' selects signal
+    fireEvent.keyDown(brakeSignal, { key: 'Enter', code: 'Enter' });
+    expect(setSignalMock).toHaveBeenCalledWith('BrakeSwitch');
+
+    // Keyboard 'Space' selects signal
+    fireEvent.keyDown(speedSignal, { key: ' ', code: 'Space' });
+    expect(setSignalMock).toHaveBeenCalledTimes(3);
+  });
 });
