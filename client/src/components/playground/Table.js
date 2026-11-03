@@ -33,6 +33,7 @@ export default function CANTable() {
   const [newValue, setNewValue] = useState('')
   const [result, setResult] = useState('')
   const [bitPosition, setBitPosition] = useState('')
+  const [isLiveActive, setIsLiveActive] = useState(false)
   const worker = new Worker()
 
   // Modifica el nombre de la clase dependiendo del valor de ecuState
@@ -45,6 +46,10 @@ export default function CANTable() {
     // Cuando el componente se desmonte, termina el Web Worker
     return () => {
         worker.terminate()
+        if (eventSource) {
+          eventSource.close()
+          eventSource = null
+        }
     }
   // eslint-disable-next-line
   }, [])
@@ -199,7 +204,11 @@ export default function CANTable() {
   }
 
   function handlePlayTraffic () {
+    if (eventSource) {
+      eventSource.close()
+    }
     eventSource = new EventSource(playUrl)
+    setIsLiveActive(true)
     //Reset table values
     setInfo([]);
     setMessage([]);
@@ -207,10 +216,17 @@ export default function CANTable() {
       const parsedData = JSON.parse(e.data)
       setInfo((data) => [...data,parsedData])
     }
+    eventSource.onerror = () => {
+      handleStopTraffic()
+    }
   };
 
   function handleStopTraffic () {
-    eventSource.close();
+    if (eventSource) {
+      eventSource.close();
+      eventSource = null;
+    }
+    setIsLiveActive(false);
     console.log("Connection closed");
   }
 
@@ -398,14 +414,20 @@ export default function CANTable() {
                       Play & Decode
                     </NavDropdown.Item>
                   </NavDropdown>
-                  <NavDropdown title="Live Traffic">
-                    <NavDropdown.Item onClick = {handlePlayTraffic}>
+                  <NavDropdown
+                    title={`Live Traffic${isLiveActive ? " (Running)" : ""}`}
+                    id="live-traffic-dropdown"
+                  >
+                    <NavDropdown.Item onClick={handlePlayTraffic} disabled={isLiveActive}>
                       Start
                     </NavDropdown.Item>
-                    <NavDropdown.Item onClick = {handleStopTraffic}>
+                    <NavDropdown.Item onClick={handleStopTraffic} disabled={!isLiveActive}>
                       Stop
                     </NavDropdown.Item>
                   </NavDropdown>
+                  <span className="visually-hidden" role="status" aria-live="polite">
+                    {isLiveActive ? "Live CAN traffic is streaming" : "Live CAN traffic is stopped"}
+                  </span>
                   <GlobalFilter globalFilter={state.globalFilter} setGlobalFilter={setGlobalFilter}/>
                 </Nav>
               </div>

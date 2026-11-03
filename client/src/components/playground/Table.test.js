@@ -96,3 +96,66 @@ describe('CANTable Context Menu UX & Accessibility', () => {
     expect(copiedMenuItem).toBeInTheDocument();
   });
 });
+
+describe('CANTable Live Traffic UX & Accessibility', () => {
+  let mockClose;
+  let mockEventSource;
+
+  beforeEach(() => {
+    mockClose = jest.fn();
+    mockEventSource = jest.fn(() => ({
+      close: mockClose,
+      onmessage: null,
+      onerror: null,
+    }));
+    global.EventSource = mockEventSource;
+  });
+
+  afterEach(() => {
+    delete global.EventSource;
+  });
+
+  test('toggles Live Traffic running status, disabled states, and aria-live feedback', () => {
+    render(
+      <ContextValues.Provider value={{ signal: 'test', setSignal: jest.fn() }}>
+        <CANTable />
+      </ContextValues.Provider>
+    );
+
+    // Initial state: Dropdown title is 'Live Traffic', live traffic stopped
+    const dropdownToggle = screen.getByRole('button', { name: /Live Traffic/i });
+    expect(dropdownToggle).toHaveTextContent('Live Traffic');
+
+    const statusLiveRegion = screen.getByRole('status');
+    expect(statusLiveRegion).toHaveTextContent('Live CAN traffic is stopped');
+
+    // Open dropdown
+    fireEvent.click(dropdownToggle);
+
+    const startItem = screen.getByRole('button', { name: /^Start$/i });
+    const stopItem = screen.getByRole('button', { name: /^Stop$/i });
+
+    expect(startItem).not.toHaveClass('disabled');
+    expect(stopItem).toHaveClass('disabled');
+
+    // Click Start
+    fireEvent.click(startItem);
+
+    // Now streaming: title updates, Start is disabled, Stop is enabled
+    expect(mockEventSource).toHaveBeenCalledWith('http://localhost:8080/play');
+    expect(dropdownToggle).toHaveTextContent('Live Traffic (Running)');
+    expect(statusLiveRegion).toHaveTextContent('Live CAN traffic is streaming');
+    expect(startItem).toHaveClass('disabled');
+    expect(stopItem).not.toHaveClass('disabled');
+
+    // Click Stop
+    fireEvent.click(stopItem);
+
+    // Now stopped: close() is called, title reverts, status updates
+    expect(mockClose).toHaveBeenCalledTimes(1);
+    expect(dropdownToggle).toHaveTextContent('Live Traffic');
+    expect(statusLiveRegion).toHaveTextContent('Live CAN traffic is stopped');
+    expect(startItem).not.toHaveClass('disabled');
+    expect(stopItem).toHaveClass('disabled');
+  });
+});
