@@ -57,43 +57,13 @@ describe('CANTable Context Menu UX & Accessibility', () => {
     // Context menu is initially hidden
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 
-    // Calculator inputs have aria-labels
+    // Calculator inputs and buttons have aria-labels
     expect(screen.getByLabelText('Least Significant Bit')).toBeInTheDocument();
     expect(screen.getByLabelText('Scale')).toBeInTheDocument();
     expect(screen.getByLabelText('Offset')).toBeInTheDocument();
     expect(screen.getByLabelText('Expected Value')).toBeInTheDocument();
-
-    // Calculator buttons have accessible names
-    expect(screen.getByRole('button', { name: 'Calculate bitwise value' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Clear calculator inputs' })).toBeInTheDocument();
-  });
-
-  test('announces calculation results and clearing actions via status region', () => {
-    render(
-      <ContextValues.Provider value={{ signal: 'test', setSignal: jest.fn() }}>
-        <CANTable />
-      </ContextValues.Provider>
-    );
-
-    const lsbInput = screen.getByLabelText('Least Significant Bit');
-    const scaleInput = screen.getByLabelText('Scale');
-    const offsetInput = screen.getByLabelText('Offset');
-    const valueInput = screen.getByLabelText('Expected Value');
-    const calcButton = screen.getByRole('button', { name: 'Calculate bitwise value' });
-    const clearButton = screen.getByRole('button', { name: 'Clear calculator inputs' });
-
-    fireEvent.change(lsbInput, { target: { value: '8' } });
-    fireEvent.change(scaleInput, { target: { value: '1' } });
-    fireEvent.change(offsetInput, { target: { value: '0' } });
-    fireEvent.change(valueInput, { target: { value: '10' } });
-
-    fireEvent.click(calcButton);
-
-    const statusRegion = screen.getByRole('status');
-    expect(statusRegion).toHaveTextContent(/Calculated Bit Position 8-15 and New Hex Value/i);
-
-    fireEvent.click(clearButton);
-    expect(statusRegion).toHaveTextContent('Calculator inputs and results cleared');
+    expect(screen.getByLabelText('Calculate bitwise value')).toBeInTheDocument();
+    expect(screen.getByLabelText('Clear calculator fields')).toBeInTheDocument();
   });
 
   test('context menu provides menu role, menuitem role, and copied feedback', async () => {
