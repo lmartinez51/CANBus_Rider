@@ -70,7 +70,7 @@ export default function CANTable() {
     const bitPosition = calculateBitPosition(parseInt(lsb))
     setResult(hexValue)
     setBitPosition(bitPosition)
-    setCalcStatus(`Calculated Bit Position ${bitPosition} and New Hex Value ${hexValue}`)
+    setCalcStatus(`Calculated Bit Position ${bitPosition} and Hex Value ${hexValue}`)
   }
 
   const calculateBitPosition = (lsb) => {
@@ -86,7 +86,7 @@ export default function CANTable() {
     setNewValue('')
     setResult('')
     setBitPosition('')
-    setCalcStatus('Calculator inputs and results cleared')
+    setCalcStatus('Calculator inputs reset')
   }
 
   const inverseCalculator = (newValue, lsb, scale, offset) => {
@@ -520,6 +520,9 @@ export default function CANTable() {
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <button className="calculate" type="submit" aria-label="Calculate bitwise value">Calculate</button>
               <button className="clear" type="button" onClick={handleClear} aria-label="Clear calculator fields">Clear</button>
+            </div>
+            <div className="visually-hidden" role="status" aria-live="polite">
+              {calcStatus}
             </div>
           </form>
         </div>
