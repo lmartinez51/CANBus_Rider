@@ -47,7 +47,7 @@ describe('CANTable Context Menu UX & Accessibility', () => {
     jest.useRealTimers();
   });
 
-  test('renders Table and confirms accessibility attributes for calculator inputs', () => {
+  test('renders Table and confirms accessibility attributes for calculator inputs and buttons', () => {
     render(
       <ContextValues.Provider value={{ signal: 'test', setSignal: jest.fn() }}>
         <CANTable />
