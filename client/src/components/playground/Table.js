@@ -26,7 +26,7 @@ export default function CANTable() {
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 })
   const [copied, setCopied] = useState(false)
   const contextMenuRef = useRef(null)
-  const { setSignal } = useContext(ContextValues)
+  const { signal: currentSignal, setSignal } = useContext(ContextValues)
   const [lsb, setLsb] = useState('')
   const [scale, setScale] = useState('')
   const [offset, setOffset] = useState('')
@@ -476,7 +476,21 @@ export default function CANTable() {
               </thead>
               <tbody className="tbodyHeight">
                   {message.map(({Signal, Value, Unit}, idx) => (
-                    <tr key={idx} className= 'signals' onClick={() => setSignal(Signal)}>
+                    <tr
+                      key={idx}
+                      className={`signals ${currentSignal === Signal ? 'selected-signal' : ''}`}
+                      onClick={() => setSignal(Signal)}
+                      tabIndex={0}
+                      role="button"
+                      aria-pressed={currentSignal === Signal}
+                      aria-label={`Select signal ${Signal}`}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSignal(Signal);
+                        }
+                      }}
+                    >
                       <td>{Signal}</td>
                       <td>{Value}</td>
                       <td>{Unit}</td>

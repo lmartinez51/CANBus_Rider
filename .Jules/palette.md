@@ -6,6 +6,6 @@
 **Learning:** Custom right-click context menus that copy table contents to the clipboard without visual status feedback leave users uncertain if the copy action succeeded. Providing temporary '✓ Copied!' status along with `role="menu"`, `role="menuitem"`, and `aria-label` ensures clear interaction feedback and screen reader accessibility.
 **Action:** Always add state-driven visual feedback and explicit ARIA menu roles to custom context menus performing asynchronous or clipboard operations.
 
-## 2026-10-12 - Live Status Regions for Dynamic Calculation Forms
-**Learning:** Interactive calculator forms that update values dynamically without full page reloads leave screen reader users unaware when calculations complete or inputs are cleared. Adding an `aria-live="polite"` status region announces state changes and calculation outcomes immediately.
-**Action:** Include `aria-live="polite"` status containers for non-navigational state updates and dynamic form submission results to ensure screen reader parity.
+## 2026-10-12 - Interactive Table Row Selection & Focus States
+**Learning:** Table rows acting as interactive selectors (e.g. decoded signal rows selecting signals for assistant prompts) must not rely solely on mouse clicks. Without `role="button"`, `tabIndex={0}`, `aria-pressed`, keyboard event listeners (`Enter` / `Space`), and `:focus-visible` styling, keyboard and screen reader users cannot discover or trigger the selection.
+**Action:** Always equip interactive table rows with button roles, explicit keyboard trigger handlers, `aria-pressed` indicators, and clear `:focus-visible` outlines.

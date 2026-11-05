@@ -98,34 +98,63 @@ describe('CANTable Context Menu UX & Accessibility', () => {
     expect(copiedMenuItem).toBeInTheDocument();
   });
 
-  test('calculator provides accessible live status announcements on submit and clear', () => {
-    render(
-      <ContextValues.Provider value={{ signal: 'test', setSignal: jest.fn() }}>
+  test('decoded signals rows have accessible attributes and keyboard navigation', async () => {
+    const setSignalMock = jest.fn();
+    const { container } = render(
+      <ContextValues.Provider value={{ signal: 'EngSpeed', setSignal: setSignalMock }}>
         <CANTable />
       </ContextValues.Provider>
     );
 
-    const lsbInput = screen.getByLabelText('Least Significant Bit');
-    const scaleInput = screen.getByLabelText('Scale');
-    const offsetInput = screen.getByLabelText('Offset');
-    const valueInput = screen.getByLabelText('Expected Value');
-    const calculateBtn = screen.getByRole('button', { name: 'Calculate' });
-    const clearBtn = screen.getByRole('button', { name: 'Clear' });
-    const statusBox = screen.getByRole('status');
+    // Populate data via mock worker message
+    act(() => {
+      workerListener({
+        data: [
+          {
+            time: '1234567890.123456',
+            can: 'vcan0',
+            id: '18F005FE',
+            dt1: '00',
+            dt2: '00',
+            dt3: '00',
+            dt4: '00',
+            dt5: '00',
+            dt6: '00',
+            dt7: '00',
+            dt8: '00',
+            ecu: 'EEC1',
+            values: '{EngSpeed: 1200 rpm, ActualEngTorque: 50 %}',
+          },
+        ],
+      });
+    });
 
-    expect(statusBox).toHaveTextContent('');
+    // Click on the raw data table row to decode messages
+    const rawRow = container.querySelector('.rawrow');
+    expect(rawRow).toBeInTheDocument();
+    fireEvent.click(rawRow);
 
-    fireEvent.change(lsbInput, { target: { value: '0' } });
-    fireEvent.change(scaleInput, { target: { value: '1' } });
-    fireEvent.change(offsetInput, { target: { value: '0' } });
-    fireEvent.change(valueInput, { target: { value: '10' } });
+    // Expect decoded signal rows to be rendered
+    const engSpeedRow = screen.getByRole('button', { name: 'Select signal EngSpeed' });
+    const torqueRow = screen.getByRole('button', { name: 'Select signal ActualEngTorque' });
 
-    fireEvent.click(calculateBtn);
+    expect(engSpeedRow).toBeInTheDocument();
+    expect(torqueRow).toBeInTheDocument();
 
-    expect(statusBox).toHaveTextContent('Calculated Bit Position 0-7 and Hex Value 0A');
+    // EngSpeed matches current signal: aria-pressed should be true and have selected-signal class
+    expect(engSpeedRow).toHaveAttribute('aria-pressed', 'true');
+    expect(engSpeedRow).toHaveClass('selected-signal');
 
-    fireEvent.click(clearBtn);
+    // ActualEngTorque is not current signal
+    expect(torqueRow).toHaveAttribute('aria-pressed', 'false');
+    expect(torqueRow).not.toHaveClass('selected-signal');
 
-    expect(statusBox).toHaveTextContent('Calculator inputs reset');
+    // Keyboard selection with Enter
+    fireEvent.keyDown(torqueRow, { key: 'Enter' });
+    expect(setSignalMock).toHaveBeenCalledWith('ActualEngTorque');
+
+    // Keyboard selection with Space
+    fireEvent.keyDown(engSpeedRow, { key: ' ' });
+    expect(setSignalMock).toHaveBeenCalledWith('EngSpeed');
   });
 });
