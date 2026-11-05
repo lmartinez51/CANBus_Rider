@@ -26,7 +26,7 @@ export default function CANTable() {
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 })
   const [copied, setCopied] = useState(false)
   const contextMenuRef = useRef(null)
-  const { setSignal } = useContext(ContextValues)
+  const { signal: currentSignal, setSignal } = useContext(ContextValues)
   const [lsb, setLsb] = useState('')
   const [scale, setScale] = useState('')
   const [offset, setOffset] = useState('')
@@ -74,6 +74,7 @@ export default function CANTable() {
     const bitPosition = calculateBitPosition(parseInt(lsb))
     setResult(hexValue)
     setBitPosition(bitPosition)
+    setCalcStatus(`Calculated Bit Position ${bitPosition} and Hex Value ${hexValue}`)
   }
 
   const calculateBitPosition = (lsb) => {
@@ -89,6 +90,7 @@ export default function CANTable() {
     setNewValue('')
     setResult('')
     setBitPosition('')
+    setCalcStatus('Calculator inputs reset')
   }
 
   const inverseCalculator = (newValue, lsb, scale, offset) => {
@@ -495,7 +497,20 @@ export default function CANTable() {
               </thead>
               <tbody className="tbodyHeight">
                   {message.map(({Signal, Value, Unit}, idx) => (
-                    <tr key={idx} className= 'signals' onClick={() => setSignal(Signal)}>
+                    <tr
+                      key={idx}
+                      className="signals"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Select signal ${Signal}`}
+                      onClick={() => setSignal(Signal)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSignal(Signal);
+                        }
+                      }}
+                    >
                       <td>{Signal}</td>
                       <td>{Value}</td>
                       <td>{Unit}</td>
@@ -508,6 +523,9 @@ export default function CANTable() {
             <div className="titleContainer">
               <h5 className="tableTitle">BitWise Whisperer</h5>
               <h4 className="tableSubtitle"><span className="italicText">Selected Message: {ecuState}</span></h4>
+            </div>
+            <div className="visually-hidden" role="status" aria-live="polite">
+              {calcStatus}
             </div>
             <Table className="calcTable marginLeft"striped bordered hover responsive variant="dark">
               <thead className="customCalcHeader">
@@ -534,8 +552,11 @@ export default function CANTable() {
               </tbody>
             </Table>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button className="calculate" type="submit">Calculate</button>
-              <button className="clear" type="button" onClick={handleClear}>Clear</button>
+              <button className="calculate" type="submit" aria-label="Calculate bitwise value">Calculate</button>
+              <button className="clear" type="button" onClick={handleClear} aria-label="Clear calculator fields">Clear</button>
+            </div>
+            <div className="visually-hidden" role="status" aria-live="polite">
+              {calcStatus}
             </div>
           </form>
         </div>
