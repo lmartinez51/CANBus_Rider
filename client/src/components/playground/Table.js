@@ -490,6 +490,9 @@ export default function CANTable() {
               <h5 className="tableTitle">BitWise Whisperer</h5>
               <h4 className="tableSubtitle"><span className="italicText">Selected Message: {ecuState}</span></h4>
             </div>
+            <div className="visually-hidden" role="status" aria-live="polite">
+              {calcStatus}
+            </div>
             <Table className="calcTable marginLeft"striped bordered hover responsive variant="dark">
               <thead className="customCalcHeader">
                 <tr className="customCalcRow">
@@ -515,8 +518,8 @@ export default function CANTable() {
               </tbody>
             </Table>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button className="calculate" type="submit">Calculate</button>
-              <button className="clear" type="button" onClick={handleClear}>Clear</button>
+              <button className="calculate" type="submit" aria-label="Calculate bitwise value">Calculate</button>
+              <button className="clear" type="button" onClick={handleClear} aria-label="Clear calculator fields">Clear</button>
             </div>
             <div className="visually-hidden" role="status" aria-live="polite">
               {calcStatus}
