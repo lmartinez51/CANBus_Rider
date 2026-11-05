@@ -1,8 +1,11 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import axios from 'axios';
 import SelectCAN from './SelectCANBus';
+
+jest.mock('axios');
 
 describe('SelectCAN Component', () => {
   test('renders select component and updates selected CAN bus value correctly', () => {
@@ -35,5 +38,24 @@ describe('SelectCAN Component', () => {
     fireEvent.click(radio1M);
     expect(radio1M).toBeChecked();
     expect(radio125).not.toBeChecked();
+  });
+
+  test('displays loading state and status message on submission', async () => {
+    axios.get.mockResolvedValueOnce({ data: { message: 'Success' } });
+
+    render(
+      <MemoryRouter>
+        <SelectCAN />
+      </MemoryRouter>
+    );
+
+    const confirmButton = screen.getByRole('button', { name: /confirm/i });
+    fireEvent.click(confirmButton);
+
+    expect(screen.getByRole('button', { name: /connecting/i })).toBeDisabled();
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toHaveTextContent('CAN Bus configured successfully!');
+    });
   });
 });

@@ -1,24 +1,37 @@
 import React, { useState } from 'react';
-import { Form, Col, Row } from "react-bootstrap";
+import { Form, Col, Row, Spinner, Alert } from "react-bootstrap";
 import { Link } from 'react-router-dom';
-import axios from 'axios'
-import "./SelectCANBus.css"
-const url = 'http://localhost:8080/can'
+import axios from 'axios';
+import "./SelectCANBus.css";
+const url = 'http://localhost:8080/can';
 
 
 function SelectCAN() {
      const [CAN, setCAN] = useState('can0');
-     const [rate, setRate] = useState('125000')
+     const [rate, setRate] = useState('125000');
+     const [isSubmitting, setIsSubmitting] = useState(false);
+     const [statusMessage, setStatusMessage] = useState(null);
 
      const handleSubmit = (event) => {
           // prevents the submit button from refreshing the page
           event.preventDefault();
+          setIsSubmitting(true);
+          setStatusMessage(null);
           console.log(CAN);
           console.log(rate);
           const data = {params: {CAN: CAN, rate: rate}};
-          axios.get(url, data).then((response) => {
-               console.log(response.data);
-           });
+          axios.get(url, data)
+               .then((response) => {
+                    console.log(response.data);
+                    setStatusMessage({ variant: 'success', text: 'CAN Bus configured successfully!' });
+               })
+               .catch((error) => {
+                    console.error(error);
+                    setStatusMessage({ variant: 'danger', text: 'Failed to configure CAN Bus. Please try again.' });
+               })
+               .finally(() => {
+                    setIsSubmitting(false);
+               });
       };
 
      function handleChange(event) {
@@ -85,8 +98,22 @@ function SelectCAN() {
                     </Col>
                </Form.Group>
                <hr />
+               {statusMessage && (
+                    <Alert variant={statusMessage.variant} className="mt-3" role="status" aria-live="polite">
+                         {statusMessage.text}
+                    </Alert>
+               )}
                <div className='Buttons'>
-                    <button className="continue" type="submit"> Confirm </button>
+                    <button className="continue" type="submit" disabled={isSubmitting}>
+                         {isSubmitting ? (
+                              <>
+                                   <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                                   <span className="ms-2">Connecting...</span>
+                              </>
+                         ) : (
+                              'Confirm'
+                         )}
+                    </button>
                     <Link to="/" className="cancel"> Cancel </Link>
                </div>
           </Form>
