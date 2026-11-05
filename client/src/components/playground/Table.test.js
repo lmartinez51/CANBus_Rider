@@ -98,63 +98,61 @@ describe('CANTable Context Menu UX & Accessibility', () => {
     expect(copiedMenuItem).toBeInTheDocument();
   });
 
-  test('decoded signals rows have accessible attributes and keyboard navigation', async () => {
+  test('decoded signals are accessible and selectable via mouse click and keyboard (Enter/Space)', async () => {
     const setSignalMock = jest.fn();
-    const { container } = render(
-      <ContextValues.Provider value={{ signal: 'EngSpeed', setSignal: setSignalMock }}>
+    render(
+      <ContextValues.Provider value={{ signal: 'test', setSignal: setSignalMock }}>
         <CANTable />
       </ContextValues.Provider>
     );
 
-    // Populate data via mock worker message
+    // Simulate worker sending a parsed CAN packet with signals
     act(() => {
-      workerListener({
-        data: [
-          {
-            time: '1234567890.123456',
-            can: 'vcan0',
-            id: '18F005FE',
-            dt1: '00',
-            dt2: '00',
-            dt3: '00',
-            dt4: '00',
-            dt5: '00',
-            dt6: '00',
-            dt7: '00',
-            dt8: '00',
-            ecu: 'EEC1',
-            values: '{EngSpeed: 1200 rpm, ActualEngTorque: 50 %}',
-          },
-        ],
-      });
+      if (workerListener) {
+        workerListener({
+          data: [
+            {
+              time: '0.001',
+              can: 'vcan0',
+              id: '18FEF1FE',
+              dt1: '00',
+              dt2: '00',
+              dt3: '00',
+              dt4: '00',
+              dt5: '00',
+              dt6: '00',
+              dt7: '00',
+              dt8: '00',
+              ecu: 'CruiseControl',
+              values: '{WheelBasedVehicleSpeed: 55 km/h, BrakeSwitch: 0 state}',
+            },
+          ],
+        });
+      }
     });
 
-    // Click on the raw data table row to decode messages
-    const rawRow = container.querySelector('.rawrow');
-    expect(rawRow).toBeInTheDocument();
+    // Click on the raw table row to decode the message
+    const rawRow = screen.getByText('18FEF1FE').closest('tr');
     fireEvent.click(rawRow);
 
-    // Expect decoded signal rows to be rendered
-    const engSpeedRow = screen.getByRole('button', { name: 'Select signal EngSpeed' });
-    const torqueRow = screen.getByRole('button', { name: 'Select signal ActualEngTorque' });
+    // Now decoded signals should appear as accessible buttons
+    const speedSignal = screen.getByRole('button', { name: 'Select signal WheelBasedVehicleSpeed' });
+    const brakeSignal = screen.getByRole('button', { name: 'Select signal BrakeSwitch' });
 
-    expect(engSpeedRow).toBeInTheDocument();
-    expect(torqueRow).toBeInTheDocument();
+    expect(speedSignal).toBeInTheDocument();
+    expect(speedSignal).toHaveAttribute('tabIndex', '0');
+    expect(brakeSignal).toBeInTheDocument();
 
-    // EngSpeed matches current signal: aria-pressed should be true and have selected-signal class
-    expect(engSpeedRow).toHaveAttribute('aria-pressed', 'true');
-    expect(engSpeedRow).toHaveClass('selected-signal');
+    // Mouse click selects signal
+    fireEvent.click(speedSignal);
+    expect(setSignalMock).toHaveBeenCalledWith('WheelBasedVehicleSpeed');
 
-    // ActualEngTorque is not current signal
-    expect(torqueRow).toHaveAttribute('aria-pressed', 'false');
-    expect(torqueRow).not.toHaveClass('selected-signal');
+    // Keyboard 'Enter' selects signal
+    fireEvent.keyDown(brakeSignal, { key: 'Enter', code: 'Enter' });
+    expect(setSignalMock).toHaveBeenCalledWith('BrakeSwitch');
 
-    // Keyboard selection with Enter
-    fireEvent.keyDown(torqueRow, { key: 'Enter' });
-    expect(setSignalMock).toHaveBeenCalledWith('ActualEngTorque');
-
-    // Keyboard selection with Space
-    fireEvent.keyDown(engSpeedRow, { key: ' ' });
-    expect(setSignalMock).toHaveBeenCalledWith('EngSpeed');
+    // Keyboard 'Space' selects signal
+    fireEvent.keyDown(speedSignal, { key: ' ', code: 'Space' });
+    expect(setSignalMock).toHaveBeenCalledTimes(3);
   });
 });

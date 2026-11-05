@@ -237,20 +237,16 @@ table.decodedTable td:nth-child(3) {
 
 .signals {
     cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease;
 }
 
 .signals:hover {
-    background-color: rgba(40, 77, 241, 0.35);
+    background-color: #1f3b64 !important;
 }
 
 .signals:focus-visible {
     outline: 2px solid #00f7ff;
     outline-offset: -2px;
-}
-
-.signals.selected-signal {
-    background-color: rgba(40, 77, 241, 0.6);
 }
 
 /* Form Styles Settings */

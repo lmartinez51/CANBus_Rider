@@ -478,12 +478,11 @@ export default function CANTable() {
                   {message.map(({Signal, Value, Unit}, idx) => (
                     <tr
                       key={idx}
-                      className={`signals ${currentSignal === Signal ? 'selected-signal' : ''}`}
-                      onClick={() => setSignal(Signal)}
-                      tabIndex={0}
+                      className="signals"
                       role="button"
-                      aria-pressed={currentSignal === Signal}
+                      tabIndex={0}
                       aria-label={`Select signal ${Signal}`}
+                      onClick={() => setSignal(Signal)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
